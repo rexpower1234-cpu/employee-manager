@@ -13,7 +13,7 @@
   --danger:#E24B4A;--danger-light:#FCEBEB;
   --warn:#BA7517;--warn-light:#FAEEDA;
   --info:#185FA5;--info-light:#E6F1FB;
-  --bg:#F8F9FA;--surface:#FFFFFF;--surface-2:#F3F4F5;
+  --bg:#F8F9FA;--surface:#FFF;--surface-2:#F3F4F5;
   --border:#E4E6E8;--border-2:#D0D3D7;
   --text:#1A1C1E;--text-2:#5C6068;--text-3:#9EA4AD;
   --nav-w:220px;--radius:10px;--radius-lg:14px;
@@ -23,95 +23,63 @@
 }
 body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;min-height:100vh}
 .app{display:flex;min-height:100vh}
-
-/* 사이드바 */
 .sidebar{width:var(--nav-w);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100}
 .sidebar-brand{padding:20px 20px 16px;border-bottom:1px solid var(--border)}
 .brand-icon{width:36px;height:36px;border-radius:9px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:10px}
-.brand-name{font-size:13px;font-weight:700;color:var(--text)}
-.brand-sub{font-size:11px;color:var(--text-3);margin-top:2px}
+.brand-name{font-size:13px;font-weight:700}.brand-sub{font-size:11px;color:var(--text-3);margin-top:2px}
 .nav-section{padding:12px 12px 4px}
 .nav-label{font-size:10px;font-weight:600;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;padding:0 8px;margin-bottom:4px}
-.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:400;color:var(--text-2);transition:all .15s;margin-bottom:2px;border:none;background:none;width:100%;text-align:left;font-family:var(--font)}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:13px;color:var(--text-2);transition:all .15s;margin-bottom:2px;border:none;background:none;width:100%;text-align:left;font-family:var(--font)}
 .nav-item:hover{background:var(--surface-2);color:var(--text)}
 .nav-item.active{background:var(--accent-light);color:var(--accent-2);font-weight:600}
 .nav-badge{margin-left:auto;font-size:10px;font-weight:600;background:var(--accent);color:#fff;padding:2px 6px;border-radius:100px;min-width:18px;text-align:center}
-
-/* 메인 */
-.main{margin-left:var(--nav-w);flex:1;display:flex;flex-direction:column;min-height:100vh}
+.main{margin-left:var(--nav-w);flex:1;display:flex;flex-direction:column}
 .topbar{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between}
-.page-title{font-size:16px;font-weight:700;color:var(--text)}
-.page-sub{font-size:12px;color:var(--text-3)}
+.page-title{font-size:16px;font-weight:700}.page-sub{font-size:12px;color:var(--text-3)}
 .topbar-right{display:flex;align-items:center;gap:8px}
 .content{padding:24px 28px;flex:1}
-
-/* 버튼 */
 .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .15s;font-family:var(--font);white-space:nowrap}
 .btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:var(--accent-2)}
-.btn-secondary{background:var(--surface);color:var(--text-2);border:1px solid var(--border-2)}.btn-secondary:hover{background:var(--surface-2);color:var(--text)}
+.btn-secondary{background:var(--surface);color:var(--text-2);border:1px solid var(--border-2)}.btn-secondary:hover{background:var(--surface-2)}
 .btn-danger{background:var(--danger-light);color:var(--danger);border:1px solid #F7C1C1}.btn-danger:hover{background:#F7C1C1}
 .btn-sm{padding:5px 10px;font-size:12px;border-radius:6px}
 .btn:disabled{opacity:.45;cursor:not-allowed}
-
-/* 카드 */
 .card{background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:20px;overflow:hidden}
 .card-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.card-title{font-size:14px;font-weight:700;color:var(--text)}
-.card-sub{font-size:12px;color:var(--text-3);margin-top:1px}
+.card-title{font-size:14px;font-weight:700}.card-sub{font-size:12px;color:var(--text-3);margin-top:1px}
 .card-body{padding:20px}.card-body.np{padding:0}
-
-/* 메트릭 */
 .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
 .metric-card{background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--border);padding:18px 20px;box-shadow:var(--shadow)}
 .metric-label{font-size:11px;font-weight:600;color:var(--text-3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px}
-.metric-value{font-size:26px;font-weight:700;color:var(--text);letter-spacing:-.5px}
-.metric-sub{font-size:11px;color:var(--text-3);margin-top:4px}
+.metric-value{font-size:26px;font-weight:700;letter-spacing:-.5px}.metric-sub{font-size:11px;color:var(--text-3);margin-top:4px}
 .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
 .dot-g{background:var(--accent)}.dot-b{background:var(--info)}.dot-y{background:var(--warn)}.dot-r{background:var(--danger)}
-
-/* 테이블 */
 .tw{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:13px}
 thead th{text-align:left;padding:10px 16px;font-size:11px;font-weight:700;color:var(--text-3);letter-spacing:.06em;text-transform:uppercase;background:var(--surface-2);white-space:nowrap}
 tbody tr{border-top:1px solid var(--border);transition:background .1s}
 tbody tr:hover{background:#FAFBFC}
-tbody td{padding:12px 16px;color:var(--text);vertical-align:middle}
-.td-m{color:var(--text-2)}.td-r{text-align:right;font-weight:600;font-size:13px}.td-g{color:var(--accent-2)}.td-red{color:var(--danger)}
-
-/* 배지 */
+tbody td{padding:12px 16px;vertical-align:middle}
+.td-m{color:var(--text-2)}.td-r{text-align:right;font-weight:600}.td-g{color:var(--accent-2)}.td-red{color:var(--danger)}
 .badge{display:inline-flex;align-items:center;font-size:11px;font-weight:600;padding:3px 8px;border-radius:100px;white-space:nowrap}
 .bg{background:#EAF3DE;color:#3B6D11}.by{background:var(--warn-light);color:var(--warn)}
-.bb{background:var(--info-light);color:var(--info)}.br{background:var(--danger-light);color:var(--danger)}
-.bgr{background:var(--surface-2);color:var(--text-2)}
-
-/* 아바타 */
+.bb{background:var(--info-light);color:var(--info)}.bgr{background:var(--surface-2);color:var(--text-2)}
 .avatar{width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
-.ec{display:flex;align-items:center;gap:10px}
-.en{font-weight:500}.ei{font-size:11px;color:var(--text-3)}
-
-/* 폼 */
+.ec{display:flex;align-items:center;gap:10px}.en{font-weight:500}.ei{font-size:11px;color:var(--text-3)}
 .fg{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.fgroup{display:flex;flex-direction:column;gap:5px}
-.fgroup.full{grid-column:1/-1}
-.flabel{font-size:12px;font-weight:600;color:var(--text-2)}
-.req{color:var(--danger);margin-left:2px}
+.fgroup{display:flex;flex-direction:column;gap:5px}.fgroup.full{grid-column:1/-1}
+.flabel{font-size:12px;font-weight:600;color:var(--text-2)}.req{color:var(--danger);margin-left:2px}
 .fc{padding:9px 12px;border-radius:8px;font-size:13px;border:1px solid var(--border-2);background:var(--surface);color:var(--text);font-family:var(--font);transition:border-color .15s;outline:none;width:100%}
 .fc:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(29,158,117,.1)}
 .fc::placeholder{color:var(--text-3)}
-
-/* 필터바 */
 .fbar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;margin-bottom:16px;display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
 .fbar .fgroup{margin-bottom:0;min-width:130px}
-
-/* 바차트 */
 .bl{display:flex;flex-direction:column;gap:12px}
 .br2{display:flex;align-items:center;gap:12px}
 .bn{font-size:13px;font-weight:500;width:72px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bt{flex:1;height:8px;background:var(--surface-2);border-radius:100px;overflow:hidden}
 .bf{height:100%;border-radius:100px;background:var(--accent);transition:width .6s cubic-bezier(.4,0,.2,1)}
 .bv{font-size:12px;font-weight:600;width:90px;text-align:right;color:var(--text-2);flex-shrink:0}
-
-/* 모달 */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:999;opacity:0;pointer-events:none;transition:opacity .2s}
 .modal-overlay.open{opacity:1;pointer-events:all}
 .modal{background:var(--surface);border-radius:var(--radius-lg);box-shadow:var(--shadow-md);width:560px;max-width:calc(100vw - 40px);max-height:calc(100vh - 60px);overflow-y:auto;transform:translateY(10px);transition:transform .2s}
@@ -119,35 +87,24 @@ tbody td{padding:12px 16px;color:var(--text);vertical-align:middle}
 .mh{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
 .mt{font-size:15px;font-weight:700}
 .mc{background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-3);padding:2px 6px;border-radius:6px}
-.mc:hover{background:var(--surface-2)}
-.mb{padding:20px 24px}
-.mf{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
-
-/* 토스트 */
+.mb{padding:20px 24px}.mf{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
 .toast-wrap{position:fixed;top:70px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px}
 .toast{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;font-size:13px;box-shadow:var(--shadow-md);display:flex;align-items:center;gap:10px;min-width:260px;animation:si .25s ease}
 .toast.s{border-left:3px solid var(--accent)}.toast.e{border-left:3px solid var(--danger)}.toast.i{border-left:3px solid var(--info)}
 @keyframes si{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
-
-/* 로딩 */
-.spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:sp .7s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
-.loading-row td{text-align:center;padding:40px;color:var(--text-3)}
-
-/* 섹션 */
 .section{display:none}.section.active{display:block}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
 .empty{text-align:center;padding:50px 20px;color:var(--text-3)}
 .empty-icon{font-size:36px;margin-bottom:10px;opacity:.4}
 .empty-title{font-size:14px;font-weight:600;color:var(--text-2);margin-bottom:4px}
-
+.loading-row td{text-align:center;padding:40px;color:var(--text-3)}
 @media(max-width:900px){.metrics{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}.fg{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <div class="app">
-
-<!-- 사이드바 -->
 <aside class="sidebar">
   <div class="sidebar-brand">
     <div class="brand-icon">📊</div>
@@ -163,7 +120,6 @@ tbody td{padding:12px 16px;color:var(--text);vertical-align:middle}
   </div>
 </aside>
 
-<!-- 메인 -->
 <div class="main">
   <div class="topbar">
     <div>
@@ -177,18 +133,17 @@ tbody td{padding:12px 16px;color:var(--text);vertical-align:middle}
   </div>
 
   <div class="content">
-
     <!-- 대시보드 -->
     <div class="section active" id="s-dashboard">
       <div class="metrics">
         <div class="metric-card"><div class="metric-label"><span class="dot dot-g"></span>재직 직원</div><div class="metric-value" id="d-emp">-</div><div class="metric-sub">명</div></div>
-        <div class="metric-card"><div class="metric-label"><span class="dot dot-b"></span>월 매출 합계</div><div class="metric-value" id="d-sales">-</div><div class="metric-sub" id="d-sales-sub">이번 달</div></div>
+        <div class="metric-card"><div class="metric-label"><span class="dot dot-b"></span>월 매출 합계</div><div class="metric-value" id="d-sales">-</div><div class="metric-sub" id="d-ssub">이번 달</div></div>
         <div class="metric-card"><div class="metric-label"><span class="dot dot-y"></span>급여 실지급 합계</div><div class="metric-value" id="d-pay">-</div><div class="metric-sub">이번 달</div></div>
         <div class="metric-card"><div class="metric-label"><span class="dot dot-r"></span>이익률</div><div class="metric-value" id="d-profit">-</div><div class="metric-sub">매출 대비</div></div>
       </div>
       <div class="two">
         <div class="card">
-          <div class="card-header"><div><div class="card-title">직원별 매출 순위</div><div class="card-sub" id="d-rank-sub"></div></div></div>
+          <div class="card-header"><div><div class="card-title">직원별 매출 순위</div><div class="card-sub" id="d-rsub"></div></div></div>
           <div class="card-body"><div class="bl" id="d-bars"><div class="empty"><div class="empty-icon">📊</div><div class="empty-title">불러오는 중...</div></div></div></div>
         </div>
         <div class="card">
@@ -257,12 +212,11 @@ tbody td{padding:12px 16px;color:var(--text);vertical-align:middle}
         </table></div></div>
       </div>
     </div>
-
   </div>
 </div>
 </div>
 
-<!-- 모달: 직원 추가/수정 -->
+<!-- 모달: 직원 -->
 <div class="modal-overlay" id="m-emp">
   <div class="modal">
     <div class="mh"><div class="mt" id="m-emp-title">직원 추가</div><button class="mc" onclick="closeM('m-emp')">✕</button></div>
@@ -271,26 +225,23 @@ tbody td{padding:12px 16px;color:var(--text);vertical-align:middle}
       <div class="fg">
         <div class="fgroup"><label class="flabel">이름<span class="req">*</span></label><input class="fc" id="ef-name" placeholder="홍길동"></div>
         <div class="fgroup"><label class="flabel">부서<span class="req">*</span></label><input class="fc" id="ef-dept" placeholder="영업팀"></div>
-        <div class="fgroup"><label class="flabel">직급<span class="req">*</span></label>
+        <div class="fgroup"><label class="flabel">직급</label>
           <select class="fc" id="ef-pos"><option>사원</option><option>주임</option><option>대리</option><option>과장</option><option>차장</option><option>부장</option><option>팀장</option><option>이사</option><option>대표</option></select>
         </div>
-        <div class="fgroup"><label class="flabel">기본급(원)<span class="req">*</span></label><input class="fc" id="ef-pay" type="number" placeholder="3000000"></div>
+        <div class="fgroup"><label class="flabel">기본급(원)</label><input class="fc" id="ef-pay" type="number" placeholder="3000000"></div>
         <div class="fgroup"><label class="flabel">입사일</label><input class="fc" id="ef-join" type="date"></div>
         <div class="fgroup"><label class="flabel">상태</label>
           <select class="fc" id="ef-st"><option>재직중</option><option>수습중</option><option>휴직중</option><option>퇴사</option></select>
         </div>
-        <div class="fgroup"><label class="flabel">이메일</label><input class="fc" id="ef-email" type="email" placeholder="email@company.com"></div>
+        <div class="fgroup"><label class="flabel">이메일</label><input class="fc" id="ef-email" type="email"></div>
         <div class="fgroup"><label class="flabel">연락처</label><input class="fc" id="ef-phone" placeholder="010-0000-0000"></div>
       </div>
     </div>
-    <div class="mf">
-      <button class="btn btn-secondary" onclick="closeM('m-emp')">취소</button>
-      <button class="btn btn-primary" id="emp-submit-btn" onclick="submitEmp()">저장</button>
-    </div>
+    <div class="mf"><button class="btn btn-secondary" onclick="closeM('m-emp')">취소</button><button class="btn btn-primary" id="emp-save-btn" onclick="submitEmp()">저장</button></div>
   </div>
 </div>
 
-<!-- 모달: 매출 입력/수정 -->
+<!-- 모달: 매출 -->
 <div class="modal-overlay" id="m-sale">
   <div class="modal">
     <div class="mh"><div class="mt" id="m-sale-title">매출 입력</div><button class="mc" onclick="closeM('m-sale')">✕</button></div>
@@ -298,31 +249,28 @@ tbody td{padding:12px 16px;color:var(--text);vertical-align:middle}
       <input type="hidden" id="sf-id">
       <div class="fg">
         <div class="fgroup"><label class="flabel">날짜<span class="req">*</span></label><input class="fc" id="sf-date" type="date"></div>
-        <div class="fgroup"><label class="flabel">직원<span class="req">*</span></label><select class="fc" id="sf-emp"><option value="">직원 선택</option></select></div>
+        <div class="fgroup"><label class="flabel">직원<span class="req">*</span></label><select class="fc" id="sf-emp"><option value="">선택</option></select></div>
         <div class="fgroup full"><label class="flabel">항목<span class="req">*</span></label><input class="fc" id="sf-item" placeholder="예: 제품 A 판매"></div>
         <div class="fgroup"><label class="flabel">매출액(원)<span class="req">*</span></label><input class="fc" id="sf-amt" type="number" placeholder="1000000"></div>
         <div class="fgroup"><label class="flabel">커미션율(%)</label><input class="fc" id="sf-comm" type="number" value="10" min="0" max="100"></div>
         <div class="fgroup"><label class="flabel">상태</label><select class="fc" id="sf-st"><option>검토중</option><option>확인</option></select></div>
-        <div class="fgroup"><label class="flabel">비고</label><input class="fc" id="sf-note" placeholder="선택 입력"></div>
+        <div class="fgroup"><label class="flabel">비고</label><input class="fc" id="sf-note"></div>
       </div>
     </div>
-    <div class="mf">
-      <button class="btn btn-secondary" onclick="closeM('m-sale')">취소</button>
-      <button class="btn btn-primary" id="sale-submit-btn" onclick="submitSale()">저장</button>
-    </div>
+    <div class="mf"><button class="btn btn-secondary" onclick="closeM('m-sale')">취소</button><button class="btn btn-primary" id="sale-save-btn" onclick="submitSale()">저장</button></div>
   </div>
 </div>
 
 <div class="toast-wrap" id="tw"></div>
 
 <script>
-// ── Apps Script URL (CORS 프록시 역할) ───────────────────────
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbzWaVJeIAm8SnMjVwOnM4JDHjcFz7wS3MvbBFAljxCQkXqp6hwUe1_hIa8hQ6fi7BDTzw/exec';
+// ══ 설정 ═══════════════════════════════════════════════════
+const GAS = 'https://script.google.com/macros/s/AKfycbzWaVJeIAm8SnMjVwOnM4JDHjcFz7wS3MvbBFAljxCQkXqp6hwUe1_hIa8hQ6fi7BDTzw/exec';
 
-// ── 상태 ────────────────────────────────────────────────────
+// ══ 상태 ═══════════════════════════════════════════════════
 let emps=[], sales=[], salary=[], curPage='dashboard';
 
-// ── 초기화 ──────────────────────────────────────────────────
+// ══ 초기화 ══════════════════════════════════════════════════
 window.onload = () => {
   const ym = thisMonth();
   document.getElementById('sal-ym').value = ym;
@@ -331,343 +279,290 @@ window.onload = () => {
 };
 
 function thisMonth(){
-  const d = new Date();
+  const d=new Date();
   return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
 }
 
-// ── API 호출 핵심 함수 ───────────────────────────────────────
-// GET 요청 (조회)
-async function apiGet(params) {
-  const qs = new URLSearchParams(params).toString();
-  const res = await fetch(GAS_URL + '?' + qs, { redirect: 'follow' });
-  const data = await res.json();
-  if (!data.ok) throw new Error(data.error || '서버 오류');
-  return data;
+// ══ JSONP 호출 (CORS 완전 우회) ════════════════════════════
+let _cbIdx = 0;
+function jsonp(params) {
+  return new Promise((resolve, reject) => {
+    const cbName = '__gsCallback_' + (++_cbIdx);
+    const timeout = setTimeout(() => {
+      delete window[cbName];
+      reject(new Error('요청 시간 초과 (10초). Apps Script 배포 상태를 확인해주세요.'));
+    }, 10000);
+
+    window[cbName] = (data) => {
+      clearTimeout(timeout);
+      delete window[cbName];
+      if (data && data.ok === false) reject(new Error(data.error || '서버 오류'));
+      else resolve(data);
+    };
+
+    const qs = Object.entries(params)
+      .map(([k,v]) => k+'='+encodeURIComponent(typeof v==='object'?JSON.stringify(v):v))
+      .join('&');
+
+    const s = document.createElement('script');
+    s.src = GAS + '?' + qs + '&callback=' + cbName;
+    s.onerror = () => {
+      clearTimeout(timeout);
+      delete window[cbName];
+      reject(new Error('스크립트 로드 실패'));
+    };
+    document.head.appendChild(s);
+    setTimeout(() => { if(s.parentNode) s.parentNode.removeChild(s); }, 11000);
+  });
 }
 
-// POST 요청 (추가/수정/삭제)
-async function apiPost(action, body) {
-  // Apps Script는 POST + redirect를 no-cors로 받아야 함
-  // JSONP 방식으로 우회: GET에 payload를 실어서 전송
-  const payload = encodeURIComponent(JSON.stringify(body));
-  const url = GAS_URL + '?action=' + action + '&payload=' + payload;
-  const res = await fetch(url, { redirect: 'follow' });
-  const data = await res.json();
-  if (!data.ok) throw new Error(data.error || '서버 오류');
-  return data;
+function api(action, payload) {
+  const params = { action };
+  if (payload && Object.keys(payload).length > 0) {
+    params.payload = JSON.stringify(payload);
+  }
+  return jsonp(params);
 }
 
-// ── 동기화 ──────────────────────────────────────────────────
+// ══ 동기화 ══════════════════════════════════════════════════
 async function syncAll(){
+  toast('데이터 불러오는 중...','i');
   try {
-    toast('데이터 불러오는 중...', 'i');
     await Promise.all([loadEmployees(), loadSales(), loadSalary()]);
     loadDashboard();
-    toast('동기화 완료 ✅', 's');
-  } catch(e) {
-    toast('불러오기 실패: ' + e.message, 'e');
-  }
+    toast('동기화 완료 ✅','s');
+  } catch(e) { toast('실패: '+e.message,'e'); }
 }
 
-// ── 대시보드 ────────────────────────────────────────────────
+// ══ 대시보드 ════════════════════════════════════════════════
 function loadDashboard(){
   const ym = thisMonth();
-  document.getElementById('d-emp').textContent = emps.filter(e=>e['상태']==='재직중').length + '명';
-  document.getElementById('d-rank-sub').textContent = ym + ' 기준';
+  document.getElementById('d-emp').textContent = emps.filter(e=>e['상태']==='재직중').length+'명';
+  document.getElementById('d-rsub').textContent = ym+' 기준';
 
-  const mSales = sales.filter(r=>String(r['날짜']).startsWith(ym) && r['상태']==='확인');
-  const totalSales = mSales.reduce((s,r)=>s+(Number(r['매출액'])||0),0);
-  document.getElementById('d-sales').textContent = fm(totalSales);
-  document.getElementById('d-sales-sub').textContent = ym + ' 확인 매출';
+  const mS = sales.filter(r=>String(r['날짜']).startsWith(ym)&&r['상태']==='확인');
+  const tS  = mS.reduce((s,r)=>s+(Number(r['매출액'])||0),0);
+  document.getElementById('d-sales').textContent = fm(tS);
+  document.getElementById('d-ssub').textContent  = ym+' 확인 매출';
 
-  const mPay = salary.filter(r=>r['연월']===ym);
-  const totalNet = mPay.reduce((s,r)=>s+(Number(r['실지급액'])||0),0);
-  document.getElementById('d-pay').textContent = fm(totalNet);
-  document.getElementById('d-profit').textContent = totalSales>0 ? Math.round((totalSales-totalNet)/totalSales*1000)/10+'%' : '0%';
+  const tP = salary.filter(r=>r['연월']===ym).reduce((s,r)=>s+(Number(r['실지급액'])||0),0);
+  document.getElementById('d-pay').textContent    = fm(tP);
+  document.getElementById('d-profit').textContent = tS>0?Math.round((tS-tP)/tS*1000)/10+'%':'0%';
 
-  // 랭킹 바
-  const byEmp = {};
-  mSales.forEach(r=>{ byEmp[r['직원명']] = (byEmp[r['직원명']]||0)+(Number(r['매출액'])||0); });
-  const ranking = Object.entries(byEmp).sort((a,b)=>b[1]-a[1]);
-  const bars = document.getElementById('d-bars');
-  if (!ranking.length) {
-    bars.innerHTML='<div class="empty"><div class="empty-icon">📊</div><div class="empty-title">매출 데이터 없음</div></div>';
-  } else {
-    const max = ranking[0][1];
-    bars.innerHTML = ranking.slice(0,6).map(([name,amt])=>`
-      <div class="br2">
-        <span class="bn">${name}</span>
-        <div class="bt"><div class="bf" style="width:${max>0?Math.round(amt/max*100):0}%"></div></div>
-        <span class="bv">${fm(amt)}</span>
-      </div>`).join('');
+  const byEmp={};
+  mS.forEach(r=>{ byEmp[r['직원명']]=(byEmp[r['직원명']]||0)+(Number(r['매출액'])||0); });
+  const ranking=Object.entries(byEmp).sort((a,b)=>b[1]-a[1]);
+  const bars=document.getElementById('d-bars');
+  if(!ranking.length){ bars.innerHTML='<div class="empty"><div class="empty-icon">📊</div><div class="empty-title">매출 데이터 없음</div></div>'; }
+  else {
+    const max=ranking[0][1];
+    bars.innerHTML=ranking.slice(0,6).map(([n,a])=>`
+      <div class="br2"><span class="bn">${n}</span>
+      <div class="bt"><div class="bf" style="width:${max>0?Math.round(a/max*100):0}%"></div></div>
+      <span class="bv">${fm(a)}</span></div>`).join('');
   }
 
-  // 최근 매출
-  const recent = [...sales].sort((a,b)=>String(b['날짜']).localeCompare(String(a['날짜']))).slice(0,5);
+  const recent=[...sales].sort((a,b)=>String(b['날짜']).localeCompare(String(a['날짜']))).slice(0,5);
   document.getElementById('d-recent').innerHTML = recent.length
-    ? recent.map(r=>`<tr>
-        <td class="td-m">${r['날짜']||''}</td>
-        <td>${r['직원명']||''}</td>
-        <td class="td-r td-g">${fm(r['매출액'])}</td>
-        <td>${badge(r['상태'])}</td>
-      </tr>`).join('')
+    ? recent.map(r=>`<tr><td class="td-m">${r['날짜']||''}</td><td>${r['직원명']||''}</td><td class="td-r td-g">${fm(r['매출액'])}</td><td>${bdg(r['상태'])}</td></tr>`).join('')
     : '<tr><td colspan="4" style="text-align:center;padding:30px;color:var(--text-3)">데이터 없음</td></tr>';
 }
 
-// ── 직원 ────────────────────────────────────────────────────
+// ══ 직원 ════════════════════════════════════════════════════
 async function loadEmployees(){
-  const r = await apiGet({action:'getEmployees'});
-  emps = r.data || [];
+  const r = await api('getEmployees');
+  emps = r.data||[];
   document.getElementById('badge-emp').textContent = emps.filter(e=>e['상태']==='재직중').length;
-  renderEmps(emps);
-  updateEmpSels();
+  renderEmps(emps); updateSels();
 }
 
 function renderEmps(list){
-  document.getElementById('emp-sub').textContent = '전체 '+list.length+'명';
-  const tbody = document.getElementById('emp-tbody');
-  if (!list.length) {
-    tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-3)">직원을 추가해주세요</td></tr>';
-    return;
-  }
-  tbody.innerHTML = list.map(e=>`
-    <tr>
-      <td><div class="ec">
-        <div class="avatar" style="background:${abg(e['이름'])};color:${afg(e['이름'])}">${(e['이름']||'?')[0]}</div>
-        <div><div class="en">${e['이름']}</div><div class="ei">${e['직원ID']||''}</div></div>
-      </div></td>
-      <td class="td-m">${e['부서']||'-'}</td>
-      <td>${e['직급']||'-'}</td>
-      <td class="td-r">${fm(e['기본급'])}</td>
-      <td class="td-m">${e['입사일']||'-'}</td>
-      <td>${badge(e['상태'])}</td>
-      <td>
-        <div style="display:flex;gap:4px">
-          <button class="btn btn-secondary btn-sm" onclick="openEmpModal('${e['직원ID']}')">수정</button>
-          <button class="btn btn-danger btn-sm" onclick="delEmp('${e['직원ID']}','${e['이름']}')">퇴사</button>
-        </div>
-      </td>
-    </tr>`).join('');
+  document.getElementById('emp-sub').textContent='전체 '+list.length+'명';
+  const tb=document.getElementById('emp-tbody');
+  if(!list.length){ tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-3)">직원을 추가해주세요</td></tr>'; return; }
+  tb.innerHTML=list.map(e=>`<tr>
+    <td><div class="ec"><div class="avatar" style="background:${abg(e['이름'])};color:${afg(e['이름'])}">${(e['이름']||'?')[0]}</div>
+    <div><div class="en">${e['이름']}</div><div class="ei">${e['직원ID']||''}</div></div></div></td>
+    <td class="td-m">${e['부서']||'-'}</td><td>${e['직급']||'-'}</td>
+    <td class="td-r">${fm(e['기본급'])}</td><td class="td-m">${e['입사일']||'-'}</td>
+    <td>${bdg(e['상태'])}</td>
+    <td><div style="display:flex;gap:4px">
+      <button class="btn btn-secondary btn-sm" onclick="openEmpModal('${e['직원ID']}')">수정</button>
+      <button class="btn btn-danger btn-sm" onclick="delEmp('${e['직원ID']}','${e['이름']}')">퇴사</button>
+    </div></td></tr>`).join('');
 }
 
 function filterEmp(){
-  const q = document.getElementById('emp-q').value.toLowerCase();
+  const q=document.getElementById('emp-q').value.toLowerCase();
   renderEmps(emps.filter(e=>(e['이름']||'').toLowerCase().includes(q)||(e['부서']||'').toLowerCase().includes(q)));
 }
 
 function openEmpModal(id){
-  document.getElementById('m-emp-title').textContent = id ? '직원 수정' : '직원 추가';
+  document.getElementById('m-emp-title').textContent=id?'직원 수정':'직원 추가';
   if(id){
-    const e = emps.find(x=>x['직원ID']===id); if(!e) return;
-    document.getElementById('ef-id').value    = id;
-    document.getElementById('ef-name').value  = e['이름']||'';
-    document.getElementById('ef-dept').value  = e['부서']||'';
-    document.getElementById('ef-pos').value   = e['직급']||'사원';
-    document.getElementById('ef-pay').value   = e['기본급']||'';
-    document.getElementById('ef-join').value  = e['입사일']||'';
-    document.getElementById('ef-st').value    = e['상태']||'재직중';
-    document.getElementById('ef-email').value = e['이메일']||'';
-    document.getElementById('ef-phone').value = e['연락처']||'';
+    const e=emps.find(x=>x['직원ID']===id); if(!e) return;
+    document.getElementById('ef-id').value=id;
+    document.getElementById('ef-name').value=e['이름']||'';
+    document.getElementById('ef-dept').value=e['부서']||'';
+    document.getElementById('ef-pos').value=e['직급']||'사원';
+    document.getElementById('ef-pay').value=e['기본급']||'';
+    document.getElementById('ef-join').value=e['입사일']||'';
+    document.getElementById('ef-st').value=e['상태']||'재직중';
+    document.getElementById('ef-email').value=e['이메일']||'';
+    document.getElementById('ef-phone').value=e['연락처']||'';
   } else {
     ['id','name','dept','pay','join','email','phone'].forEach(f=>document.getElementById('ef-'+f).value='');
-    document.getElementById('ef-pos').value = '사원';
-    document.getElementById('ef-st').value  = '재직중';
+    document.getElementById('ef-pos').value='사원';
+    document.getElementById('ef-st').value='재직중';
   }
   openM('m-emp');
 }
 
 async function submitEmp(){
-  const id = document.getElementById('ef-id').value;
-  const payload = {
-    id,
-    name:     document.getElementById('ef-name').value,
-    dept:     document.getElementById('ef-dept').value,
-    position: document.getElementById('ef-pos').value,
-    basePay:  document.getElementById('ef-pay').value,
-    joinDate: document.getElementById('ef-join').value,
-    status:   document.getElementById('ef-st').value,
-    email:    document.getElementById('ef-email').value,
-    phone:    document.getElementById('ef-phone').value,
-  };
-  if(!payload.name || !payload.dept){ toast('이름과 부서는 필수입니다.','e'); return; }
-  const btn = document.getElementById('emp-submit-btn');
-  btn.disabled = true; btn.textContent = '저장 중...';
+  const id=document.getElementById('ef-id').value;
+  const p={id,name:document.getElementById('ef-name').value,dept:document.getElementById('ef-dept').value,
+    position:document.getElementById('ef-pos').value,basePay:document.getElementById('ef-pay').value,
+    joinDate:document.getElementById('ef-join').value,status:document.getElementById('ef-st').value,
+    email:document.getElementById('ef-email').value,phone:document.getElementById('ef-phone').value};
+  if(!p.name||!p.dept){toast('이름과 부서는 필수입니다.','e');return;}
+  const btn=document.getElementById('emp-save-btn');
+  btn.disabled=true; btn.textContent='저장 중...';
   try {
-    const r = await apiPost(id ? 'updateEmployee' : 'addEmployee', payload);
-    toast(r.message || '저장 완료 ✅', 's');
-    closeM('m-emp');
-    await loadEmployees();
-    loadDashboard();
-  } catch(e){ toast(e.message,'e'); }
-  finally { btn.disabled=false; btn.textContent='저장'; }
+    const r=await api(id?'updateEmployee':'addEmployee',p);
+    toast(r.message||'저장 완료 ✅','s'); closeM('m-emp');
+    await loadEmployees(); loadDashboard();
+  } catch(e){toast(e.message,'e');}
+  finally{btn.disabled=false;btn.textContent='저장';}
 }
 
-async function delEmp(id, name){
+async function delEmp(id,name){
   if(!confirm('"'+name+'" 직원을 퇴사 처리하시겠습니까?')) return;
-  try {
-    const r = await apiPost('deleteEmployee', {id});
-    toast(r.message, 's');
-    await loadEmployees();
-    loadDashboard();
-  } catch(e){ toast(e.message,'e'); }
+  try{ const r=await api('deleteEmployee',{id}); toast(r.message,'s'); await loadEmployees(); loadDashboard(); }
+  catch(e){toast(e.message,'e');}
 }
 
-// ── 매출 ────────────────────────────────────────────────────
+// ══ 매출 ════════════════════════════════════════════════════
 async function loadSales(){
-  const ym    = document.getElementById('sal-ym').value;
-  const empId = document.getElementById('sal-emp').value;
-  const st    = document.getElementById('sal-st').value;
-  const r = await apiGet({action:'getSales', ym, empId});
-  let data = r.data || [];
-  if(st) data = data.filter(x=>x['상태']===st);
-  sales = r.data || [];
+  const ym=document.getElementById('sal-ym').value;
+  const empId=document.getElementById('sal-emp').value;
+  const st=document.getElementById('sal-st').value;
+  const r=await api('getSales',{ym,empId});
+  sales=r.data||[];
+  let data=sales;
+  if(st) data=data.filter(x=>x['상태']===st);
   renderSales(data);
 }
 
 function renderSales(list){
-  const total = list.reduce((s,r)=>s+(Number(r['매출액'])||0),0);
-  document.getElementById('sale-sub').textContent = list.length+'건';
-  document.getElementById('sale-total').textContent = '합계: '+fm(total);
-  const tbody = document.getElementById('sale-tbody');
-  if(!list.length){
-    tbody.innerHTML='<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text-3)">매출 데이터가 없습니다</td></tr>';
-    return;
-  }
-  tbody.innerHTML = list.map(r=>`
-    <tr>
-      <td class="td-m">${r['날짜']||''}</td>
-      <td>${r['직원명']||''}</td>
-      <td>${r['항목']||''}</td>
-      <td class="td-r">${fm(r['매출액'])}</td>
-      <td style="text-align:right">${r['커미션율']||0}%</td>
-      <td class="td-r td-g">${fm(r['커미션액'])}</td>
-      <td>${badge(r['상태'])}</td>
-      <td>
-        <div style="display:flex;gap:4px">
-          <button class="btn btn-secondary btn-sm" onclick="openSaleModal('${r['매출ID']}')">수정</button>
-          <button class="btn btn-danger btn-sm" onclick="delSale('${r['매출ID']}')">삭제</button>
-        </div>
-      </td>
-    </tr>`).join('');
+  const total=list.reduce((s,r)=>s+(Number(r['매출액'])||0),0);
+  document.getElementById('sale-sub').textContent=list.length+'건';
+  document.getElementById('sale-total').textContent='합계: '+fm(total);
+  const tb=document.getElementById('sale-tbody');
+  if(!list.length){tb.innerHTML='<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text-3)">데이터 없음</td></tr>';return;}
+  tb.innerHTML=list.map(r=>`<tr>
+    <td class="td-m">${r['날짜']||''}</td><td>${r['직원명']||''}</td><td>${r['항목']||''}</td>
+    <td class="td-r">${fm(r['매출액'])}</td><td style="text-align:right">${r['커미션율']||0}%</td>
+    <td class="td-r td-g">${fm(r['커미션액'])}</td><td>${bdg(r['상태'])}</td>
+    <td><div style="display:flex;gap:4px">
+      <button class="btn btn-secondary btn-sm" onclick="openSaleModal('${r['매출ID']}')">수정</button>
+      <button class="btn btn-danger btn-sm" onclick="delSale('${r['매출ID']}')">삭제</button>
+    </div></td></tr>`).join('');
 }
 
 function openSaleModal(id){
-  document.getElementById('m-sale-title').textContent = id ? '매출 수정' : '매출 입력';
-  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('m-sale-title').textContent=id?'매출 수정':'매출 입력';
+  const today=new Date().toISOString().split('T')[0];
   if(id){
-    const r = sales.find(x=>x['매출ID']===id); if(!r) return;
-    document.getElementById('sf-id').value   = id;
-    document.getElementById('sf-date').value = r['날짜']||today;
-    document.getElementById('sf-emp').value  = r['직원ID']||'';
-    document.getElementById('sf-item').value = r['항목']||'';
-    document.getElementById('sf-amt').value  = r['매출액']||'';
-    document.getElementById('sf-comm').value = r['커미션율']||10;
-    document.getElementById('sf-st').value   = r['상태']||'검토중';
-    document.getElementById('sf-note').value = r['비고']||'';
+    const r=sales.find(x=>x['매출ID']===id); if(!r)return;
+    document.getElementById('sf-id').value=id;
+    document.getElementById('sf-date').value=r['날짜']||today;
+    document.getElementById('sf-emp').value=r['직원ID']||'';
+    document.getElementById('sf-item').value=r['항목']||'';
+    document.getElementById('sf-amt').value=r['매출액']||'';
+    document.getElementById('sf-comm').value=r['커미션율']||10;
+    document.getElementById('sf-st').value=r['상태']||'검토중';
+    document.getElementById('sf-note').value=r['비고']||'';
   } else {
-    document.getElementById('sf-id').value   = '';
-    document.getElementById('sf-date').value = today;
+    document.getElementById('sf-id').value='';
+    document.getElementById('sf-date').value=today;
     ['item','amt','note'].forEach(f=>document.getElementById('sf-'+f).value='');
-    document.getElementById('sf-comm').value = 10;
-    document.getElementById('sf-st').value   = '검토중';
+    document.getElementById('sf-comm').value=10;
+    document.getElementById('sf-st').value='검토중';
   }
   openM('m-sale');
 }
 
 async function submitSale(){
-  const id = document.getElementById('sf-id').value;
-  const sel = document.getElementById('sf-emp');
-  const empId   = sel.value;
-  const empName = sel.options[sel.selectedIndex]?.text.replace(/\s*\(.*\)$/,'') || '';
-  const payload = {
-    id, empId, empName,
-    date:       document.getElementById('sf-date').value,
-    item:       document.getElementById('sf-item').value,
-    amount:     document.getElementById('sf-amt').value,
-    commission: document.getElementById('sf-comm').value,
-    status:     document.getElementById('sf-st').value,
-    note:       document.getElementById('sf-note').value,
-  };
-  if(!payload.item || !payload.amount){ toast('항목과 매출액은 필수입니다.','e'); return; }
-  const btn = document.getElementById('sale-submit-btn');
+  const id=document.getElementById('sf-id').value;
+  const sel=document.getElementById('sf-emp');
+  const empId=sel.value;
+  const empName=(sel.options[sel.selectedIndex]?.text||'').replace(/\s*\(.*\)$/,'');
+  const p={id,empId,empName,date:document.getElementById('sf-date').value,
+    item:document.getElementById('sf-item').value,amount:document.getElementById('sf-amt').value,
+    commission:document.getElementById('sf-comm').value,status:document.getElementById('sf-st').value,
+    note:document.getElementById('sf-note').value};
+  if(!p.item||!p.amount){toast('항목과 매출액은 필수입니다.','e');return;}
+  const btn=document.getElementById('sale-save-btn');
   btn.disabled=true; btn.textContent='저장 중...';
   try {
-    const r = await apiPost(id ? 'updateSale' : 'addSale', payload);
-    toast(r.message || '저장 완료 ✅','s');
-    closeM('m-sale');
-    await loadSales();
-    loadDashboard();
-  } catch(e){ toast(e.message,'e'); }
-  finally { btn.disabled=false; btn.textContent='저장'; }
+    const r=await api(id?'updateSale':'addSale',p);
+    toast(r.message||'저장 완료 ✅','s'); closeM('m-sale');
+    await loadSales(); loadDashboard();
+  } catch(e){toast(e.message,'e');}
+  finally{btn.disabled=false;btn.textContent='저장';}
 }
 
 async function delSale(id){
   if(!confirm('이 매출 항목을 삭제하시겠습니까?')) return;
-  try {
-    const r = await apiPost('deleteSale', {id});
-    toast(r.message,'s');
-    await loadSales();
-    loadDashboard();
-  } catch(e){ toast(e.message,'e'); }
+  try{ const r=await api('deleteSale',{id}); toast(r.message,'s'); await loadSales(); loadDashboard(); }
+  catch(e){toast(e.message,'e');}
 }
 
-// ── 급여 ────────────────────────────────────────────────────
+// ══ 급여 ════════════════════════════════════════════════════
 async function loadSalary(){
-  const ym = document.getElementById('pay-ym').value;
-  const r = await apiGet({action:'getSalary', ym});
-  salary = r.data || [];
-  renderSalary(salary, ym);
+  const ym=document.getElementById('pay-ym').value;
+  const r=await api('getSalary',{ym});
+  salary=r.data||[];
+  renderSalary(salary,ym);
 }
 
-function renderSalary(list, ym){
-  const total = list.reduce((s,r)=>s+(Number(r['실지급액'])||0),0);
-  document.getElementById('pay-sub').textContent = (ym||thisMonth())+' 급여 명세';
-  document.getElementById('pay-total').textContent = '실지급 합계: '+fm(total);
-  const tbody = document.getElementById('pay-tbody');
-  if(!list.length){
-    tbody.innerHTML='<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--text-3)">데이터 없음. ⚡ 급여 자동 계산을 눌러주세요.</td></tr>';
-    return;
-  }
-  tbody.innerHTML = list.map(r=>`
-    <tr>
-      <td><div class="ec">
-        <div class="avatar" style="background:${abg(r['직원명'])};color:${afg(r['직원명'])}">${(r['직원명']||'?')[0]}</div>
-        <span class="en">${r['직원명']}</span>
-      </div></td>
-      <td class="td-r">${fm(r['기본급'])}</td>
-      <td class="td-r td-g">${fm(r['매출성과급'])}</td>
-      <td class="td-r">${fm(r['기타수당'])}</td>
-      <td class="td-r td-red">-${fm(r['소득세'])}</td>
-      <td class="td-r td-red">-${fm(r['국민연금'])}</td>
-      <td class="td-r td-red">-${fm(r['건강보험'])}</td>
-      <td class="td-r td-red">-${fm(r['고용보험'])}</td>
-      <td class="td-r" style="color:var(--accent-2);font-size:14px">${fm(r['실지급액'])}</td>
-      <td>${badge(r['지급상태'])}</td>
-    </tr>`).join('');
+function renderSalary(list,ym){
+  const total=list.reduce((s,r)=>s+(Number(r['실지급액'])||0),0);
+  document.getElementById('pay-sub').textContent=(ym||thisMonth())+' 급여 명세';
+  document.getElementById('pay-total').textContent='실지급 합계: '+fm(total);
+  const tb=document.getElementById('pay-tbody');
+  if(!list.length){tb.innerHTML='<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--text-3)">데이터 없음. ⚡ 급여 자동 계산을 눌러주세요.</td></tr>';return;}
+  tb.innerHTML=list.map(r=>`<tr>
+    <td><div class="ec"><div class="avatar" style="background:${abg(r['직원명'])};color:${afg(r['직원명'])}">${(r['직원명']||'?')[0]}</div><span class="en">${r['직원명']}</span></div></td>
+    <td class="td-r">${fm(r['기본급'])}</td><td class="td-r td-g">${fm(r['매출성과급'])}</td>
+    <td class="td-r">${fm(r['기타수당'])}</td><td class="td-r td-red">-${fm(r['소득세'])}</td>
+    <td class="td-r td-red">-${fm(r['국민연금'])}</td><td class="td-r td-red">-${fm(r['건강보험'])}</td>
+    <td class="td-r td-red">-${fm(r['고용보험'])}</td>
+    <td class="td-r" style="color:var(--accent-2);font-size:14px">${fm(r['실지급액'])}</td>
+    <td>${bdg(r['지급상태'])}</td></tr>`).join('');
 }
 
 async function doCalcSalary(){
-  const ym = document.getElementById('pay-ym').value || thisMonth();
+  const ym=document.getElementById('pay-ym').value||thisMonth();
   if(!confirm(ym+' 급여를 자동 계산하시겠습니까?\n기존 해당 월 데이터는 덮어씁니다.')) return;
   toast('급여 계산 중...','i');
   try {
-    const r = await apiPost('calcSalary', {ym});
+    const r=await api('calcSalary',{ym});
     toast(r.count+'명 급여 계산 완료 ✅','s');
-    await loadSalary();
-    loadDashboard();
-  } catch(e){ toast(e.message,'e'); }
+    await loadSalary(); loadDashboard();
+  } catch(e){toast(e.message,'e');}
 }
 
-// ── 직원 셀렉트 업데이트 ────────────────────────────────────
-function updateEmpSels(){
-  const active = emps.filter(e=>e['상태']!=='퇴사');
-  const opts = active.map(e=>`<option value="${e['직원ID']}">${e['이름']} (${e['부서']})</option>`).join('');
-  document.getElementById('sal-emp').innerHTML = '<option value="">전체</option>'+opts;
-  document.getElementById('sf-emp').innerHTML  = '<option value="">직원 선택</option>'+opts;
+// ══ 셀렉트 업데이트 ════════════════════════════════════════
+function updateSels(){
+  const active=emps.filter(e=>e['상태']!=='퇴사');
+  const opts=active.map(e=>`<option value="${e['직원ID']}">${e['이름']} (${e['부서']})</option>`).join('');
+  document.getElementById('sal-emp').innerHTML='<option value="">전체</option>'+opts;
+  document.getElementById('sf-emp').innerHTML='<option value="">직원 선택</option>'+opts;
 }
 
-// ── 네비게이션 ───────────────────────────────────────────────
-const PAGES = {
+// ══ 네비게이션 ══════════════════════════════════════════════
+const PAGES={
   dashboard:{title:'대시보드',sub:'전체 현황 요약',act:false},
   employees:{title:'직원 관리',sub:'직원 정보 관리',act:true,label:'＋ 직원 추가',fn:()=>openEmpModal()},
   sales:    {title:'매출 관리',sub:'매출 입력 및 조회',act:true,label:'＋ 매출 입력',fn:()=>openSaleModal()},
@@ -686,32 +581,32 @@ function go(page){
   if(p.act){btn.style.display='inline-flex';btn.textContent=p.label;}
   else btn.style.display='none';
 }
-function actClick(){ PAGES[curPage]?.fn?.(); }
+function actClick(){PAGES[curPage]?.fn?.();}
 
-// ── 모달 ────────────────────────────────────────────────────
+// ══ 모달 ════════════════════════════════════════════════════
 function openM(id){document.getElementById(id).classList.add('open');}
 function closeM(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.modal-overlay').forEach(el=>{
   el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');});
 });
 
-// ── 토스트 ──────────────────────────────────────────────────
+// ══ 토스트 ══════════════════════════════════════════════════
 function toast(msg,type='i'){
   const tc=document.getElementById('tw');
   const t=document.createElement('div');
   t.className='toast '+type;
   t.innerHTML='<span>'+(type==='s'?'✅':type==='e'?'❌':'ℹ️')+'</span><span>'+msg+'</span>';
   tc.appendChild(t);
-  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(20px)';t.style.transition='.3s';setTimeout(()=>t.remove(),300);},3500);
+  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(20px)';t.style.transition='.3s';setTimeout(()=>t.remove(),300);},4000);
 }
 
-// ── 유틸 ────────────────────────────────────────────────────
+// ══ 유틸 ════════════════════════════════════════════════════
 function fm(n){
   const v=Number(n)||0;
-  if(Math.abs(v)>=1000000) return '₩'+(v/1000000).toFixed(1)+'M';
+  if(Math.abs(v)>=1000000)return '₩'+(v/1000000).toFixed(1)+'M';
   return '₩'+v.toLocaleString('ko-KR');
 }
-function badge(s){
+function bdg(s){
   const m={재직중:'bg',수습중:'bb',휴직중:'by',퇴사:'bgr',확인:'bg',검토중:'by',계산완료:'bb',지급완료:'bg'};
   return '<span class="badge '+(m[s]||'bgr')+'">'+(s||'-')+'</span>';
 }
