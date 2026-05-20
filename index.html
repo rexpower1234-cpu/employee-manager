@@ -132,19 +132,11 @@ tbody td{padding:12px 16px;color:var(--text);vertical-align:middle}
 /* 로딩 */
 .spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle}
 @keyframes sp{to{transform:rotate(360deg)}}
-.loading-bar{display:flex;align-items:center;justify-content:center;gap:10px;padding:40px;color:var(--text-3);font-size:13px}
+.loading-row td{text-align:center;padding:40px;color:var(--text-3)}
 
 /* 섹션 */
 .section{display:none}.section.active{display:block}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-
-/* 설정 */
-.step{display:flex;gap:16px;padding:18px 0;border-bottom:1px solid var(--border)}
-.step:last-child{border-bottom:none}
-.snum{width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
-.stitle{font-size:14px;font-weight:600;margin-bottom:5px}
-.sdesc{font-size:13px;color:var(--text-2);line-height:1.6}
-code{font-family:monospace;font-size:12px;background:var(--surface-2);border:1px solid var(--border);padding:2px 6px;border-radius:5px;color:var(--accent-2)}
 .empty{text-align:center;padding:50px 20px;color:var(--text-3)}
 .empty-icon{font-size:36px;margin-bottom:10px;opacity:.4}
 .empty-title{font-size:14px;font-weight:600;color:var(--text-2);margin-bottom:4px}
@@ -168,7 +160,6 @@ code{font-family:monospace;font-size:12px;background:var(--surface-2);border:1px
     <button class="nav-item" onclick="go('employees')">👥 직원 관리 <span class="nav-badge" id="badge-emp">-</span></button>
     <button class="nav-item" onclick="go('sales')">📈 매출 관리</button>
     <button class="nav-item" onclick="go('salary')">💳 급여 관리</button>
-    <button class="nav-item" onclick="go('setup')">⚙️ 설정</button>
   </div>
 </aside>
 
@@ -198,13 +189,13 @@ code{font-family:monospace;font-size:12px;background:var(--surface-2);border:1px
       <div class="two">
         <div class="card">
           <div class="card-header"><div><div class="card-title">직원별 매출 순위</div><div class="card-sub" id="d-rank-sub"></div></div></div>
-          <div class="card-body"><div class="bl" id="d-bars"><div class="loading-bar"><span class="spinner"></span>불러오는 중...</div></div></div>
+          <div class="card-body"><div class="bl" id="d-bars"><div class="empty"><div class="empty-icon">📊</div><div class="empty-title">불러오는 중...</div></div></div></div>
         </div>
         <div class="card">
           <div class="card-header"><div class="card-title">최근 매출 내역</div></div>
           <div class="card-body np"><div class="tw"><table>
             <thead><tr><th>날짜</th><th>직원</th><th>매출액</th><th>상태</th></tr></thead>
-            <tbody id="d-recent"><tr><td colspan="4" class="loading-bar">불러오는 중...</td></tr></tbody>
+            <tbody id="d-recent"><tr class="loading-row"><td colspan="4"><span class="spinner"></span> 불러오는 중...</td></tr></tbody>
           </table></div></div>
         </div>
       </div>
@@ -222,7 +213,7 @@ code{font-family:monospace;font-size:12px;background:var(--surface-2);border:1px
         </div>
         <div class="card-body np"><div class="tw"><table>
           <thead><tr><th>직원</th><th>부서</th><th>직급</th><th>기본급</th><th>입사일</th><th>상태</th><th>관리</th></tr></thead>
-          <tbody id="emp-tbody"><tr><td colspan="7" class="loading-bar">불러오는 중...</td></tr></tbody>
+          <tbody id="emp-tbody"><tr class="loading-row"><td colspan="7"><span class="spinner"></span> 불러오는 중...</td></tr></tbody>
         </table></div></div>
       </div>
     </div>
@@ -243,7 +234,7 @@ code{font-family:monospace;font-size:12px;background:var(--surface-2);border:1px
         </div>
         <div class="card-body np"><div class="tw"><table>
           <thead><tr><th>날짜</th><th>직원</th><th>항목</th><th>매출액</th><th>커미션율</th><th>커미션액</th><th>상태</th><th>관리</th></tr></thead>
-          <tbody id="sale-tbody"><tr><td colspan="8" class="loading-bar">불러오는 중...</td></tr></tbody>
+          <tbody id="sale-tbody"><tr class="loading-row"><td colspan="8"><span class="spinner"></span> 불러오는 중...</td></tr></tbody>
         </table></div></div>
       </div>
     </div>
@@ -262,36 +253,8 @@ code{font-family:monospace;font-size:12px;background:var(--surface-2);border:1px
         </div>
         <div class="card-body np"><div class="tw"><table>
           <thead><tr><th>직원</th><th>기본급</th><th>성과급</th><th>수당</th><th>소득세</th><th>국민연금</th><th>건강보험</th><th>고용보험</th><th>실지급액</th><th>상태</th></tr></thead>
-          <tbody id="pay-tbody"><tr><td colspan="10" class="loading-bar">불러오는 중...</td></tr></tbody>
+          <tbody id="pay-tbody"><tr class="loading-row"><td colspan="10"><span class="spinner"></span> 불러오는 중...</td></tr></tbody>
         </table></div></div>
-      </div>
-    </div>
-
-    <!-- 설정 -->
-    <div class="section" id="s-setup">
-      <div class="card" style="max-width:680px">
-        <div class="card-header"><div class="card-title">⚙️ 연동 정보</div></div>
-        <div class="card-body">
-          <div class="step">
-            <div class="snum">✓</div>
-            <div><div class="stitle">연동된 구글 시트</div>
-            <div class="sdesc">시트 ID: <code>1gFPgyXs5GhrgJgaVFGPXi1VyDmtgyhcX7pu5eB3j2vU</code></div>
-            <div class="sdesc" style="margin-top:6px">API 키가 코드에 포함되어 있습니다. Vercel 배포 후 URL을 공유하세요.</div>
-            </div>
-          </div>
-          <div class="step">
-            <div class="snum">!</div>
-            <div><div class="stitle">급여 자동 계산 안내</div>
-            <div class="sdesc">Vercel 버전은 읽기 전용입니다. 급여 계산·직원 추가·매출 입력 등 <strong>쓰기 작업</strong>은 기존 Apps Script 웹앱에서 진행 후, 여기서 조회하세요.</div>
-            </div>
-          </div>
-          <div class="step">
-            <div class="snum">i</div>
-            <div><div class="stitle">데이터가 안 보일 때</div>
-            <div class="sdesc">구글 시트 공유 설정이 <code>링크가 있는 모든 사용자 → 뷰어</code>로 되어있는지 확인하세요.</div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -299,7 +262,7 @@ code{font-family:monospace;font-size:12px;background:var(--surface-2);border:1px
 </div>
 </div>
 
-<!-- 모달: 직원 -->
+<!-- 모달: 직원 추가/수정 -->
 <div class="modal-overlay" id="m-emp">
   <div class="modal">
     <div class="mh"><div class="mt" id="m-emp-title">직원 추가</div><button class="mc" onclick="closeM('m-emp')">✕</button></div>
@@ -316,18 +279,18 @@ code{font-family:monospace;font-size:12px;background:var(--surface-2);border:1px
         <div class="fgroup"><label class="flabel">상태</label>
           <select class="fc" id="ef-st"><option>재직중</option><option>수습중</option><option>휴직중</option><option>퇴사</option></select>
         </div>
-        <div class="fgroup"><label class="flabel">이메일</label><input class="fc" id="ef-email" type="email"></div>
+        <div class="fgroup"><label class="flabel">이메일</label><input class="fc" id="ef-email" type="email" placeholder="email@company.com"></div>
         <div class="fgroup"><label class="flabel">연락처</label><input class="fc" id="ef-phone" placeholder="010-0000-0000"></div>
       </div>
-      <div style="margin-top:14px;padding:12px;background:var(--warn-light);border-radius:8px;font-size:12px;color:var(--warn)">
-        ⚠️ Vercel 버전은 조회 전용입니다. 직원 추가는 Apps Script 웹앱에서 해주세요.
-      </div>
     </div>
-    <div class="mf"><button class="btn btn-secondary" onclick="closeM('m-emp')">닫기</button></div>
+    <div class="mf">
+      <button class="btn btn-secondary" onclick="closeM('m-emp')">취소</button>
+      <button class="btn btn-primary" id="emp-submit-btn" onclick="submitEmp()">저장</button>
+    </div>
   </div>
 </div>
 
-<!-- 모달: 매출 -->
+<!-- 모달: 매출 입력/수정 -->
 <div class="modal-overlay" id="m-sale">
   <div class="modal">
     <div class="mh"><div class="mt" id="m-sale-title">매출 입력</div><button class="mc" onclick="closeM('m-sale')">✕</button></div>
@@ -338,25 +301,23 @@ code{font-family:monospace;font-size:12px;background:var(--surface-2);border:1px
         <div class="fgroup"><label class="flabel">직원<span class="req">*</span></label><select class="fc" id="sf-emp"><option value="">직원 선택</option></select></div>
         <div class="fgroup full"><label class="flabel">항목<span class="req">*</span></label><input class="fc" id="sf-item" placeholder="예: 제품 A 판매"></div>
         <div class="fgroup"><label class="flabel">매출액(원)<span class="req">*</span></label><input class="fc" id="sf-amt" type="number" placeholder="1000000"></div>
-        <div class="fgroup"><label class="flabel">커미션율(%)</label><input class="fc" id="sf-comm" type="number" value="10"></div>
+        <div class="fgroup"><label class="flabel">커미션율(%)</label><input class="fc" id="sf-comm" type="number" value="10" min="0" max="100"></div>
         <div class="fgroup"><label class="flabel">상태</label><select class="fc" id="sf-st"><option>검토중</option><option>확인</option></select></div>
-        <div class="fgroup"><label class="flabel">비고</label><input class="fc" id="sf-note"></div>
-      </div>
-      <div style="margin-top:14px;padding:12px;background:var(--warn-light);border-radius:8px;font-size:12px;color:var(--warn)">
-        ⚠️ Vercel 버전은 조회 전용입니다. 매출 입력은 Apps Script 웹앱에서 해주세요.
+        <div class="fgroup"><label class="flabel">비고</label><input class="fc" id="sf-note" placeholder="선택 입력"></div>
       </div>
     </div>
-    <div class="mf"><button class="btn btn-secondary" onclick="closeM('m-sale')">닫기</button></div>
+    <div class="mf">
+      <button class="btn btn-secondary" onclick="closeM('m-sale')">취소</button>
+      <button class="btn btn-primary" id="sale-submit-btn" onclick="submitSale()">저장</button>
+    </div>
   </div>
 </div>
 
 <div class="toast-wrap" id="tw"></div>
 
 <script>
-// ── 설정값 ──────────────────────────────────────────────────
-const API_KEY  = 'AIzaSyCvLJyVaxHXnf97imtd53sZjEkEBLNTFFw';
-const SHEET_ID = '1gFPgyXs5GhrgJgaVFGPXi1VyDmtgyhcX7pu5eB3j2vU';
-const BASE_URL = 'https://sheets.googleapis.com/v4/spreadsheets';
+// ── Apps Script URL (CORS 프록시 역할) ───────────────────────
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzWaVJeIAm8SnMjVwOnM4JDHjcFz7wS3MvbBFAljxCQkXqp6hwUe1_hIa8hQ6fi7BDTzw/exec';
 
 // ── 상태 ────────────────────────────────────────────────────
 let emps=[], sales=[], salary=[], curPage='dashboard';
@@ -370,79 +331,75 @@ window.onload = () => {
 };
 
 function thisMonth(){
-  const d=new Date();
+  const d = new Date();
   return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
 }
 
-// ── Sheets API 호출 ─────────────────────────────────────────
-async function getSheet(sheetName) {
-  const url = `${BASE_URL}/${SHEET_ID}/values/${encodeURIComponent(sheetName)}?key=${API_KEY}`;
-  try {
-    const res = await fetch(url);
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.error?.message || '시트 읽기 실패');
-    }
-    const data = await res.json();
-    const rows = data.values || [];
-    if (rows.length < 2) return [];
-    const headers = rows[0];
-    return rows.slice(1)
-      .filter(r => r[0])
-      .map(r => {
-        const obj = {};
-        headers.forEach((h,i) => obj[h] = r[i] || '');
-        return obj;
-      });
-  } catch(e) {
-    toast('시트 오류: ' + e.message, 'e');
-    return [];
-  }
+// ── API 호출 핵심 함수 ───────────────────────────────────────
+// GET 요청 (조회)
+async function apiGet(params) {
+  const qs = new URLSearchParams(params).toString();
+  const res = await fetch(GAS_URL + '?' + qs, { redirect: 'follow' });
+  const data = await res.json();
+  if (!data.ok) throw new Error(data.error || '서버 오류');
+  return data;
+}
+
+// POST 요청 (추가/수정/삭제)
+async function apiPost(action, body) {
+  // Apps Script는 POST + redirect를 no-cors로 받아야 함
+  // JSONP 방식으로 우회: GET에 payload를 실어서 전송
+  const payload = encodeURIComponent(JSON.stringify(body));
+  const url = GAS_URL + '?action=' + action + '&payload=' + payload;
+  const res = await fetch(url, { redirect: 'follow' });
+  const data = await res.json();
+  if (!data.ok) throw new Error(data.error || '서버 오류');
+  return data;
 }
 
 // ── 동기화 ──────────────────────────────────────────────────
 async function syncAll(){
-  toast('데이터 불러오는 중...', 'i');
-  await Promise.all([loadEmployees(), loadSales(), loadSalary()]);
-  loadDashboard();
-  toast('동기화 완료 ✅', 's');
+  try {
+    toast('데이터 불러오는 중...', 'i');
+    await Promise.all([loadEmployees(), loadSales(), loadSalary()]);
+    loadDashboard();
+    toast('동기화 완료 ✅', 's');
+  } catch(e) {
+    toast('불러오기 실패: ' + e.message, 'e');
+  }
 }
 
 // ── 대시보드 ────────────────────────────────────────────────
 function loadDashboard(){
   const ym = thisMonth();
-  const active = emps.filter(e => e['상태']==='재직중').length;
-  document.getElementById('d-emp').textContent = active + '명';
+  document.getElementById('d-emp').textContent = emps.filter(e=>e['상태']==='재직중').length + '명';
   document.getElementById('d-rank-sub').textContent = ym + ' 기준';
 
-  const mSales = sales.filter(r => String(r['날짜']).startsWith(ym) && r['상태']==='확인');
-  const totalSales = mSales.reduce((s,r) => s+(Number(r['매출액'])||0), 0);
+  const mSales = sales.filter(r=>String(r['날짜']).startsWith(ym) && r['상태']==='확인');
+  const totalSales = mSales.reduce((s,r)=>s+(Number(r['매출액'])||0),0);
   document.getElementById('d-sales').textContent = fm(totalSales);
   document.getElementById('d-sales-sub').textContent = ym + ' 확인 매출';
 
-  const mPay = salary.filter(r => r['연월']===ym);
-  const totalNet = mPay.reduce((s,r) => s+(Number(r['실지급액'])||0), 0);
+  const mPay = salary.filter(r=>r['연월']===ym);
+  const totalNet = mPay.reduce((s,r)=>s+(Number(r['실지급액'])||0),0);
   document.getElementById('d-pay').textContent = fm(totalNet);
-
-  const profit = totalSales > 0 ? Math.round((totalSales-totalNet)/totalSales*1000)/10 : 0;
-  document.getElementById('d-profit').textContent = profit + '%';
+  document.getElementById('d-profit').textContent = totalSales>0 ? Math.round((totalSales-totalNet)/totalSales*1000)/10+'%' : '0%';
 
   // 랭킹 바
   const byEmp = {};
-  mSales.forEach(r => { byEmp[r['직원명']] = (byEmp[r['직원명']]||0) + (Number(r['매출액'])||0); });
+  mSales.forEach(r=>{ byEmp[r['직원명']] = (byEmp[r['직원명']]||0)+(Number(r['매출액'])||0); });
   const ranking = Object.entries(byEmp).sort((a,b)=>b[1]-a[1]);
   const bars = document.getElementById('d-bars');
   if (!ranking.length) {
-    bars.innerHTML = '<div class="empty"><div class="empty-icon">📊</div><div class="empty-title">매출 데이터 없음</div></div>';
+    bars.innerHTML='<div class="empty"><div class="empty-icon">📊</div><div class="empty-title">매출 데이터 없음</div></div>';
   } else {
     const max = ranking[0][1];
-    bars.innerHTML = ranking.slice(0,6).map(([name,amt]) => `
+    bars.innerHTML = ranking.slice(0,6).map(([name,amt])=>`
       <div class="br2">
         <span class="bn">${name}</span>
         <div class="bt"><div class="bf" style="width:${max>0?Math.round(amt/max*100):0}%"></div></div>
         <span class="bv">${fm(amt)}</span>
-      </div>
-    `).join('');
+      </div>`).join('');
   }
 
   // 최근 매출
@@ -459,7 +416,8 @@ function loadDashboard(){
 
 // ── 직원 ────────────────────────────────────────────────────
 async function loadEmployees(){
-  emps = await getSheet('직원정보');
+  const r = await apiGet({action:'getEmployees'});
+  emps = r.data || [];
   document.getElementById('badge-emp').textContent = emps.filter(e=>e['상태']==='재직중').length;
   renderEmps(emps);
   updateEmpSels();
@@ -469,7 +427,7 @@ function renderEmps(list){
   document.getElementById('emp-sub').textContent = '전체 '+list.length+'명';
   const tbody = document.getElementById('emp-tbody');
   if (!list.length) {
-    tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-3)">직원 데이터가 없습니다</td></tr>';
+    tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-3)">직원을 추가해주세요</td></tr>';
     return;
   }
   tbody.innerHTML = list.map(e=>`
@@ -483,9 +441,13 @@ function renderEmps(list){
       <td class="td-r">${fm(e['기본급'])}</td>
       <td class="td-m">${e['입사일']||'-'}</td>
       <td>${badge(e['상태'])}</td>
-      <td><span style="font-size:11px;color:var(--text-3)">Apps Script에서 수정</span></td>
-    </tr>
-  `).join('');
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-secondary btn-sm" onclick="openEmpModal('${e['직원ID']}')">수정</button>
+          <button class="btn btn-danger btn-sm" onclick="delEmp('${e['직원ID']}','${e['이름']}')">퇴사</button>
+        </div>
+      </td>
+    </tr>`).join('');
 }
 
 function filterEmp(){
@@ -493,19 +455,72 @@ function filterEmp(){
   renderEmps(emps.filter(e=>(e['이름']||'').toLowerCase().includes(q)||(e['부서']||'').toLowerCase().includes(q)));
 }
 
-function openEmpModal(){ openM('m-emp'); }
+function openEmpModal(id){
+  document.getElementById('m-emp-title').textContent = id ? '직원 수정' : '직원 추가';
+  if(id){
+    const e = emps.find(x=>x['직원ID']===id); if(!e) return;
+    document.getElementById('ef-id').value    = id;
+    document.getElementById('ef-name').value  = e['이름']||'';
+    document.getElementById('ef-dept').value  = e['부서']||'';
+    document.getElementById('ef-pos').value   = e['직급']||'사원';
+    document.getElementById('ef-pay').value   = e['기본급']||'';
+    document.getElementById('ef-join').value  = e['입사일']||'';
+    document.getElementById('ef-st').value    = e['상태']||'재직중';
+    document.getElementById('ef-email').value = e['이메일']||'';
+    document.getElementById('ef-phone').value = e['연락처']||'';
+  } else {
+    ['id','name','dept','pay','join','email','phone'].forEach(f=>document.getElementById('ef-'+f).value='');
+    document.getElementById('ef-pos').value = '사원';
+    document.getElementById('ef-st').value  = '재직중';
+  }
+  openM('m-emp');
+}
+
+async function submitEmp(){
+  const id = document.getElementById('ef-id').value;
+  const payload = {
+    id,
+    name:     document.getElementById('ef-name').value,
+    dept:     document.getElementById('ef-dept').value,
+    position: document.getElementById('ef-pos').value,
+    basePay:  document.getElementById('ef-pay').value,
+    joinDate: document.getElementById('ef-join').value,
+    status:   document.getElementById('ef-st').value,
+    email:    document.getElementById('ef-email').value,
+    phone:    document.getElementById('ef-phone').value,
+  };
+  if(!payload.name || !payload.dept){ toast('이름과 부서는 필수입니다.','e'); return; }
+  const btn = document.getElementById('emp-submit-btn');
+  btn.disabled = true; btn.textContent = '저장 중...';
+  try {
+    const r = await apiPost(id ? 'updateEmployee' : 'addEmployee', payload);
+    toast(r.message || '저장 완료 ✅', 's');
+    closeM('m-emp');
+    await loadEmployees();
+    loadDashboard();
+  } catch(e){ toast(e.message,'e'); }
+  finally { btn.disabled=false; btn.textContent='저장'; }
+}
+
+async function delEmp(id, name){
+  if(!confirm('"'+name+'" 직원을 퇴사 처리하시겠습니까?')) return;
+  try {
+    const r = await apiPost('deleteEmployee', {id});
+    toast(r.message, 's');
+    await loadEmployees();
+    loadDashboard();
+  } catch(e){ toast(e.message,'e'); }
+}
 
 // ── 매출 ────────────────────────────────────────────────────
 async function loadSales(){
-  const allSales = await getSheet('매출관리');
   const ym    = document.getElementById('sal-ym').value;
   const empId = document.getElementById('sal-emp').value;
   const st    = document.getElementById('sal-st').value;
-  let data = allSales;
-  if (ym)    data = data.filter(r => String(r['날짜']).startsWith(ym));
-  if (empId) data = data.filter(r => r['직원ID']===empId);
-  if (st)    data = data.filter(r => r['상태']===st);
-  sales = allSales;
+  const r = await apiGet({action:'getSales', ym, empId});
+  let data = r.data || [];
+  if(st) data = data.filter(x=>x['상태']===st);
+  sales = r.data || [];
   renderSales(data);
 }
 
@@ -514,7 +529,7 @@ function renderSales(list){
   document.getElementById('sale-sub').textContent = list.length+'건';
   document.getElementById('sale-total').textContent = '합계: '+fm(total);
   const tbody = document.getElementById('sale-tbody');
-  if (!list.length) {
+  if(!list.length){
     tbody.innerHTML='<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text-3)">매출 데이터가 없습니다</td></tr>';
     return;
   }
@@ -527,20 +542,81 @@ function renderSales(list){
       <td style="text-align:right">${r['커미션율']||0}%</td>
       <td class="td-r td-g">${fm(r['커미션액'])}</td>
       <td>${badge(r['상태'])}</td>
-      <td><span style="font-size:11px;color:var(--text-3)">Apps Script에서 수정</span></td>
-    </tr>
-  `).join('');
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-secondary btn-sm" onclick="openSaleModal('${r['매출ID']}')">수정</button>
+          <button class="btn btn-danger btn-sm" onclick="delSale('${r['매출ID']}')">삭제</button>
+        </div>
+      </td>
+    </tr>`).join('');
 }
 
-function openSaleModal(){ openM('m-sale'); }
+function openSaleModal(id){
+  document.getElementById('m-sale-title').textContent = id ? '매출 수정' : '매출 입력';
+  const today = new Date().toISOString().split('T')[0];
+  if(id){
+    const r = sales.find(x=>x['매출ID']===id); if(!r) return;
+    document.getElementById('sf-id').value   = id;
+    document.getElementById('sf-date').value = r['날짜']||today;
+    document.getElementById('sf-emp').value  = r['직원ID']||'';
+    document.getElementById('sf-item').value = r['항목']||'';
+    document.getElementById('sf-amt').value  = r['매출액']||'';
+    document.getElementById('sf-comm').value = r['커미션율']||10;
+    document.getElementById('sf-st').value   = r['상태']||'검토중';
+    document.getElementById('sf-note').value = r['비고']||'';
+  } else {
+    document.getElementById('sf-id').value   = '';
+    document.getElementById('sf-date').value = today;
+    ['item','amt','note'].forEach(f=>document.getElementById('sf-'+f).value='');
+    document.getElementById('sf-comm').value = 10;
+    document.getElementById('sf-st').value   = '검토중';
+  }
+  openM('m-sale');
+}
+
+async function submitSale(){
+  const id = document.getElementById('sf-id').value;
+  const sel = document.getElementById('sf-emp');
+  const empId   = sel.value;
+  const empName = sel.options[sel.selectedIndex]?.text.replace(/\s*\(.*\)$/,'') || '';
+  const payload = {
+    id, empId, empName,
+    date:       document.getElementById('sf-date').value,
+    item:       document.getElementById('sf-item').value,
+    amount:     document.getElementById('sf-amt').value,
+    commission: document.getElementById('sf-comm').value,
+    status:     document.getElementById('sf-st').value,
+    note:       document.getElementById('sf-note').value,
+  };
+  if(!payload.item || !payload.amount){ toast('항목과 매출액은 필수입니다.','e'); return; }
+  const btn = document.getElementById('sale-submit-btn');
+  btn.disabled=true; btn.textContent='저장 중...';
+  try {
+    const r = await apiPost(id ? 'updateSale' : 'addSale', payload);
+    toast(r.message || '저장 완료 ✅','s');
+    closeM('m-sale');
+    await loadSales();
+    loadDashboard();
+  } catch(e){ toast(e.message,'e'); }
+  finally { btn.disabled=false; btn.textContent='저장'; }
+}
+
+async function delSale(id){
+  if(!confirm('이 매출 항목을 삭제하시겠습니까?')) return;
+  try {
+    const r = await apiPost('deleteSale', {id});
+    toast(r.message,'s');
+    await loadSales();
+    loadDashboard();
+  } catch(e){ toast(e.message,'e'); }
+}
 
 // ── 급여 ────────────────────────────────────────────────────
 async function loadSalary(){
-  const allSalary = await getSheet('급여관리');
   const ym = document.getElementById('pay-ym').value;
-  salary = allSalary;
-  const data = ym ? allSalary.filter(r=>r['연월']===ym) : allSalary;
-  renderSalary(data, ym);
+  const r = await apiGet({action:'getSalary', ym});
+  salary = r.data || [];
+  renderSalary(salary, ym);
 }
 
 function renderSalary(list, ym){
@@ -548,8 +624,8 @@ function renderSalary(list, ym){
   document.getElementById('pay-sub').textContent = (ym||thisMonth())+' 급여 명세';
   document.getElementById('pay-total').textContent = '실지급 합계: '+fm(total);
   const tbody = document.getElementById('pay-tbody');
-  if (!list.length) {
-    tbody.innerHTML='<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--text-3)">급여 데이터 없음. Apps Script 웹앱에서 ⚡ 급여 자동 계산을 먼저 실행해주세요.</td></tr>';
+  if(!list.length){
+    tbody.innerHTML='<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--text-3)">데이터 없음. ⚡ 급여 자동 계산을 눌러주세요.</td></tr>';
     return;
   }
   tbody.innerHTML = list.map(r=>`
@@ -567,15 +643,22 @@ function renderSalary(list, ym){
       <td class="td-r td-red">-${fm(r['고용보험'])}</td>
       <td class="td-r" style="color:var(--accent-2);font-size:14px">${fm(r['실지급액'])}</td>
       <td>${badge(r['지급상태'])}</td>
-    </tr>
-  `).join('');
+    </tr>`).join('');
 }
 
-function doCalcSalary(){
-  toast('급여 계산은 Apps Script 웹앱에서 실행해주세요.', 'i');
+async function doCalcSalary(){
+  const ym = document.getElementById('pay-ym').value || thisMonth();
+  if(!confirm(ym+' 급여를 자동 계산하시겠습니까?\n기존 해당 월 데이터는 덮어씁니다.')) return;
+  toast('급여 계산 중...','i');
+  try {
+    const r = await apiPost('calcSalary', {ym});
+    toast(r.count+'명 급여 계산 완료 ✅','s');
+    await loadSalary();
+    loadDashboard();
+  } catch(e){ toast(e.message,'e'); }
 }
 
-// ── 직원 셀렉트 ─────────────────────────────────────────────
+// ── 직원 셀렉트 업데이트 ────────────────────────────────────
 function updateEmpSels(){
   const active = emps.filter(e=>e['상태']!=='퇴사');
   const opts = active.map(e=>`<option value="${e['직원ID']}">${e['이름']} (${e['부서']})</option>`).join('');
@@ -586,10 +669,9 @@ function updateEmpSels(){
 // ── 네비게이션 ───────────────────────────────────────────────
 const PAGES = {
   dashboard:{title:'대시보드',sub:'전체 현황 요약',act:false},
-  employees:{title:'직원 관리',sub:'직원 정보 조회',act:false},
-  sales:    {title:'매출 관리',sub:'매출 조회',act:false},
-  salary:   {title:'급여 관리',sub:'급여 명세 조회',act:false},
-  setup:    {title:'설정',sub:'연동 정보',act:false},
+  employees:{title:'직원 관리',sub:'직원 정보 관리',act:true,label:'＋ 직원 추가',fn:()=>openEmpModal()},
+  sales:    {title:'매출 관리',sub:'매출 입력 및 조회',act:true,label:'＋ 매출 입력',fn:()=>openSaleModal()},
+  salary:   {title:'급여 관리',sub:'급여 계산 및 명세',act:false},
 };
 function go(page){
   curPage=page;
@@ -600,9 +682,11 @@ function go(page){
   const p=PAGES[page];
   document.getElementById('page-title').textContent=p.title;
   document.getElementById('page-sub').textContent=p.sub;
-  document.getElementById('act-btn').style.display='none';
+  const btn=document.getElementById('act-btn');
+  if(p.act){btn.style.display='inline-flex';btn.textContent=p.label;}
+  else btn.style.display='none';
 }
-function actClick(){ }
+function actClick(){ PAGES[curPage]?.fn?.(); }
 
 // ── 모달 ────────────────────────────────────────────────────
 function openM(id){document.getElementById(id).classList.add('open');}
@@ -618,7 +702,7 @@ function toast(msg,type='i'){
   t.className='toast '+type;
   t.innerHTML='<span>'+(type==='s'?'✅':type==='e'?'❌':'ℹ️')+'</span><span>'+msg+'</span>';
   tc.appendChild(t);
-  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(20px)';t.style.transition='.3s';setTimeout(()=>t.remove(),300);},3000);
+  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(20px)';t.style.transition='.3s';setTimeout(()=>t.remove(),300);},3500);
 }
 
 // ── 유틸 ────────────────────────────────────────────────────
