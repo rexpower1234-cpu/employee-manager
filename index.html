@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>직원 관리 시스템</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --accent:#1D9E75;--accent-2:#0F6E56;--accent-light:#E1F5EE;
+  --danger:#E24B4A;--danger-light:#FCEBEB;
+  --warn:#BA7517;--warn-light:#FAEEDA;
+  --info:#185FA5;--info-light:#E6F1FB;
+  --bg:#F8F9FA;--surface:#FFFFFF;--surface-2:#F3F4F5;
+  --border:#E4E6E8;--border-2:#D0D3D7;
+  --text:#1A1C1E;--text-2:#5C6068;--text-3:#9EA4AD;
+  --nav-w:220px;--radius:10px;--radius-lg:14px;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:0 4px 12px rgba(0,0,0,.1);
+  --font:'Noto Sans KR',sans-serif;
+}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;min-height:100vh}
+.app{display:flex;min-height:100vh}
+
+/* 사이드바 */
+.sidebar{width:var(--nav-w);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100}
+.sidebar-brand{padding:20px 20px 16px;border-bottom:1px solid var(--border)}
+.brand-icon{width:36px;height:36px;border-radius:9px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:10px}
+.brand-name{font-size:13px;font-weight:700;color:var(--text)}
+.brand-sub{font-size:11px;color:var(--text-3);margin-top:2px}
+.nav-section{padding:12px 12px 4px}
+.nav-label{font-size:10px;font-weight:600;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;padding:0 8px;margin-bottom:4px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:400;color:var(--text-2);transition:all .15s;margin-bottom:2px;border:none;background:none;width:100%;text-align:left;font-family:var(--font)}
+.nav-item:hover{background:var(--surface-2);color:var(--text)}
+.nav-item.active{background:var(--accent-light);color:var(--accent-2);font-weight:600}
+.nav-badge{margin-left:auto;font-size:10px;font-weight:600;background:var(--accent);color:#fff;padding:2px 6px;border-radius:100px;min-width:18px;text-align:center}
+
+/* 메인 */
+.main{margin-left:var(--nav-w);flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between}
+.page-title{font-size:16px;font-weight:700;color:var(--text)}
+.page-sub{font-size:12px;color:var(--text-3)}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.content{padding:24px 28px;flex:1}
+
+/* 버튼 */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .15s;font-family:var(--font);white-space:nowrap}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:var(--accent-2)}
+.btn-secondary{background:var(--surface);color:var(--text-2);border:1px solid var(--border-2)}.btn-secondary:hover{background:var(--surface-2);color:var(--text)}
+.btn-danger{background:var(--danger-light);color:var(--danger);border:1px solid #F7C1C1}.btn-danger:hover{background:#F7C1C1}
+.btn-sm{padding:5px 10px;font-size:12px;border-radius:6px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+/* 카드 */
+.card{background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:20px;overflow:hidden}
+.card-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:14px;font-weight:700;color:var(--text)}
+.card-sub{font-size:12px;color:var(--text-3);margin-top:1px}
+.card-body{padding:20px}.card-body.np{padding:0}
+
+/* 메트릭 */
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.metric-card{background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--border);padding:18px 20px;box-shadow:var(--shadow)}
+.metric-label{font-size:11px;font-weight:600;color:var(--text-3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.metric-value{font-size:26px;font-weight:700;color:var(--text);letter-spacing:-.5px}
+.metric-sub{font-size:11px;color:var(--text-3);margin-top:4px}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.dot-g{background:var(--accent)}.dot-b{background:var(--info)}.dot-y{background:var(--warn)}.dot-r{background:var(--danger)}
+
+/* 테이블 */
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{text-align:left;padding:10px 16px;font-size:11px;font-weight:700;color:var(--text-3);letter-spacing:.06em;text-transform:uppercase;background:var(--surface-2);white-space:nowrap}
+tbody tr{border-top:1px solid var(--border);transition:background .1s}
+tbody tr:hover{background:#FAFBFC}
+tbody td{padding:12px 16px;color:var(--text);vertical-align:middle}
+.td-m{color:var(--text-2)}.td-r{text-align:right;font-weight:600;font-size:13px}.td-g{color:var(--accent-2)}.td-red{color:var(--danger)}
+
+/* 배지 */
+.badge{display:inline-flex;align-items:center;font-size:11px;font-weight:600;padding:3px 8px;border-radius:100px;white-space:nowrap}
+.bg{background:#EAF3DE;color:#3B6D11}.by{background:var(--warn-light);color:var(--warn)}
+.bb{background:var(--info-light);color:var(--info)}.br{background:var(--danger-light);color:var(--danger)}
+.bgr{background:var(--surface-2);color:var(--text-2)}
+
+/* 아바타 */
+.avatar{width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.ec{display:flex;align-items:center;gap:10px}
+.en{font-weight:500}.ei{font-size:11px;color:var(--text-3)}
+
+/* 폼 */
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.fgroup{display:flex;flex-direction:column;gap:5px}
+.fgroup.full{grid-column:1/-1}
+.flabel{font-size:12px;font-weight:600;color:var(--text-2)}
+.req{color:var(--danger);margin-left:2px}
+.fc{padding:9px 12px;border-radius:8px;font-size:13px;border:1px solid var(--border-2);background:var(--surface);color:var(--text);font-family:var(--font);transition:border-color .15s;outline:none;width:100%}
+.fc:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(29,158,117,.1)}
+.fc::placeholder{color:var(--text-3)}
+
+/* 필터바 */
+.fbar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;margin-bottom:16px;display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
+.fbar .fgroup{margin-bottom:0;min-width:130px}
+
+/* 바차트 */
+.bl{display:flex;flex-direction:column;gap:12px}
+.br2{display:flex;align-items:center;gap:12px}
+.bn{font-size:13px;font-weight:500;width:72px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bt{flex:1;height:8px;background:var(--surface-2);border-radius:100px;overflow:hidden}
+.bf{height:100%;border-radius:100px;background:var(--accent);transition:width .6s cubic-bezier(.4,0,.2,1)}
+.bv{font-size:12px;font-weight:600;width:90px;text-align:right;color:var(--text-2);flex-shrink:0}
+
+/* 모달 */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:999;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{background:var(--surface);border-radius:var(--radius-lg);box-shadow:var(--shadow-md);width:560px;max-width:calc(100vw - 40px);max-height:calc(100vh - 60px);overflow-y:auto;transform:translateY(10px);transition:transform .2s}
+.modal-overlay.open .modal{transform:translateY(0)}
+.mh{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.mt{font-size:15px;font-weight:700}
+.mc{background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-3);padding:2px 6px;border-radius:6px}
+.mc:hover{background:var(--surface-2)}
+.mb{padding:20px 24px}
+.mf{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+
+/* 토스트 */
+.toast-wrap{position:fixed;top:70px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;font-size:13px;box-shadow:var(--shadow-md);display:flex;align-items:center;gap:10px;min-width:260px;animation:si .25s ease}
+.toast.s{border-left:3px solid var(--accent)}.toast.e{border-left:3px solid var(--danger)}.toast.i{border-left:3px solid var(--info)}
+@keyframes si{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+
+/* 로딩 */
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle}
+@keyframes sp{to{transform:rotate(360deg)}}
+.loading-bar{display:flex;align-items:center;justify-content:center;gap:10px;padding:40px;color:var(--text-3);font-size:13px}
+
+/* 섹션 */
+.section{display:none}.section.active{display:block}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+
+/* 설정 */
+.step{display:flex;gap:16px;padding:18px 0;border-bottom:1px solid var(--border)}
+.step:last-child{border-bottom:none}
+.snum{width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.stitle{font-size:14px;font-weight:600;margin-bottom:5px}
+.sdesc{font-size:13px;color:var(--text-2);line-height:1.6}
+code{font-family:monospace;font-size:12px;background:var(--surface-2);border:1px solid var(--border);padding:2px 6px;border-radius:5px;color:var(--accent-2)}
+.empty{text-align:center;padding:50px 20px;color:var(--text-3)}
+.empty-icon{font-size:36px;margin-bottom:10px;opacity:.4}
+.empty-title{font-size:14px;font-weight:600;color:var(--text-2);margin-bottom:4px}
+
+@media(max-width:900px){.metrics{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}.fg{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- 사이드바 -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon">📊</div>
+    <div class="brand-name">직원 관리 시스템</div>
+    <div class="brand-sub">매출 · 급여 · 직원 정보</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">메뉴</div>
+    <button class="nav-item active" onclick="go('dashboard')">🏠 대시보드</button>
+    <button class="nav-item" onclick="go('employees')">👥 직원 관리 <span class="nav-badge" id="badge-emp">-</span></button>
+    <button class="nav-item" onclick="go('sales')">📈 매출 관리</button>
+    <button class="nav-item" onclick="go('salary')">💳 급여 관리</button>
+    <button class="nav-item" onclick="go('setup')">⚙️ 설정</button>
+  </div>
+</aside>
+
+<!-- 메인 -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="page-title" id="page-title">대시보드</div>
+      <div class="page-sub" id="page-sub">전체 현황 요약</div>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-secondary btn-sm" onclick="syncAll()">🔄 새로고침</button>
+      <button class="btn btn-primary btn-sm" id="act-btn" style="display:none" onclick="actClick()">＋ 추가</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- 대시보드 -->
+    <div class="section active" id="s-dashboard">
+      <div class="metrics">
+        <div class="metric-card"><div class="metric-label"><span class="dot dot-g"></span>재직 직원</div><div class="metric-value" id="d-emp">-</div><div class="metric-sub">명</div></div>
+        <div class="metric-card"><div class="metric-label"><span class="dot dot-b"></span>월 매출 합계</div><div class="metric-value" id="d-sales">-</div><div class="metric-sub" id="d-sales-sub">이번 달</div></div>
+        <div class="metric-card"><div class="metric-label"><span class="dot dot-y"></span>급여 실지급 합계</div><div class="metric-value" id="d-pay">-</div><div class="metric-sub">이번 달</div></div>
+        <div class="metric-card"><div class="metric-label"><span class="dot dot-r"></span>이익률</div><div class="metric-value" id="d-profit">-</div><div class="metric-sub">매출 대비</div></div>
+      </div>
+      <div class="two">
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">직원별 매출 순위</div><div class="card-sub" id="d-rank-sub"></div></div></div>
+          <div class="card-body"><div class="bl" id="d-bars"><div class="loading-bar"><span class="spinner"></span>불러오는 중...</div></div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">최근 매출 내역</div></div>
+          <div class="card-body np"><div class="tw"><table>
+            <thead><tr><th>날짜</th><th>직원</th><th>매출액</th><th>상태</th></tr></thead>
+            <tbody id="d-recent"><tr><td colspan="4" class="loading-bar">불러오는 중...</td></tr></tbody>
+          </table></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 직원 관리 -->
+    <div class="section" id="s-employees">
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">직원 목록</div><div class="card-sub" id="emp-sub">-</div></div>
+          <div style="display:flex;gap:8px">
+            <input class="fc" style="width:200px;padding:7px 10px" placeholder="🔍 이름·부서 검색" id="emp-q" oninput="filterEmp()">
+            <button class="btn btn-primary btn-sm" onclick="openEmpModal()">＋ 직원 추가</button>
+          </div>
+        </div>
+        <div class="card-body np"><div class="tw"><table>
+          <thead><tr><th>직원</th><th>부서</th><th>직급</th><th>기본급</th><th>입사일</th><th>상태</th><th>관리</th></tr></thead>
+          <tbody id="emp-tbody"><tr><td colspan="7" class="loading-bar">불러오는 중...</td></tr></tbody>
+        </table></div></div>
+      </div>
+    </div>
+
+    <!-- 매출 관리 -->
+    <div class="section" id="s-sales">
+      <div class="fbar">
+        <div class="fgroup"><label class="flabel">연월</label><input class="fc" type="month" id="sal-ym" style="width:150px"></div>
+        <div class="fgroup"><label class="flabel">직원</label><select class="fc" id="sal-emp" style="width:140px"><option value="">전체</option></select></div>
+        <div class="fgroup"><label class="flabel">상태</label><select class="fc" id="sal-st" style="width:110px"><option value="">전체</option><option>확인</option><option>검토중</option></select></div>
+        <button class="btn btn-primary" style="margin-top:auto" onclick="loadSales()">조회</button>
+        <button class="btn btn-secondary" style="margin-top:auto" onclick="openSaleModal()">＋ 매출 입력</button>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">매출 내역</div><div class="card-sub" id="sale-sub"></div></div>
+          <div id="sale-total" style="font-size:13px;font-weight:700;color:var(--accent-2)"></div>
+        </div>
+        <div class="card-body np"><div class="tw"><table>
+          <thead><tr><th>날짜</th><th>직원</th><th>항목</th><th>매출액</th><th>커미션율</th><th>커미션액</th><th>상태</th><th>관리</th></tr></thead>
+          <tbody id="sale-tbody"><tr><td colspan="8" class="loading-bar">불러오는 중...</td></tr></tbody>
+        </table></div></div>
+      </div>
+    </div>
+
+    <!-- 급여 관리 -->
+    <div class="section" id="s-salary">
+      <div class="fbar">
+        <div class="fgroup"><label class="flabel">연월</label><input class="fc" type="month" id="pay-ym" style="width:150px"></div>
+        <button class="btn btn-primary" style="margin-top:auto" onclick="loadSalary()">조회</button>
+        <button class="btn btn-secondary" style="margin-top:auto" onclick="doCalcSalary()">⚡ 급여 자동 계산</button>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">급여 명세</div><div class="card-sub" id="pay-sub"></div></div>
+          <div id="pay-total" style="font-size:13px;font-weight:700;color:var(--accent-2)"></div>
+        </div>
+        <div class="card-body np"><div class="tw"><table>
+          <thead><tr><th>직원</th><th>기본급</th><th>성과급</th><th>수당</th><th>소득세</th><th>국민연금</th><th>건강보험</th><th>고용보험</th><th>실지급액</th><th>상태</th></tr></thead>
+          <tbody id="pay-tbody"><tr><td colspan="10" class="loading-bar">불러오는 중...</td></tr></tbody>
+        </table></div></div>
+      </div>
+    </div>
+
+    <!-- 설정 -->
+    <div class="section" id="s-setup">
+      <div class="card" style="max-width:680px">
+        <div class="card-header"><div class="card-title">⚙️ 연동 정보</div></div>
+        <div class="card-body">
+          <div class="step">
+            <div class="snum">✓</div>
+            <div><div class="stitle">연동된 구글 시트</div>
+            <div class="sdesc">시트 ID: <code>1gFPgyXs5GhrgJgaVFGPXi1VyDmtgyhcX7pu5eB3j2vU</code></div>
+            <div class="sdesc" style="margin-top:6px">API 키가 코드에 포함되어 있습니다. Vercel 배포 후 URL을 공유하세요.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="snum">!</div>
+            <div><div class="stitle">급여 자동 계산 안내</div>
+            <div class="sdesc">Vercel 버전은 읽기 전용입니다. 급여 계산·직원 추가·매출 입력 등 <strong>쓰기 작업</strong>은 기존 Apps Script 웹앱에서 진행 후, 여기서 조회하세요.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="snum">i</div>
+            <div><div class="stitle">데이터가 안 보일 때</div>
+            <div class="sdesc">구글 시트 공유 설정이 <code>링크가 있는 모든 사용자 → 뷰어</code>로 되어있는지 확인하세요.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- 모달: 직원 -->
+<div class="modal-overlay" id="m-emp">
+  <div class="modal">
+    <div class="mh"><div class="mt" id="m-emp-title">직원 추가</div><button class="mc" onclick="closeM('m-emp')">✕</button></div>
+    <div class="mb">
+      <input type="hidden" id="ef-id">
+      <div class="fg">
+        <div class="fgroup"><label class="flabel">이름<span class="req">*</span></label><input class="fc" id="ef-name" placeholder="홍길동"></div>
+        <div class="fgroup"><label class="flabel">부서<span class="req">*</span></label><input class="fc" id="ef-dept" placeholder="영업팀"></div>
+        <div class="fgroup"><label class="flabel">직급<span class="req">*</span></label>
+          <select class="fc" id="ef-pos"><option>사원</option><option>주임</option><option>대리</option><option>과장</option><option>차장</option><option>부장</option><option>팀장</option><option>이사</option><option>대표</option></select>
+        </div>
+        <div class="fgroup"><label class="flabel">기본급(원)<span class="req">*</span></label><input class="fc" id="ef-pay" type="number" placeholder="3000000"></div>
+        <div class="fgroup"><label class="flabel">입사일</label><input class="fc" id="ef-join" type="date"></div>
+        <div class="fgroup"><label class="flabel">상태</label>
+          <select class="fc" id="ef-st"><option>재직중</option><option>수습중</option><option>휴직중</option><option>퇴사</option></select>
+        </div>
+        <div class="fgroup"><label class="flabel">이메일</label><input class="fc" id="ef-email" type="email"></div>
+        <div class="fgroup"><label class="flabel">연락처</label><input class="fc" id="ef-phone" placeholder="010-0000-0000"></div>
+      </div>
+      <div style="margin-top:14px;padding:12px;background:var(--warn-light);border-radius:8px;font-size:12px;color:var(--warn)">
+        ⚠️ Vercel 버전은 조회 전용입니다. 직원 추가는 Apps Script 웹앱에서 해주세요.
+      </div>
+    </div>
+    <div class="mf"><button class="btn btn-secondary" onclick="closeM('m-emp')">닫기</button></div>
+  </div>
+</div>
+
+<!-- 모달: 매출 -->
+<div class="modal-overlay" id="m-sale">
+  <div class="modal">
+    <div class="mh"><div class="mt" id="m-sale-title">매출 입력</div><button class="mc" onclick="closeM('m-sale')">✕</button></div>
+    <div class="mb">
+      <input type="hidden" id="sf-id">
+      <div class="fg">
+        <div class="fgroup"><label class="flabel">날짜<span class="req">*</span></label><input class="fc" id="sf-date" type="date"></div>
+        <div class="fgroup"><label class="flabel">직원<span class="req">*</span></label><select class="fc" id="sf-emp"><option value="">직원 선택</option></select></div>
+        <div class="fgroup full"><label class="flabel">항목<span class="req">*</span></label><input class="fc" id="sf-item" placeholder="예: 제품 A 판매"></div>
+        <div class="fgroup"><label class="flabel">매출액(원)<span class="req">*</span></label><input class="fc" id="sf-amt" type="number" placeholder="1000000"></div>
+        <div class="fgroup"><label class="flabel">커미션율(%)</label><input class="fc" id="sf-comm" type="number" value="10"></div>
+        <div class="fgroup"><label class="flabel">상태</label><select class="fc" id="sf-st"><option>검토중</option><option>확인</option></select></div>
+        <div class="fgroup"><label class="flabel">비고</label><input class="fc" id="sf-note"></div>
+      </div>
+      <div style="margin-top:14px;padding:12px;background:var(--warn-light);border-radius:8px;font-size:12px;color:var(--warn)">
+        ⚠️ Vercel 버전은 조회 전용입니다. 매출 입력은 Apps Script 웹앱에서 해주세요.
+      </div>
+    </div>
+    <div class="mf"><button class="btn btn-secondary" onclick="closeM('m-sale')">닫기</button></div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="tw"></div>
+
+<script>
+// ── 설정값 ──────────────────────────────────────────────────
+const API_KEY  = 'AIzaSyCvLJyVaxHXnf97imtd53sZjEkEEBLNTFFw';
+const SHEET_ID = '1gFPgyXs5GhrgJgaVFGPXi1VyDmtgyhcX7pu5eB3j2vU';
+const BASE_URL = 'https://sheets.googleapis.com/v4/spreadsheets';
+
+// ── 상태 ────────────────────────────────────────────────────
+let emps=[], sales=[], salary=[], curPage='dashboard';
+
+// ── 초기화 ──────────────────────────────────────────────────
+window.onload = () => {
+  const ym = thisMonth();
+  document.getElementById('sal-ym').value = ym;
+  document.getElementById('pay-ym').value = ym;
+  syncAll();
+};
+
+function thisMonth(){
+  const d=new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+}
+
+// ── Sheets API 호출 ─────────────────────────────────────────
+async function getSheet(sheetName) {
+  const url = `${BASE_URL}/${SHEET_ID}/values/${encodeURIComponent(sheetName)}?key=${API_KEY}`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error?.message || '시트 읽기 실패');
+    }
+    const data = await res.json();
+    const rows = data.values || [];
+    if (rows.length < 2) return [];
+    const headers = rows[0];
+    return rows.slice(1)
+      .filter(r => r[0])
+      .map(r => {
+        const obj = {};
+        headers.forEach((h,i) => obj[h] = r[i] || '');
+        return obj;
+      });
+  } catch(e) {
+    toast('시트 오류: ' + e.message, 'e');
+    return [];
+  }
+}
+
+// ── 동기화 ──────────────────────────────────────────────────
+async function syncAll(){
+  toast('데이터 불러오는 중...', 'i');
+  await Promise.all([loadEmployees(), loadSales(), loadSalary()]);
+  loadDashboard();
+  toast('동기화 완료 ✅', 's');
+}
+
+// ── 대시보드 ────────────────────────────────────────────────
+function loadDashboard(){
+  const ym = thisMonth();
+  const active = emps.filter(e => e['상태']==='재직중').length;
+  document.getElementById('d-emp').textContent = active + '명';
+  document.getElementById('d-rank-sub').textContent = ym + ' 기준';
+
+  const mSales = sales.filter(r => String(r['날짜']).startsWith(ym) && r['상태']==='확인');
+  const totalSales = mSales.reduce((s,r) => s+(Number(r['매출액'])||0), 0);
+  document.getElementById('d-sales').textContent = fm(totalSales);
+  document.getElementById('d-sales-sub').textContent = ym + ' 확인 매출';
+
+  const mPay = salary.filter(r => r['연월']===ym);
+  const totalNet = mPay.reduce((s,r) => s+(Number(r['실지급액'])||0), 0);
+  document.getElementById('d-pay').textContent = fm(totalNet);
+
+  const profit = totalSales > 0 ? Math.round((totalSales-totalNet)/totalSales*1000)/10 : 0;
+  document.getElementById('d-profit').textContent = profit + '%';
+
+  // 랭킹 바
+  const byEmp = {};
+  mSales.forEach(r => { byEmp[r['직원명']] = (byEmp[r['직원명']]||0) + (Number(r['매출액'])||0); });
+  const ranking = Object.entries(byEmp).sort((a,b)=>b[1]-a[1]);
+  const bars = document.getElementById('d-bars');
+  if (!ranking.length) {
+    bars.innerHTML = '<div class="empty"><div class="empty-icon">📊</div><div class="empty-title">매출 데이터 없음</div></div>';
+  } else {
+    const max = ranking[0][1];
+    bars.innerHTML = ranking.slice(0,6).map(([name,amt]) => `
+      <div class="br2">
+        <span class="bn">${name}</span>
+        <div class="bt"><div class="bf" style="width:${max>0?Math.round(amt/max*100):0}%"></div></div>
+        <span class="bv">${fm(amt)}</span>
+      </div>
+    `).join('');
+  }
+
+  // 최근 매출
+  const recent = [...sales].sort((a,b)=>String(b['날짜']).localeCompare(String(a['날짜']))).slice(0,5);
+  document.getElementById('d-recent').innerHTML = recent.length
+    ? recent.map(r=>`<tr>
+        <td class="td-m">${r['날짜']||''}</td>
+        <td>${r['직원명']||''}</td>
+        <td class="td-r td-g">${fm(r['매출액'])}</td>
+        <td>${badge(r['상태'])}</td>
+      </tr>`).join('')
+    : '<tr><td colspan="4" style="text-align:center;padding:30px;color:var(--text-3)">데이터 없음</td></tr>';
+}
+
+// ── 직원 ────────────────────────────────────────────────────
+async function loadEmployees(){
+  emps = await getSheet('직원정보');
+  document.getElementById('badge-emp').textContent = emps.filter(e=>e['상태']==='재직중').length;
+  renderEmps(emps);
+  updateEmpSels();
+}
+
+function renderEmps(list){
+  document.getElementById('emp-sub').textContent = '전체 '+list.length+'명';
+  const tbody = document.getElementById('emp-tbody');
+  if (!list.length) {
+    tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-3)">직원 데이터가 없습니다</td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map(e=>`
+    <tr>
+      <td><div class="ec">
+        <div class="avatar" style="background:${abg(e['이름'])};color:${afg(e['이름'])}">${(e['이름']||'?')[0]}</div>
+        <div><div class="en">${e['이름']}</div><div class="ei">${e['직원ID']||''}</div></div>
+      </div></td>
+      <td class="td-m">${e['부서']||'-'}</td>
+      <td>${e['직급']||'-'}</td>
+      <td class="td-r">${fm(e['기본급'])}</td>
+      <td class="td-m">${e['입사일']||'-'}</td>
+      <td>${badge(e['상태'])}</td>
+      <td><span style="font-size:11px;color:var(--text-3)">Apps Script에서 수정</span></td>
+    </tr>
+  `).join('');
+}
+
+function filterEmp(){
+  const q = document.getElementById('emp-q').value.toLowerCase();
+  renderEmps(emps.filter(e=>(e['이름']||'').toLowerCase().includes(q)||(e['부서']||'').toLowerCase().includes(q)));
+}
+
+function openEmpModal(){ openM('m-emp'); }
+
+// ── 매출 ────────────────────────────────────────────────────
+async function loadSales(){
+  const allSales = await getSheet('매출관리');
+  const ym    = document.getElementById('sal-ym').value;
+  const empId = document.getElementById('sal-emp').value;
+  const st    = document.getElementById('sal-st').value;
+  let data = allSales;
+  if (ym)    data = data.filter(r => String(r['날짜']).startsWith(ym));
+  if (empId) data = data.filter(r => r['직원ID']===empId);
+  if (st)    data = data.filter(r => r['상태']===st);
+  sales = allSales;
+  renderSales(data);
+}
+
+function renderSales(list){
+  const total = list.reduce((s,r)=>s+(Number(r['매출액'])||0),0);
+  document.getElementById('sale-sub').textContent = list.length+'건';
+  document.getElementById('sale-total').textContent = '합계: '+fm(total);
+  const tbody = document.getElementById('sale-tbody');
+  if (!list.length) {
+    tbody.innerHTML='<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text-3)">매출 데이터가 없습니다</td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map(r=>`
+    <tr>
+      <td class="td-m">${r['날짜']||''}</td>
+      <td>${r['직원명']||''}</td>
+      <td>${r['항목']||''}</td>
+      <td class="td-r">${fm(r['매출액'])}</td>
+      <td style="text-align:right">${r['커미션율']||0}%</td>
+      <td class="td-r td-g">${fm(r['커미션액'])}</td>
+      <td>${badge(r['상태'])}</td>
+      <td><span style="font-size:11px;color:var(--text-3)">Apps Script에서 수정</span></td>
+    </tr>
+  `).join('');
+}
+
+function openSaleModal(){ openM('m-sale'); }
+
+// ── 급여 ────────────────────────────────────────────────────
+async function loadSalary(){
+  const allSalary = await getSheet('급여관리');
+  const ym = document.getElementById('pay-ym').value;
+  salary = allSalary;
+  const data = ym ? allSalary.filter(r=>r['연월']===ym) : allSalary;
+  renderSalary(data, ym);
+}
+
+function renderSalary(list, ym){
+  const total = list.reduce((s,r)=>s+(Number(r['실지급액'])||0),0);
+  document.getElementById('pay-sub').textContent = (ym||thisMonth())+' 급여 명세';
+  document.getElementById('pay-total').textContent = '실지급 합계: '+fm(total);
+  const tbody = document.getElementById('pay-tbody');
+  if (!list.length) {
+    tbody.innerHTML='<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--text-3)">급여 데이터 없음. Apps Script 웹앱에서 ⚡ 급여 자동 계산을 먼저 실행해주세요.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map(r=>`
+    <tr>
+      <td><div class="ec">
+        <div class="avatar" style="background:${abg(r['직원명'])};color:${afg(r['직원명'])}">${(r['직원명']||'?')[0]}</div>
+        <span class="en">${r['직원명']}</span>
+      </div></td>
+      <td class="td-r">${fm(r['기본급'])}</td>
+      <td class="td-r td-g">${fm(r['매출성과급'])}</td>
+      <td class="td-r">${fm(r['기타수당'])}</td>
+      <td class="td-r td-red">-${fm(r['소득세'])}</td>
+      <td class="td-r td-red">-${fm(r['국민연금'])}</td>
+      <td class="td-r td-red">-${fm(r['건강보험'])}</td>
+      <td class="td-r td-red">-${fm(r['고용보험'])}</td>
+      <td class="td-r" style="color:var(--accent-2);font-size:14px">${fm(r['실지급액'])}</td>
+      <td>${badge(r['지급상태'])}</td>
+    </tr>
+  `).join('');
+}
+
+function doCalcSalary(){
+  toast('급여 계산은 Apps Script 웹앱에서 실행해주세요.', 'i');
+}
+
+// ── 직원 셀렉트 ─────────────────────────────────────────────
+function updateEmpSels(){
+  const active = emps.filter(e=>e['상태']!=='퇴사');
+  const opts = active.map(e=>`<option value="${e['직원ID']}">${e['이름']} (${e['부서']})</option>`).join('');
+  document.getElementById('sal-emp').innerHTML = '<option value="">전체</option>'+opts;
+  document.getElementById('sf-emp').innerHTML  = '<option value="">직원 선택</option>'+opts;
+}
+
+// ── 네비게이션 ───────────────────────────────────────────────
+const PAGES = {
+  dashboard:{title:'대시보드',sub:'전체 현황 요약',act:false},
+  employees:{title:'직원 관리',sub:'직원 정보 조회',act:false},
+  sales:    {title:'매출 관리',sub:'매출 조회',act:false},
+  salary:   {title:'급여 관리',sub:'급여 명세 조회',act:false},
+  setup:    {title:'설정',sub:'연동 정보',act:false},
+};
+function go(page){
+  curPage=page;
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('s-'+page).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.querySelectorAll('.nav-item')[Object.keys(PAGES).indexOf(page)].classList.add('active');
+  const p=PAGES[page];
+  document.getElementById('page-title').textContent=p.title;
+  document.getElementById('page-sub').textContent=p.sub;
+  document.getElementById('act-btn').style.display='none';
+}
+function actClick(){ }
+
+// ── 모달 ────────────────────────────────────────────────────
+function openM(id){document.getElementById(id).classList.add('open');}
+function closeM(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(el=>{
+  el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');});
+});
+
+// ── 토스트 ──────────────────────────────────────────────────
+function toast(msg,type='i'){
+  const tc=document.getElementById('tw');
+  const t=document.createElement('div');
+  t.className='toast '+type;
+  t.innerHTML='<span>'+(type==='s'?'✅':type==='e'?'❌':'ℹ️')+'</span><span>'+msg+'</span>';
+  tc.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(20px)';t.style.transition='.3s';setTimeout(()=>t.remove(),300);},3000);
+}
+
+// ── 유틸 ────────────────────────────────────────────────────
+function fm(n){
+  const v=Number(n)||0;
+  if(Math.abs(v)>=1000000) return '₩'+(v/1000000).toFixed(1)+'M';
+  return '₩'+v.toLocaleString('ko-KR');
+}
+function badge(s){
+  const m={재직중:'bg',수습중:'bb',휴직중:'by',퇴사:'bgr',확인:'bg',검토중:'by',계산완료:'bb',지급완료:'bg'};
+  return '<span class="badge '+(m[s]||'bgr')+'">'+(s||'-')+'</span>';
+}
+const AC=[['#E1F5EE','#0F6E56'],['#E6F1FB','#185FA5'],['#FAEEDA','#854F0B'],['#EEEDFE','#3C3489'],['#FCEBEB','#A32D2D'],['#EAF3DE','#3B6D11']];
+function abg(n){return AC[((n||'').charCodeAt(0)||0)%AC.length][0];}
+function afg(n){return AC[((n||'').charCodeAt(0)||0)%AC.length][1];}
+</script>
+</body>
+</html>
