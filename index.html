@@ -234,6 +234,26 @@ tbody td{padding:9px 12px;vertical-align:middle}
 .cal-event:hover{opacity:.85}
 .cal-more{font-size:9px;color:var(--text-3);padding:1px 5px}
 
+
+
+/* 규정 자동완성 드롭다운 */
+.reg-suggest{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow-md);max-height:280px;overflow-y:auto;z-index:1000;margin-top:2px;display:none}
+.reg-suggest.open{display:block}
+.reg-item{padding:10px 12px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .1s}
+.reg-item:hover{background:var(--accent-light)}
+.reg-item:last-child{border-bottom:none}
+.reg-item .reg-main{font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px}
+.reg-item .reg-sub{font-size:10px;color:var(--text-3);display:flex;gap:8px;flex-wrap:wrap}
+.reg-item .reg-tag{display:inline-block;font-size:9px;font-weight:600;padding:1px 6px;border-radius:100px;background:var(--accent-light);color:var(--accent-2)}
+.reg-item.no-data{cursor:default;text-align:center;color:var(--text-3);padding:14px;font-size:11px}
+.reg-item.no-data:hover{background:#fff}
+
+/* 점검 이벤트 (업체명 위 + 일급 아래) */
+.insp-event{background:#1D9E75;color:#fff;border-radius:5px;padding:3px 6px;margin-bottom:3px;cursor:pointer;line-height:1.2;overflow:hidden;transition:background .15s}
+.insp-event:hover{background:#0F6E56}
+.insp-company{font-size:10px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.insp-pay{font-size:9px;font-weight:700;margin-top:1px;opacity:.95;text-align:right;font-variant-numeric:tabular-nums}
+
 /* 주간/일간 뷰 */
 .cal-time-grid{display:grid;grid-template-columns:50px 1fr;max-height:560px;overflow-y:auto}
 .cal-week-grid{display:grid;grid-template-columns:50px repeat(7,1fr);max-height:560px;overflow-y:auto}
@@ -534,38 +554,46 @@ tbody td{padding:9px 12px;vertical-align:middle}
       </div>
     </div>
 
-    <!-- 직원 관리 -->
+    <!-- 직원 관리 (재직/퇴사 탭) -->
     <div class="section" id="s-employees">
-      <div class="card">
-        <div class="card-header">
-          <div><div class="card-title">직원 목록</div><div class="card-sub" id="emp-sub">-</div></div>
-          <div style="display:flex;gap:6px">
-            <input class="fc" style="width:180px;padding:6px 9px" placeholder="🔍 이름·부서 검색" id="emp-q" oninput="filterEmpSearch()">
-            <button class="btn btn-primary btn-sm" onclick="openEmpModal()">＋ 직원 추가</button>
-          </div>
-        </div>
-        <div class="card-body np"><div class="tw"><table>
-          <thead><tr><th>직원</th><th>부서</th><th>직급</th><th>기본급</th><th>입사일</th><th>상태</th><th>권한</th><th>관리</th></tr></thead>
-          <tbody id="emp-tbody"><tr class="loading-row"><td colspan="8"><span class="spinner"></span> 불러오는 중...</td></tr></tbody>
-        </table></div></div>
+      <!-- 탭 -->
+      <div style="display:flex;gap:4px;margin-bottom:14px;background:var(--surface-2);border-radius:8px;padding:3px;width:fit-content">
+        <button class="emp-tab active" data-tab="active" onclick="switchEmpTab('active')" style="padding:7px 16px;border:none;background:var(--surface);font-size:12px;font-weight:600;cursor:pointer;border-radius:6px;font-family:var(--font);color:var(--text);box-shadow:var(--shadow)">👥 재직 중</button>
+        <button class="emp-tab" data-tab="resigned" onclick="switchEmpTab('resigned')" style="padding:7px 16px;border:none;background:none;font-size:12px;font-weight:500;cursor:pointer;border-radius:6px;font-family:var(--font);color:var(--text-2)">🚪 퇴사자</button>
       </div>
-    </div>
 
-
-    <!-- 퇴사자 관리 -->
-    <div class="section" id="s-resignees">
-      <div class="card">
-        <div class="card-header">
-          <div><div class="card-title">퇴사자 목록</div><div class="card-sub" id="res-sub">-</div></div>
-          <div style="display:flex;gap:6px">
-            <input class="fc" style="width:180px;padding:6px 9px" placeholder="🔍 이름 검색" id="res-q" oninput="filterResSearch()">
-            <button class="btn btn-primary btn-sm" onclick="openResModal()">＋ 퇴사자 추가</button>
+      <!-- 재직 중 탭 -->
+      <div id="emp-tab-active">
+        <div class="card">
+          <div class="card-header">
+            <div><div class="card-title">재직 직원 목록</div><div class="card-sub" id="emp-sub">-</div></div>
+            <div style="display:flex;gap:6px">
+              <input class="fc" style="width:180px;padding:6px 9px" placeholder="🔍 이름·부서 검색" id="emp-q" oninput="filterEmpSearch()">
+              <button class="btn btn-primary btn-sm" onclick="openEmpModal()">＋ 직원 추가</button>
+            </div>
           </div>
+          <div class="card-body np"><div class="tw"><table>
+            <thead><tr><th>직원</th><th>부서</th><th>직급</th><th>기본급</th><th>입사일</th><th>상태</th><th>권한</th><th>관리</th></tr></thead>
+            <tbody id="emp-tbody"><tr class="loading-row"><td colspan="8"><span class="spinner"></span> 불러오는 중...</td></tr></tbody>
+          </table></div></div>
         </div>
-        <div class="card-body np"><div class="tw"><table>
-          <thead><tr><th>이름</th><th>퇴사일</th><th>책임이행보증금</th><th>특이사항</th><th>관리</th></tr></thead>
-          <tbody id="res-tbody"><tr class="loading-row"><td colspan="5"><span class="spinner"></span> 불러오는 중...</td></tr></tbody>
-        </table></div></div>
+      </div>
+
+      <!-- 퇴사자 탭 -->
+      <div id="emp-tab-resigned" style="display:none">
+        <div class="card">
+          <div class="card-header">
+            <div><div class="card-title">퇴사자 목록</div><div class="card-sub" id="res-sub">-</div></div>
+            <div style="display:flex;gap:6px">
+              <input class="fc" style="width:180px;padding:6px 9px" placeholder="🔍 이름 검색" id="res-q" oninput="filterResSearch()">
+              <button class="btn btn-primary btn-sm" onclick="openResModal()">＋ 퇴사자 추가</button>
+            </div>
+          </div>
+          <div class="card-body np"><div class="tw"><table>
+            <thead><tr><th>이름</th><th>퇴사일</th><th>책임이행보증금</th><th>특이사항</th><th>관리</th></tr></thead>
+            <tbody id="res-tbody"><tr class="loading-row"><td colspan="5"><span class="spinner"></span> 불러오는 중...</td></tr></tbody>
+          </table></div></div>
+        </div>
       </div>
     </div>
 
@@ -609,8 +637,10 @@ tbody td{padding:9px 12px;vertical-align:middle}
     <div class="section" id="s-salary">
       <div class="fbar">
         <div class="fgroup"><label class="flabel">연월</label><input class="fc" type="month" id="pay-ym" style="width:140px"></div>
+        <div class="fgroup" id="pay-emp-wrap" style="display:none"><label class="flabel">직원</label><select class="fc" id="pay-emp-filter" style="width:140px" onchange="renderSalary(salary,document.getElementById('pay-ym').value)"><option value="">전체</option></select></div>
         <button class="btn btn-primary" style="margin-top:auto" onclick="loadSalary()">조회</button>
         <button class="btn btn-secondary" style="margin-top:auto" id="btn-calc-salary" onclick="doCalcSalary()">⚡ 급여 자동 계산</button>
+        <div style="margin-top:auto;font-size:11px;color:var(--text-3);padding:6px 10px;background:var(--accent-light);border-radius:6px">💡 페이지 진입 시 자동 계산됩니다</div>
       </div>
       <div class="card">
         <div class="card-header">
@@ -794,8 +824,16 @@ tbody td{padding:9px 12px;vertical-align:middle}
       <div class="fg fg3">
         <div class="fgroup full"><label class="flabel">고객번호</label><input class="fc" id="sf-cno" placeholder="1-01-260101-0000"></div>
         <div class="fgroup full"><label class="flabel">고객명<span class="req">*</span></label><input class="fc" id="sf-cname" placeholder="고객명 입력"></div>
-        <div class="fgroup"><label class="flabel">모델명<span class="req">*</span></label><input class="fc" id="sf-model" placeholder="CP-AHS100HEW(S)"></div>
-        <div class="fgroup full"><label class="flabel">상품명</label><input class="fc" id="sf-product" placeholder="상품명 입력"></div>
+        <div class="fgroup" style="position:relative">
+          <label class="flabel">모델명<span class="req">*</span></label>
+          <input class="fc" id="sf-model" placeholder="예: CP-AHS, ABS, 비데..." autocomplete="off" oninput="showRegSuggest(this,'model')" onfocus="showRegSuggest(this,'model')" onblur="setTimeout(()=>hideRegSuggest('sug-model'),200)">
+          <div id="sug-model" class="reg-suggest"></div>
+        </div>
+        <div class="fgroup full" style="position:relative">
+          <label class="flabel">상품명 <span style="font-size:9px;color:var(--text-3);font-weight:400">(상품군 검색 가능: 정수기/공기청정기/비데/매트리스 등)</span></label>
+          <input class="fc" id="sf-product" placeholder="예: 정수기, 공기청정기, 비데..." autocomplete="off" oninput="showRegSuggest(this,'product')" onfocus="showRegSuggest(this,'product')" onblur="setTimeout(()=>hideRegSuggest('sug-product'),200)">
+          <div id="sug-product" class="reg-suggest"></div>
+        </div>
         <div class="fgroup"><label class="flabel">의무(개월)</label><input class="fc" id="sf-duty" type="number" placeholder="60"></div>
         <div class="fgroup"><label class="flabel">렌탈료</label><input class="fc" id="sf-rental" type="number" placeholder="39870" oninput="calcFee()"></div>
         <div class="fgroup"><label class="flabel">지급율(기본)%</label><input class="fc" id="sf-rate1" type="number" placeholder="6" oninput="calcFee()"></div>
@@ -1019,7 +1057,11 @@ function getPermsOf(name){
     const all = {}; PERM_KEYS.forEach(p=>all[p.k]=true); return {position:'관리자',perms:all};
   }
   const all = getPermsDetail();
-  return all[name] || {position:'영업부직원',perms:{view_salary_self:true}};
+  const p = all[name] || {position:'영업부직원',perms:{}};
+  // 본인 급여 보기는 기본으로 보장
+  if(!p.perms) p.perms={};
+  if(p.perms.view_salary_self===undefined && !p.perms.view_salary_all) p.perms.view_salary_self=true;
+  return p;
 }
 
 function canDo(perm, name){
@@ -1206,7 +1248,10 @@ function applyRole(){
   if(btnAddSale) btnAddSale.style.display = 'inline-flex'; // 모두 본인 매출 등록 가능
   // 급여 계산 버튼
   const btnCalc=document.getElementById('btn-calc-salary');
-  if(btnCalc) btnCalc.style.display = canDo('manage_salary') ? 'inline-flex' : 'none';
+  if(btnCalc) btnCalc.style.display = (canDo('manage_salary')||isAdmin) ? 'inline-flex' : 'none';
+  // 급여 직원 필터 (전체 보기 권한 있을 때만)
+  const payEmpWrap=document.getElementById('pay-emp-wrap');
+  if(payEmpWrap) payEmpWrap.style.display = (canDo('view_salary_all')||isAdmin) ? 'flex' : 'none';
 
   // 날짜 필터 초기값
   document.getElementById('sal-ym').value=thisMonth();
@@ -1218,7 +1263,6 @@ function applyRole(){
 const DEFAULT_MENUS = [
   {id:'dashboard',  label:'대시보드',   icon:'🏠', perm:null},
   {id:'employees',  label:'직원 관리',  icon:'👥', perm:'view_employees'},
-  {id:'resignees',  label:'퇴사자 관리',icon:'🚪', perm:'view_employees'},
   {id:'sales',      label:'매출 관리',  icon:'📊', perm:null},
   {id:'inspection', label:'점검 관리',  icon:'🔧', perm:null},
   {id:'support',    label:'지원 관리',  icon:'💰', perm:null},
@@ -1233,7 +1277,7 @@ function saveMenus(m){ lSet('menu_config', m); }
 function canViewMenu(menuId){
   // 항상 보이는 메뉴
   if(['dashboard','sales','attendance','calendar'].includes(menuId)) return true;
-  if(menuId==='employees' || menuId==='resignees')  return canDo('view_employees');
+  if(menuId==='employees')  return canDo('view_employees');
   if(menuId==='salary')     return canDo('view_salary_all') || canDo('view_salary_self') || canDo('manage_salary');
   if(menuId==='inspection') return true; // 본인 것은 항상 볼 수 있음
   if(menuId==='support')    return true; // 본인 것은 항상 볼 수 있음
@@ -1276,7 +1320,7 @@ async function syncAll(){
   const isAdmin = CU.name===ADMIN_NAME;
   try{
     // 직원 목록은 항상 로드 (담당자 선택 드롭다운 등에 필요)
-    const tasks=[loadEmployees(), loadSales(), loadEvents(), loadInspections(), loadSupports(), loadResignees()];
+    const tasks=[loadEmployees(), loadSales(), loadEvents(), loadInspections(), loadSupports(), loadResignees(), loadRegulations()];
     if(canDo('view_salary_all') || canDo('view_salary_self') || canDo('manage_salary')) tasks.push(loadSalary());
     if(canDo('view_attendance_all') || isAdmin) tasks.push(loadAttendance());
     await Promise.all(tasks);
@@ -1635,13 +1679,32 @@ function exportSales(){
 
 // ══ 급여 ════════════════════════════════════════════════════
 async function loadSalary(){
-  const ym=document.getElementById('pay-ym').value;
-  const r=await api('getSalary',{ym});salary=r.data||[];renderSalary(salary,ym);
+  const ym=document.getElementById('pay-ym').value||thisMonth();
+  // 자동 계산 권한이 있는 사람은 페이지 들어올 때 자동 계산
+  if(canDo('manage_salary') || CU.name===ADMIN_NAME){
+    try{ await api('calcSalary',{ym}); }
+    catch(e){ console.warn('자동 계산 실패:',e.message); }
+  }
+  const r=await api('getSalary',{ym});
+  salary=r.data||[];
+  renderSalary(salary,ym);
 }
 function renderSalary(list,ym){
-  // 본인 급여만 보기 권한이면 본인 것만 필터
-  if(!canDo('view_salary_all') && canDo('view_salary_self')){
+  // 관리자(송용한)는 전체, 그 외엔 권한 체크
+  const isAdmin = CU.name===ADMIN_NAME;
+  if(!isAdmin && !canDo('view_salary_all')){
+    // 전체 보기 권한 없으면 본인 것만
     list = list.filter(r=>r['직원명']===CU.name);
+  } else {
+    // 전체 권한자: 직원 필터 옵션 채우기 + 필터 적용
+    const filterSel=document.getElementById('pay-emp-filter');
+    if(filterSel){
+      const active=emps.filter(e=>e['상태']!=='퇴사');
+      const cur=filterSel.value;
+      filterSel.innerHTML='<option value="">전체</option>'+active.map(e=>`<option value="${e['이름']}">${e['이름']}</option>`).join('');
+      filterSel.value=cur;
+      if(cur) list = list.filter(r=>r['직원명']===cur);
+    }
   }
   const total=list.reduce((s,r)=>s+(Number(r['실지급액'])||0),0);
   document.getElementById('pay-sub').textContent=(ym||thisMonth())+' 급여 명세';
@@ -1744,7 +1807,6 @@ function updateSels(){
 const PAGES={
   dashboard: {title:'대시보드',sub:'전체 현황 요약',act:false},
   employees: {title:'직원 관리',sub:'직원 정보 관리',act:true,label:'＋ 직원 추가',fn:()=>openEmpModal()},
-  resignees: {title:'퇴사자 관리',sub:'퇴사자 정보 및 보증금',act:true,label:'＋ 퇴사자 추가',fn:()=>openResModal()},
   sales:     {title:'매출 관리',sub:'지국 매출 정리표',act:true,label:'＋ 매출 입력',fn:()=>openSaleModal()},
   inspection:{title:'점검 관리',sub:'점검 일정 및 일일급여',act:true,label:'＋ 점검 추가',fn:()=>openInspModal()},
   support:   {title:'지원 관리',sub:'회사 지원 항목',act:true,label:'＋ 지원 추가',fn:()=>openSupportModal()},
@@ -1789,9 +1851,18 @@ function go(page){
   if(page==='inspection')   initInspection();
   if(page==='support')      loadSupports();
   if(page==='salary')       loadSalary();
-  if(page==='resignees')    loadResignees();
+  if(page==='employees')    loadResignees();
 }
-function actClick(){PAGES[curPage]?.fn?.();}
+function actClick(){
+  // 직원 관리에서는 현재 탭에 따라 분기
+  if(curPage==='employees'){
+    const tab = document.querySelector('.emp-tab.active')?.dataset.tab;
+    if(tab==='resigned') openResModal();
+    else openEmpModal();
+    return;
+  }
+  PAGES[curPage]?.fn?.();
+}
 
 // ══ 모달 ════════════════════════════════════════════════════
 function openM(id){document.getElementById(id).classList.add('open');}
@@ -2073,6 +2144,33 @@ async function deleteEvent(){
 
 
 
+
+// ════ 직원 관리 탭 전환 ══════════════════════════════════════
+function switchEmpTab(tab){
+  document.querySelectorAll('.emp-tab').forEach(b=>{
+    if(b.dataset.tab===tab){
+      b.classList.add('active');
+      b.style.background='var(--surface)';
+      b.style.color='var(--text)';
+      b.style.fontWeight='600';
+      b.style.boxShadow='var(--shadow)';
+    } else {
+      b.classList.remove('active');
+      b.style.background='none';
+      b.style.color='var(--text-2)';
+      b.style.fontWeight='500';
+      b.style.boxShadow='none';
+    }
+  });
+  document.getElementById('emp-tab-active').style.display = tab==='active' ? '' : 'none';
+  document.getElementById('emp-tab-resigned').style.display = tab==='resigned' ? '' : 'none';
+  // 상단 추가 버튼 텍스트 변경
+  const actBtn=document.getElementById('act-btn');
+  if(actBtn && curPage==='employees'){
+    actBtn.textContent = tab==='resigned' ? '＋ 퇴사자 추가' : '＋ 직원 추가';
+  }
+}
+
 // ════ 퇴사자 관리 ════════════════════════════════════════════
 let resignees=[];
 
@@ -2226,7 +2324,7 @@ function renderInspection(){
     const dayEvs=evs.filter(e=>e['날짜']===ds);
     let evHtml='';
     dayEvs.slice(0,3).forEach(e=>{
-      evHtml+=`<div class="cal-event" style="background:#1D9E75" onclick="event.stopPropagation();openInspModal('${e['점검ID']}')">${e['업체명']}・${Number(e['일일급여']||0).toLocaleString()}</div>`;
+      evHtml+=`<div class="insp-event" onclick="event.stopPropagation();openInspModal('${e['점검ID']}')" title="${e['업체명']||''} - ₩${Number(e['일일급여']||0).toLocaleString()}"><div class="insp-company">${e['업체명']||''}</div><div class="insp-pay">₩${Number(e['일일급여']||0).toLocaleString()}</div></div>`;
     });
     if(dayEvs.length>3) evHtml+=`<div class="cal-more">+${dayEvs.length-3}건</div>`;
     html+=`<div class="cal-cell ${isToday?'today':''}" onclick="openInspModalForDate('${ds}')"><div class="cal-date ${dow===0?'sun':dow===6?'sat':''}">${d}</div>${evHtml}</div>`;
@@ -2507,6 +2605,175 @@ function resetMenus(){
 async function doInit(){
   if(!confirm('시트를 초기화하시겠습니까? (이미 있으면 무시됨)'))return;
   try{const r=await api('initAll');toast(r.message,'s');}catch(e){toast(e.message,'e');}
+}
+
+
+// ════ 규정표 자동완성 ════════════════════════════════════════
+let REGULATIONS = null;
+
+async function loadRegulations(){
+  try{
+    const r = await api('getRegulations');
+    REGULATIONS = r.data || {};
+  }catch(e){
+    REGULATIONS = {saupjang:[],toolbyul:[],sales:[],personal:[]};
+  }
+}
+
+// 의무 텍스트를 숫자로 변환
+function parseDuty(str){
+  if(!str) return null;
+  const s = String(str);
+  if(s.includes('36/48')) return 36; // 기본 36 (사용자가 수정 가능)
+  if(s.includes('60/72')) return 60;
+  if(s.includes('36')) return 36;
+  if(s.includes('48')) return 48;
+  if(s.includes('60')) return 60;
+  if(s.includes('72')) return 72;
+  if(s.includes('공통')) return null;
+  return null;
+}
+
+// 후보 검색
+function searchRegulations(query, field){
+  if(!REGULATIONS || !query) return [];
+  const q = query.toLowerCase().trim();
+  if(q.length < 1) return [];
+  const results = [];
+
+  // 1) 툴별 추가수수료 검색 (모델/툴명)
+  (REGULATIONS.toolbyul||[]).forEach(r=>{
+    const model = String(r['모델/툴명']||'');
+    const pgun  = String(r['제품군']||'');
+    const matchModel = model.toLowerCase().includes(q);
+    const matchPgun  = pgun.toLowerCase().includes(q);
+    if(matchModel || matchPgun){
+      results.push({
+        type: 'toolbyul',
+        title: model,
+        subtitle: `${pgun} · ${r['의무']||''} · 툴별 ${r['직원용%']||0}%`,
+        duty: parseDuty(r['의무']),
+        toolRate: Number(r['직원용%']||0),
+        model: model,
+        productGroup: pgun,
+        raw: r,
+      });
+    }
+  });
+
+  // 2) 사업장주력모델 검색
+  (REGULATIONS.saupjang||[]).forEach(r=>{
+    const mgun = String(r['모델군']||'');
+    const sgun = String(r['상품군']||'');
+    if(mgun.toLowerCase().includes(q) || sgun.toLowerCase().includes(q)){
+      results.push({
+        type: 'saupjang',
+        title: `${sgun} - ${mgun}`,
+        subtitle: `사업장 주력 · ${r['의무']||''} · 기본 ${r['직원용%']||0}%`,
+        duty: parseDuty(r['의무']),
+        baseRate: Number(r['직원용%']||0),
+        model: mgun,
+        productGroup: sgun,
+        raw: r,
+      });
+    }
+  });
+
+  // 3) 개인고객 추가수수료 검색 (상품군 단순 검색)
+  (REGULATIONS.personal||[]).forEach(r=>{
+    const sgun = String(r['상품군']||'');
+    if(sgun.toLowerCase().includes(q)){
+      results.push({
+        type: 'personal',
+        title: `${sgun} (개인고객)`,
+        subtitle: `개인 추가 ${r['요율%']||0}% · ${r['비고']||''}`,
+        personalRate: Number(r['요율%']||0),
+        productGroup: sgun,
+        raw: r,
+      });
+    }
+  });
+
+  return results.slice(0, 8); // 최대 8개
+}
+
+// 드롭다운 표시
+function showRegSuggest(input, field){
+  if(!REGULATIONS){ loadRegulations().then(()=>showRegSuggest(input,field)); return; }
+  const q = input.value.trim();
+  const target = field==='model' ? 'sug-model' : 'sug-product';
+  const dropdown = document.getElementById(target);
+  if(!dropdown) return;
+
+  const results = searchRegulations(q, field);
+  if(!results.length){
+    if(q.length >= 1){
+      dropdown.innerHTML = '<div class="reg-item no-data">💭 일치하는 규정이 없어요. 직접 입력해주세요.</div>';
+      dropdown.classList.add('open');
+    } else {
+      dropdown.classList.remove('open');
+    }
+    return;
+  }
+
+  dropdown.innerHTML = results.map((r,i)=>`
+    <div class="reg-item" onclick="applyRegulation(${i})">
+      <div class="reg-main">
+        <span class="reg-tag">${r.type==='toolbyul'?'툴별':r.type==='saupjang'?'사업장':'개인'}</span>
+        ${r.title}
+      </div>
+      <div class="reg-sub">${r.subtitle}</div>
+    </div>
+  `).join('');
+  dropdown.classList.add('open');
+
+  // 현재 결과 저장 (applyRegulation에서 사용)
+  window._currentSuggests = results;
+}
+
+function hideRegSuggest(id){
+  const el = document.getElementById(id);
+  if(el) el.classList.remove('open');
+}
+
+// 자동입력 실행
+function applyRegulation(idx){
+  const r = window._currentSuggests && window._currentSuggests[idx];
+  if(!r) return;
+
+  // 모델명 채우기 (있으면)
+  if(r.model){
+    document.getElementById('sf-model').value = r.model;
+  }
+  // 상품군 채우기 (상품명 칸에)
+  if(r.productGroup && !document.getElementById('sf-product').value){
+    document.getElementById('sf-product').value = r.productGroup;
+  }
+  // 의무
+  if(r.duty){
+    document.getElementById('sf-duty').value = r.duty;
+  }
+  // 기본 지급율 (사업장주력)
+  if(r.baseRate !== undefined && r.baseRate !== null){
+    document.getElementById('sf-rate1').value = r.baseRate;
+  }
+  // 툴별 지급율
+  if(r.toolRate !== undefined && r.toolRate !== null){
+    document.getElementById('sf-rate2').value = r.toolRate;
+  }
+  // 개인고객은 별도 메시지
+  if(r.type==='personal'){
+    toast(`💡 개인고객 추가수수료 ${r.personalRate}%는 "개인고객 추가수수료" 칸에 입력하세요`, 'i');
+  }
+
+  // 자동 계산
+  if(typeof calcFee==='function') calcFee();
+
+  // 드롭다운 닫기
+  hideRegSuggest('sug-model');
+  hideRegSuggest('sug-product');
+
+  toast('✅ 규정 자동 입력됨 (필요시 수정 가능)','s');
 }
 
 // ══ 유틸 ════════════════════════════════════════════════════
