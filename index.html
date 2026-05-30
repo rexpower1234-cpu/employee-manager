@@ -6,6 +6,15 @@
 <title>언빌리버블 컴퍼니 관리 시스템</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- PWA -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#1D9E75">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="UC 관리">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -247,6 +256,43 @@ tbody td{padding:9px 12px;vertical-align:middle}
 .reg-item .reg-tag{display:inline-block;font-size:9px;font-weight:600;padding:1px 6px;border-radius:100px;background:var(--accent-light);color:var(--accent-2)}
 .reg-item.no-data{cursor:default;text-align:center;color:var(--text-3);padding:14px;font-size:11px}
 .reg-item.no-data:hover{background:#fff}
+
+
+/* 견적서 마법사 */
+.qw-step{flex:1;padding:8px 12px;background:var(--surface-2);border-radius:6px;font-size:11px;font-weight:600;color:var(--text-3);text-align:center}
+.qw-step.active{background:var(--accent);color:#fff}
+.qw-step.done{background:var(--accent-light);color:var(--accent-2)}
+
+.qw-type-card{padding:24px 16px;border:2px solid var(--border);border-radius:10px;cursor:pointer;text-align:center;transition:all .15s;background:var(--surface)}
+.qw-type-card:hover{border-color:var(--accent);background:var(--accent-light)}
+.qw-type-card.selected{border-color:var(--accent);background:var(--accent-light);box-shadow:0 0 0 3px rgba(29,158,117,.15)}
+
+/* 견적서 제품 카드 */
+.qw-product-card{display:flex;gap:12px;padding:10px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;cursor:pointer;background:var(--surface);transition:all .15s}
+.qw-product-card:hover{border-color:var(--accent);background:var(--accent-light)}
+.qw-product-card.selected{border-color:var(--accent);background:var(--accent-light);box-shadow:0 0 0 2px rgba(29,158,117,.2)}
+.qw-product-img{width:50px;height:50px;object-fit:contain;background:#f5f5f5;border-radius:6px;flex-shrink:0}
+.qw-product-info{flex:1;min-width:0}
+.qw-product-name{font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qw-product-code{font-size:10px;color:var(--text-3);margin-bottom:3px}
+.qw-product-meta{font-size:9px;color:var(--text-3);display:flex;gap:6px;flex-wrap:wrap}
+
+.qw-product-tag{display:inline-block;font-size:9px;padding:1px 6px;border-radius:100px;background:var(--surface-2);color:var(--text-2)}
+.qw-product-tag.brand-coway{background:#DBEAFE;color:#1E3A8A}
+.qw-product-tag.brand-chungho{background:#D1FAE5;color:#065F46}
+.qw-product-tag.brand-cuckoo{background:#FEF3C7;color:#92400E}
+.qw-product-tag.brand-wells{background:#FCE7F3;color:#831843}
+
+/* 견적서 미리보기 */
+.quote-preview{font-family:var(--font);color:var(--text)}
+.quote-preview h1{font-size:24px;text-align:center;color:var(--accent-2);margin-bottom:20px;padding-bottom:16px;border-bottom:3px double var(--accent)}
+.quote-preview h2{font-size:14px;color:var(--text-2);margin:18px 0 8px;padding:6px 12px;background:var(--surface-2);border-left:3px solid var(--accent);border-radius:4px}
+.quote-preview table{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:14px}
+.quote-preview table th{background:var(--accent-light);color:var(--accent-2);padding:8px;text-align:left;border:1px solid var(--border)}
+.quote-preview table td{padding:8px;border:1px solid var(--border);vertical-align:middle}
+.quote-preview .quote-total{font-size:16px;font-weight:700;color:var(--accent-2);text-align:right;padding:12px;background:var(--accent-light);border-radius:6px;margin-top:14px}
+.quote-preview .quote-footer{margin-top:24px;padding-top:14px;border-top:1px solid var(--border);font-size:10px;color:var(--text-3);text-align:center}
+
 
 /* 점검 이벤트 (업체명 위 + 일급 아래) */
 .insp-event{background:#1D9E75;color:#fff;border-radius:5px;padding:3px 6px;margin-bottom:3px;cursor:pointer;line-height:1.2;overflow:hidden;transition:background .15s}
@@ -496,6 +542,8 @@ tbody td{padding:9px 12px;vertical-align:middle}
       <div class="page-sub" id="page-sub">전체 현황 요약</div>
     </div>
     <div class="topbar-right">
+      <button class="btn btn-secondary btn-sm" id="btn-notice-popup" onclick="showNoticePopup()" style="display:none">📢 공지보기</button>
+      <button class="btn btn-purple btn-sm" id="btn-add-notice" onclick="openNoticeModal()" style="display:none">📢 공지 등록</button>
       <button class="btn btn-secondary btn-sm" onclick="syncAll()">🔄 새로고침</button>
       <button class="btn btn-primary btn-sm" id="act-btn" style="display:none" onclick="actClick()">＋ 추가</button>
     </div>
@@ -552,6 +600,56 @@ tbody td{padding:9px 12px;vertical-align:middle}
           </table></div></div>
         </div>
       </div>
+
+      <!-- ====== 🎉 Refresh 회식 정보 ====== -->
+      <div id="dash-refresh-section" style="margin-top:24px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <h2 style="font-size:15px;font-weight:700;color:var(--text)">🎉 Refresh 회식 일정</h2>
+          <div style="flex:1;height:1px;background:var(--border)"></div>
+          <button class="btn btn-primary btn-sm" id="btn-add-refresh" onclick="openRefreshModal()" style="display:none">＋ 회식 추가</button>
+        </div>
+        <div id="dash-refresh-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px">
+          <div class="empty" style="grid-column:1/-1"><div class="empty-icon">🎉</div><div class="empty-title">등록된 회식 일정이 없습니다</div></div>
+        </div>
+      </div>
+
+      <!-- ====== 💳 브랜드사별 제휴카드 ====== -->
+      <div id="dash-card-section" style="margin-top:24px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+          <h2 style="font-size:15px;font-weight:700;color:var(--text)">💳 브랜드사별 제휴카드</h2>
+          <div style="flex:1;height:1px;background:var(--border);min-width:20px"></div>
+          <select class="fc" id="card-brand-filter" style="width:140px;padding:6px 9px" onchange="renderPartnerCards()">
+            <option value="">전체 브랜드</option>
+            <option value="코웨이">코웨이</option>
+            <option value="청호나이스">청호나이스</option>
+            <option value="쿠쿠">쿠쿠</option>
+            <option value="교원">교원</option>
+          </select>
+          <button class="btn btn-primary btn-sm" id="btn-add-card" onclick="openPartnerCardModal()" style="display:none">＋ 카드 추가</button>
+        </div>
+        <div id="dash-card-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px">
+          <div class="empty" style="grid-column:1/-1"><div class="empty-icon">💳</div><div class="empty-title">등록된 제휴카드가 없습니다</div></div>
+        </div>
+      </div>
+
+      <!-- ====== 🎁 브랜드사별 프로모션 ====== -->
+      <div id="dash-promo-section" style="margin-top:24px;margin-bottom:24px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+          <h2 style="font-size:15px;font-weight:700;color:var(--text)">🎁 브랜드사별 프로모션</h2>
+          <div style="flex:1;height:1px;background:var(--border);min-width:20px"></div>
+          <select class="fc" id="promo-brand-filter" style="width:140px;padding:6px 9px" onchange="renderPromotions()">
+            <option value="">전체 브랜드</option>
+            <option value="코웨이">코웨이</option>
+            <option value="청호나이스">청호나이스</option>
+            <option value="쿠쿠">쿠쿠</option>
+            <option value="교원">교원</option>
+          </select>
+          <button class="btn btn-primary btn-sm" id="btn-add-promo" onclick="openPromotionModal()" style="display:none">＋ 프로모션 추가</button>
+        </div>
+        <div id="dash-promo-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px">
+          <div class="empty" style="grid-column:1/-1"><div class="empty-icon">🎁</div><div class="empty-title">등록된 프로모션이 없습니다</div></div>
+        </div>
+      </div>
     </div>
 
     <!-- 직원 관리 (재직/퇴사 탭) -->
@@ -597,8 +695,15 @@ tbody td{padding:9px 12px;vertical-align:middle}
       </div>
     </div>
 
-    <!-- 매출 관리 (지국 형식) -->
+    <!-- 매출 관리 (지국/총판/마감검증 탭) -->
     <div class="section" id="s-sales">
+      <!-- 탭 -->
+      <div style="display:flex;gap:4px;margin-bottom:14px;background:var(--surface-2);border-radius:8px;padding:3px;width:fit-content">
+        <button class="sales-tab active" data-tab="branch" onclick="switchSalesTab('branch')" style="padding:7px 16px;border:none;background:var(--surface);font-size:12px;font-weight:600;cursor:pointer;border-radius:6px;font-family:var(--font);color:var(--text);box-shadow:var(--shadow)">📊 지국 매출</button>
+        <button class="sales-tab" data-tab="dealer" onclick="switchSalesTab('dealer')" style="padding:7px 16px;border:none;background:none;font-size:12px;font-weight:500;cursor:pointer;border-radius:6px;font-family:var(--font);color:var(--text-2)">🏢 총판 매출</button>
+        <button class="sales-tab" id="tab-verify" data-tab="verify" onclick="switchSalesTab('verify')" style="padding:7px 16px;border:none;background:none;font-size:12px;font-weight:500;cursor:pointer;border-radius:6px;font-family:var(--font);color:var(--purple);display:none">🔐 마감 검증</button>
+      </div>
+
       <div class="fbar">
         <div class="fgroup"><label class="flabel">연월</label><input class="fc" type="month" id="sal-ym" style="width:140px"></div>
         <div class="fgroup"><label class="flabel">판매인</label><select class="fc" id="sal-seller" style="width:120px"><option value="">전체</option></select></div>
@@ -607,9 +712,13 @@ tbody td{padding:9px 12px;vertical-align:middle}
         <button class="btn btn-secondary" style="margin-top:auto" id="btn-add-sale" onclick="openSaleModal()">＋ 매출 입력</button>
         <button class="btn btn-secondary btn-sm" style="margin-top:auto" onclick="exportSales()">📥 엑셀 다운로드</button>
       </div>
+      <div id="verify-banner" style="display:none;background:linear-gradient(135deg,#EEEDFE 0%,#FAEEDA 100%);border:1px solid var(--purple);border-radius:10px;padding:12px 16px;margin-bottom:14px">
+        <div style="font-size:12px;font-weight:700;color:var(--purple);margin-bottom:4px">🔐 마감 검증 모드 (관리자 전용)</div>
+        <div style="font-size:11px;color:var(--text-2)">마감검증용 규정(직원용보다 50%p 높음)으로 자동 재계산된 화면입니다. 회사 마진을 확인할 수 있어요.</div>
+      </div>
       <div class="card">
         <div class="card-header">
-          <div><div class="card-title">지국 매출 정리표</div><div class="card-sub" id="sale-sub"></div></div>
+          <div><div class="card-title" id="sale-card-title">지국 매출 정리표</div><div class="card-sub" id="sale-sub"></div></div>
           <div id="sale-total" style="font-size:12px;font-weight:700;color:var(--accent-2)"></div>
         </div>
         <div class="card-body np">
@@ -617,15 +726,16 @@ tbody td{padding:9px 12px;vertical-align:middle}
             <table class="sales-table" id="sales-tbl">
               <thead>
                 <tr>
-                  <th>고객번호</th><th>고객명</th><th>모델명</th><th>상품명</th>
+                  <th>출처</th><th>고객번호</th><th>고객명</th><th>모델명</th><th>상품명</th>
                   <th>의무</th><th>렌탈료</th><th>지급율(기본)%</th><th>판매수수료(기본)</th>
                   <th>지급율(툴별)%</th><th>툴별&업소용 추가수수료</th><th>사업장 추가수수료</th>
                   <th>개인고객 추가수수료</th><th>셀프</th><th>최종수수료</th>
                   <th>실 판매인</th><th>판매인</th><th>실적인정</th><th>사업자</th>
+                  <th id="verify-margin-th" style="background:#6B4EE6;display:none">검증 마진</th>
                   <th style="background:#0F6E56">관리</th>
                 </tr>
               </thead>
-              <tbody id="sale-tbody"><tr class="loading-row"><td colspan="19"><span class="spinner"></span> 불러오는 중...</td></tr></tbody>
+              <tbody id="sale-tbody"><tr class="loading-row"><td colspan="20"><span class="spinner"></span> 불러오는 중...</td></tr></tbody>
               <tfoot id="sale-tfoot"></tfoot>
             </table>
           </div>
@@ -696,6 +806,86 @@ tbody td{padding:9px 12px;vertical-align:middle}
           <div id="cal-month-view"></div>
           <div id="cal-week-view" style="display:none"></div>
           <div id="cal-day-view" style="display:none"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 견적서 관리 -->
+    <div class="section" id="s-quote">
+      <!-- 탭 -->
+      <div style="display:flex;gap:4px;margin-bottom:14px;background:var(--surface-2);border-radius:8px;padding:3px;width:fit-content">
+        <button class="quote-tab active" data-tab="list" onclick="switchQuoteTab('list')" style="padding:7px 16px;border:none;background:var(--surface);font-size:12px;font-weight:600;cursor:pointer;border-radius:6px;font-family:var(--font);color:var(--text);box-shadow:var(--shadow)">📋 견적서 목록</button>
+        <button class="quote-tab" data-tab="response" onclick="switchQuoteTab('response')" style="padding:7px 16px;border:none;background:none;font-size:12px;font-weight:500;cursor:pointer;border-radius:6px;font-family:var(--font);color:var(--text-2)">📬 고객 응답</button>
+        <button class="quote-tab" id="quote-tab-template" data-tab="template" onclick="switchQuoteTab('template')" style="padding:7px 16px;border:none;background:none;font-size:12px;font-weight:500;cursor:pointer;border-radius:6px;font-family:var(--font);color:var(--purple);display:none">🛠 제품/템플릿 관리</button>
+      </div>
+
+      <!-- 견적서 목록 탭 -->
+      <div id="quote-tab-list">
+        <div class="fbar">
+          <div class="fgroup"><label class="flabel">상태</label>
+            <select class="fc" id="q-filter-status" style="width:140px" onchange="renderQuoteList()">
+              <option value="">전체</option>
+              <option value="대기">⏸ 대기</option>
+              <option value="수락">✅ 수락</option>
+              <option value="거절">❌ 거절</option>
+              <option value="검토중">🔍 검토중</option>
+            </select>
+          </div>
+          <div class="fgroup"><label class="flabel">검색</label>
+            <input class="fc" id="q-filter-search" placeholder="고객명·견적번호" style="width:200px" oninput="renderQuoteList()">
+          </div>
+          <button class="btn btn-primary" style="margin-top:auto" onclick="openQuoteWizard()">＋ 새 견적서</button>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div><div class="card-title">견적서 내역</div><div class="card-sub" id="q-sub">-</div></div>
+            <div id="q-total" style="font-size:12px;font-weight:700;color:var(--accent-2)"></div>
+          </div>
+          <div class="card-body np"><div class="tw"><table>
+            <thead><tr><th>견적번호</th><th>작성일</th><th>작성자</th><th>종류</th><th>회사</th><th>고객명</th><th>총금액</th><th>상태</th><th>관리</th></tr></thead>
+            <tbody id="q-tbody"><tr class="loading-row"><td colspan="9"><span class="spinner"></span> 불러오는 중...</td></tr></tbody>
+          </table></div></div>
+        </div>
+      </div>
+
+      <!-- 고객 응답 탭 -->
+      <div id="quote-tab-response" style="display:none">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">
+          <div class="metric-card"><div class="metric-label"><span class="dot dot-g"></span>수락</div><div class="metric-value" id="qr-accept" style="color:var(--accent-2)">0</div></div>
+          <div class="metric-card"><div class="metric-label"><span class="dot dot-r"></span>거절</div><div class="metric-value" id="qr-reject" style="color:var(--danger)">0</div></div>
+          <div class="metric-card"><div class="metric-label"><span class="dot dot-y"></span>검토중</div><div class="metric-value" id="qr-review" style="color:var(--warn)">0</div></div>
+          <div class="metric-card"><div class="metric-label"><span class="dot dot-b"></span>대기</div><div class="metric-value" id="qr-pending" style="color:var(--info)">0</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">응답 내역</div></div>
+          <div class="card-body np"><div class="tw"><table>
+            <thead><tr><th>견적번호</th><th>응답일</th><th>고객명</th><th>회사</th><th>총금액</th><th>상태</th><th>관리</th></tr></thead>
+            <tbody id="qr-tbody"><tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-3)">응답 내역 없음</td></tr></tbody>
+          </table></div></div>
+        </div>
+      </div>
+
+      <!-- 제품/템플릿 관리 탭 (관리자만) -->
+      <div id="quote-tab-template" style="display:none">
+        <div class="card">
+          <div class="card-header">
+            <div><div class="card-title">📦 제품 목록</div><div class="card-sub" id="qp-sub">-</div></div>
+            <div style="display:flex;gap:6px">
+              <label class="btn btn-purple btn-sm" style="cursor:pointer">
+                📥 JSON 백업 가져오기
+                <input type="file" accept=".json" style="display:none" onchange="importProductsJson(this)">
+              </label>
+            </div>
+          </div>
+          <div class="card-body">
+            <div style="display:flex;gap:6px;margin-bottom:12px">
+              <select class="fc" id="qp-brand-filter" style="width:140px" onchange="renderProductList()"><option value="">전체 브랜드</option></select>
+              <select class="fc" id="qp-cat-filter" style="width:140px" onchange="renderProductList()"><option value="">전체 카테고리</option></select>
+              <input class="fc" id="qp-search" placeholder="🔍 제품명·모델 검색" style="width:200px" oninput="renderProductList()">
+              <div id="qp-count" style="margin-left:auto;align-self:center;font-size:11px;color:var(--text-3)"></div>
+            </div>
+            <div id="qp-list" style="max-height:500px;overflow-y:auto"><div class="empty">📭 제품 데이터가 없습니다. JSON 백업 파일을 가져와주세요.</div></div>
+          </div>
         </div>
       </div>
     </div>
@@ -780,6 +970,17 @@ tbody td{padding:9px 12px;vertical-align:middle}
         </div>
       </div>
 
+      <!-- 공지사항 목록 -->
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">📢 공지사항 관리</div><div class="card-sub">현재 표시 중인 공지사항</div></div>
+          <button class="btn btn-purple btn-sm" onclick="openNoticeModal()">＋ 공지 등록</button>
+        </div>
+        <div class="card-body" id="admin-notice-list">
+          <div class="empty"><div class="empty-icon">📢</div><div class="empty-title">등록된 공지가 없습니다</div></div>
+        </div>
+      </div>
+
       <!-- 시스템 -->
       <div class="card">
         <div class="card-header"><div class="card-title">🗂️ 시스템 관리</div></div>
@@ -822,6 +1023,12 @@ tbody td{padding:9px 12px;vertical-align:middle}
     <div class="mh"><div class="mt" id="m-sale-title">매출 입력</div><button class="mc" onclick="closeM('m-sale')">✕</button></div>
     <div class="mb"><input type="hidden" id="sf-id">
       <div class="fg fg3">
+        <div class="fgroup full"><label class="flabel">매출 출처<span class="req">*</span></label>
+          <select class="fc" id="sf-source">
+            <option value="지국">📊 지국</option>
+            <option value="총판">🏢 총판</option>
+          </select>
+        </div>
         <div class="fgroup full"><label class="flabel">고객번호</label><input class="fc" id="sf-cno" placeholder="1-01-260101-0000"></div>
         <div class="fgroup full"><label class="flabel">고객명<span class="req">*</span></label><input class="fc" id="sf-cname" placeholder="고객명 입력"></div>
         <div class="fgroup" style="position:relative">
@@ -959,6 +1166,125 @@ tbody td{padding:9px 12px;vertical-align:middle}
   </div>
 </div>
 
+<!-- 모달: 견적서 작성 마법사 -->
+<div class="modal-overlay" id="m-quote">
+  <div class="modal" style="width:880px;max-width:96vw">
+    <div class="mh">
+      <div>
+        <div class="mt" id="m-quote-title">📄 견적서 작성</div>
+        <div style="font-size:11px;color:var(--text-3);margin-top:2px" id="m-quote-step-info">1단계: 견적서 종류 선택</div>
+      </div>
+      <button class="mc" onclick="closeQuoteWizard()">✕</button>
+    </div>
+    <div class="mb" style="padding:24px 28px">
+      <input type="hidden" id="qw-id">
+
+      <!-- 단계 표시 -->
+      <div style="display:flex;gap:6px;margin-bottom:20px" id="qw-steps">
+        <div class="qw-step active" data-step="1">1. 종류</div>
+        <div class="qw-step" data-step="2">2. 고객</div>
+        <div class="qw-step" data-step="3">3. 제품</div>
+        <div class="qw-step" data-step="4">4. 미리보기</div>
+      </div>
+
+      <!-- 1단계: 견적서 종류 선택 -->
+      <div class="qw-content" id="qw-1">
+        <div style="font-size:13px;font-weight:600;margin-bottom:14px">어떤 견적서를 만들까요?</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+          <div class="qw-type-card" data-type="single" onclick="selectQuoteType('single')">
+            <div style="font-size:32px;margin-bottom:8px">📄</div>
+            <div style="font-size:13px;font-weight:700;margin-bottom:4px">단일 견적서</div>
+            <div style="font-size:11px;color:var(--text-3)">한 가지 제품<br>단독 견적</div>
+          </div>
+          <div class="qw-type-card" data-type="compare" onclick="selectQuoteType('compare')">
+            <div style="font-size:32px;margin-bottom:8px">📊</div>
+            <div style="font-size:13px;font-weight:700;margin-bottom:4px">비교 견적서</div>
+            <div style="font-size:11px;color:var(--text-3)">기존 ↔ 교체<br>비교 견적</div>
+          </div>
+          <div class="qw-type-card" data-type="multiple" onclick="selectQuoteType('multiple')">
+            <div style="font-size:32px;margin-bottom:8px">📚</div>
+            <div style="font-size:13px;font-weight:700;margin-bottom:4px">다수 견적서</div>
+            <div style="font-size:11px;color:var(--text-3)">여러 제품<br>묶음 견적</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2단계: 고객 정보 -->
+      <div class="qw-content" id="qw-2" style="display:none">
+        <div style="font-size:13px;font-weight:600;margin-bottom:14px">고객 정보를 입력해주세요</div>
+        <div class="fg" style="gap:14px">
+          <div class="fgroup full"><label class="flabel">고객명 / 기업명<span class="req">*</span></label><input class="fc" id="qw-cname" placeholder="예) ○○ 주식회사"></div>
+          <div class="fgroup"><label class="flabel">주소</label><input class="fc" id="qw-caddr" placeholder="예) 서울시 강남구"></div>
+          <div class="fgroup"><label class="flabel">세부주소</label><input class="fc" id="qw-caddr2" placeholder="예) 123동 456호"></div>
+          <div class="fgroup"><label class="flabel">담당자명</label><input class="fc" id="qw-ccontact" placeholder="예) 홍길동 팀장"></div>
+          <div class="fgroup"><label class="flabel">연락처</label><input class="fc" id="qw-cphone" placeholder="010-0000-0000"></div>
+          <div class="fgroup"><label class="flabel">고객 이메일 (응답 추적용)</label><input class="fc" id="qw-cemail" type="email" placeholder="customer@email.com"></div>
+          <div class="fgroup"><label class="flabel">관련번호</label><input class="fc" id="qw-cref" placeholder="예) SC-JP-14400107"></div>
+        </div>
+      </div>
+
+      <!-- 3단계: 제품 선택 -->
+      <div class="qw-content" id="qw-3" style="display:none">
+        <div id="qw-product-area">
+          <!-- 동적으로 채워짐 -->
+        </div>
+      </div>
+
+      <!-- 4단계: 미리보기 -->
+      <div class="qw-content" id="qw-4" style="display:none">
+        <div style="font-size:13px;font-weight:600;margin-bottom:14px">📋 미리보기</div>
+        <div id="qw-preview" style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:24px;max-height:500px;overflow-y:auto"></div>
+        <div style="margin-top:14px;padding:12px;background:var(--accent-light);border-radius:8px;font-size:11px;color:var(--text-2)">
+          💡 <strong>다음 단계:</strong> 견적서를 저장 후 PDF 다운로드, 이메일 발송, 카카오톡 공유 등이 가능합니다.
+        </div>
+      </div>
+
+    </div>
+    <div class="mf">
+      <button class="btn btn-secondary" id="qw-prev-btn" onclick="prevQuoteStep()" style="display:none">← 이전</button>
+      <div style="margin-left:auto;display:flex;gap:7px">
+        <button class="btn btn-secondary" onclick="closeQuoteWizard()">취소</button>
+        <button class="btn btn-primary" id="qw-next-btn" onclick="nextQuoteStep()">다음 →</button>
+        <button class="btn btn-primary" id="qw-save-btn" onclick="saveQuote()" style="display:none">💾 저장</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 모달: 견적서 작성 후 액션 -->
+<div class="modal-overlay" id="m-quote-actions">
+  <div class="modal modal-sm">
+    <div class="mh"><div class="mt">✅ 견적서 저장 완료</div><button class="mc" onclick="closeM('m-quote-actions')">✕</button></div>
+    <div class="mb">
+      <div style="background:var(--accent-light);border-radius:8px;padding:14px;margin-bottom:16px">
+        <div style="font-size:11px;color:var(--text-3);margin-bottom:4px">견적번호</div>
+        <div style="font-size:15px;font-weight:700;color:var(--accent-2)" id="qa-id">-</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button class="btn btn-primary" onclick="downloadQuotePdf()">📥 PDF 다운로드</button>
+        <button class="btn btn-secondary" onclick="openGmailForQuote()">📧 Gmail로 발송 (직원 본인 이메일)</button>
+        <button class="btn btn-secondary" onclick="shareKakaoQuote()">💬 카카오톡 공유</button>
+        <button class="btn btn-secondary" onclick="previewQuoteFull()">👁 다시 미리보기</button>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn btn-secondary" onclick="closeM('m-quote-actions')">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 모달: 견적서 보기 -->
+<div class="modal-overlay" id="m-quote-view">
+  <div class="modal" style="width:880px">
+    <div class="mh"><div class="mt" id="qv-title">견적서 보기</div><button class="mc" onclick="closeM('m-quote-view')">✕</button></div>
+    <div class="mb"><div id="qv-content" style="background:#fff;padding:24px;border-radius:8px;border:1px solid var(--border)"></div></div>
+    <div class="mf">
+      <button class="btn btn-secondary" onclick="closeM('m-quote-view')">닫기</button>
+      <button class="btn btn-primary" onclick="downloadQuotePdfFromView()">📥 PDF 다운로드</button>
+    </div>
+  </div>
+</div>
+
 <!-- 모달: 권한 상세 설정 -->
 <div class="modal-overlay" id="m-perm">
   <div class="modal">
@@ -992,6 +1318,172 @@ tbody td{padding:9px 12px;vertical-align:middle}
     <div class="mf">
       <button class="btn btn-secondary" onclick="closeM('m-perm')">취소</button>
       <button class="btn btn-primary" onclick="savePermDetail()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 공지사항 팝업 -->
+<div class="modal-overlay" id="m-notice-popup">
+  <div class="modal" style="width:520px">
+    <div class="mh" style="background:linear-gradient(135deg,#1D9E75 0%,#0F6E56 100%);color:#fff;border-bottom:none">
+      <div class="mt" style="color:#fff">📢 공지사항</div>
+      <button class="mc" style="color:#fff" onclick="closeNoticePopup()">✕</button>
+    </div>
+    <div class="mb" id="notice-popup-content" style="max-height:60vh;overflow-y:auto"></div>
+    <div class="mf" style="justify-content:space-between">
+      <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-2);cursor:pointer">
+        <input type="checkbox" id="notice-hide-today" style="width:14px;height:14px;cursor:pointer;accent-color:var(--accent)">
+        오늘 하루 안 보기
+      </label>
+      <button class="btn btn-primary" onclick="closeNoticePopup()">확인</button>
+    </div>
+  </div>
+</div>
+
+<!-- 공지사항 추가/수정 모달 -->
+<div class="modal-overlay" id="m-notice">
+  <div class="modal modal-sm">
+    <div class="mh"><div class="mt" id="m-notice-title">공지사항 등록</div><button class="mc" onclick="closeM('m-notice')">✕</button></div>
+    <div class="mb"><input type="hidden" id="nt-id">
+      <div class="fgroup" style="margin-bottom:12px">
+        <label class="flabel">제목<span class="req">*</span></label>
+        <input class="fc" id="nt-title" placeholder="공지 제목">
+      </div>
+      <div class="fgroup" style="margin-bottom:12px">
+        <label class="flabel">내용<span class="req">*</span></label>
+        <textarea class="fc" id="nt-content" rows="5" placeholder="공지 내용 입력" style="resize:vertical;min-height:120px;font-family:var(--font);line-height:1.5"></textarea>
+      </div>
+      <div class="fg" style="gap:12px;margin-bottom:12px">
+        <div class="fgroup"><label class="flabel">종료일</label><input class="fc" id="nt-end" type="date"></div>
+        <div class="fgroup"><label class="flabel">색상</label>
+          <select class="fc" id="nt-color">
+            <option value="#1D9E75">🟢 초록</option>
+            <option value="#2461d4">🔵 파랑</option>
+            <option value="#E24B4A">🔴 빨강</option>
+            <option value="#BA7517">🟠 주황</option>
+            <option value="#6B4EE6">🟣 보라</option>
+          </select>
+        </div>
+      </div>
+      <div class="fgroup">
+        <label class="flabel">우선순위 (높을수록 위에 표시)</label>
+        <input class="fc" id="nt-priority" type="number" value="1" min="1" max="10">
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn btn-danger" id="nt-del-btn" onclick="delNotice()" style="display:none;margin-right:auto">삭제</button>
+      <button class="btn btn-secondary" onclick="closeM('m-notice')">취소</button>
+      <button class="btn btn-primary" onclick="submitNotice()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 회식 추가/수정 모달 -->
+<div class="modal-overlay" id="m-refresh">
+  <div class="modal">
+    <div class="mh"><div class="mt" id="m-refresh-title">회식 정보 등록</div><button class="mc" onclick="closeM('m-refresh')">✕</button></div>
+    <div class="mb"><input type="hidden" id="rf-id">
+      <div class="fgroup" style="margin-bottom:12px">
+        <label class="flabel">회식명<span class="req">*</span></label>
+        <input class="fc" id="rf-title" placeholder="예: 5월 정기 회식">
+      </div>
+      <div class="fg" style="gap:12px;margin-bottom:12px">
+        <div class="fgroup"><label class="flabel">일시<span class="req">*</span></label><input class="fc" id="rf-datetime" type="datetime-local"></div>
+        <div class="fgroup"><label class="flabel">장소</label><input class="fc" id="rf-place" placeholder="예: ○○ 식당"></div>
+      </div>
+      <div class="fgroup" style="margin-bottom:12px">
+        <label class="flabel">메뉴</label>
+        <input class="fc" id="rf-menu" placeholder="예: 삼겹살, 소주">
+      </div>
+      <div class="fgroup" style="margin-bottom:12px">
+        <label class="flabel">사진 (선택)</label>
+        <input type="file" accept="image/*" id="rf-image-input" onchange="uploadRefreshImage(this)" style="font-size:11px">
+        <div id="rf-image-preview" style="margin-top:8px"></div>
+        <input type="hidden" id="rf-image-url">
+      </div>
+      <div class="fgroup">
+        <label class="flabel">메모</label>
+        <textarea class="fc" id="rf-memo" rows="2" placeholder="추가 안내사항" style="resize:vertical"></textarea>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn btn-danger" id="rf-del-btn" onclick="delRefresh()" style="display:none;margin-right:auto">삭제</button>
+      <button class="btn btn-secondary" onclick="closeM('m-refresh')">취소</button>
+      <button class="btn btn-primary" id="rf-save-btn" onclick="submitRefresh()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 제휴카드 추가 모달 -->
+<div class="modal-overlay" id="m-card">
+  <div class="modal modal-sm">
+    <div class="mh"><div class="mt">💳 제휴카드 등록</div><button class="mc" onclick="closeM('m-card')">✕</button></div>
+    <div class="mb">
+      <div class="fg" style="gap:12px;margin-bottom:12px">
+        <div class="fgroup"><label class="flabel">브랜드<span class="req">*</span></label>
+          <select class="fc" id="cd-brand">
+            <option value="코웨이">코웨이</option>
+            <option value="청호나이스">청호나이스</option>
+            <option value="쿠쿠">쿠쿠</option>
+            <option value="교원">교원</option>
+          </select>
+        </div>
+        <div class="fgroup"><label class="flabel">카드명<span class="req">*</span></label><input class="fc" id="cd-title" placeholder="예: 코웨이 제휴 카드"></div>
+      </div>
+      <div class="fgroup" style="margin-bottom:12px">
+        <label class="flabel">이미지 또는 파일 업로드<span class="req">*</span></label>
+        <input type="file" accept="image/*,.pdf" id="cd-file-input" onchange="uploadCardFile(this)" style="font-size:11px">
+        <div id="cd-file-preview" style="margin-top:8px"></div>
+        <input type="hidden" id="cd-image-url">
+        <input type="hidden" id="cd-file-url">
+      </div>
+      <div class="fgroup">
+        <label class="flabel">메모</label>
+        <textarea class="fc" id="cd-memo" rows="2" style="resize:vertical"></textarea>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn btn-secondary" onclick="closeM('m-card')">취소</button>
+      <button class="btn btn-primary" id="cd-save-btn" onclick="submitPartnerCard()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 프로모션 추가 모달 -->
+<div class="modal-overlay" id="m-promo">
+  <div class="modal modal-sm">
+    <div class="mh"><div class="mt">🎁 프로모션 등록</div><button class="mc" onclick="closeM('m-promo')">✕</button></div>
+    <div class="mb">
+      <div class="fg" style="gap:12px;margin-bottom:12px">
+        <div class="fgroup"><label class="flabel">브랜드<span class="req">*</span></label>
+          <select class="fc" id="pm-brand">
+            <option value="코웨이">코웨이</option>
+            <option value="청호나이스">청호나이스</option>
+            <option value="쿠쿠">쿠쿠</option>
+            <option value="교원">교원</option>
+          </select>
+        </div>
+        <div class="fgroup"><label class="flabel">제목<span class="req">*</span></label><input class="fc" id="pm-title" placeholder="예: 5월 프로모션"></div>
+      </div>
+      <div class="fg" style="gap:12px;margin-bottom:12px">
+        <div class="fgroup"><label class="flabel">시작일</label><input class="fc" id="pm-start" type="date"></div>
+        <div class="fgroup"><label class="flabel">종료일</label><input class="fc" id="pm-end" type="date"></div>
+      </div>
+      <div class="fgroup" style="margin-bottom:12px">
+        <label class="flabel">이미지 또는 파일 업로드<span class="req">*</span></label>
+        <input type="file" accept="image/*,.pdf" id="pm-file-input" onchange="uploadPromoFile(this)" style="font-size:11px">
+        <div id="pm-file-preview" style="margin-top:8px"></div>
+        <input type="hidden" id="pm-image-url">
+        <input type="hidden" id="pm-file-url">
+      </div>
+      <div class="fgroup">
+        <label class="flabel">메모</label>
+        <textarea class="fc" id="pm-memo" rows="2" style="resize:vertical"></textarea>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn btn-secondary" onclick="closeM('m-promo')">취소</button>
+      <button class="btn btn-primary" id="pm-save-btn" onclick="submitPromotion()">저장</button>
     </div>
   </div>
 </div>
@@ -1038,6 +1530,13 @@ const PERM_KEYS = [
   {k:'view_support_all',   label:'전체 지원 관리 보기'},
   {k:'manage_support',     label:'지원 추가/수정/삭제'},
   {k:'view_calendar_all',  label:'전체 직원 캘린더 보기'},
+  {k:'manage_notice',           label:'📢 공지사항 등록/수정'},
+  {k:'manage_refresh',          label:'🎉 회식 정보 등록/수정'},
+  {k:'manage_menu',             label:'🍽 식단표 등록/수정'},
+  {k:'manage_cleaning',         label:'🧹 청소당번 등록/수정'},
+  {k:'manage_partner_card',     label:'💳 제휴카드 등록/삭제'},
+  {k:'manage_promotion',        label:'🎁 프로모션 등록/삭제'},
+  {k:'manage_global_event',     label:'📅 전체 일정 등록 (전직원 캘린더 표시)'},
 ];
 
 const POSITION_LIST = ['총괄실장','영업부실장','용역부실장','영업부직원','용역부직원','팀장'];
@@ -1045,7 +1544,7 @@ const POSITION_LIST = ['총괄실장','영업부실장','용역부실장','영�
 // 프리셋 정의
 const PRESETS = {
   all: PERM_KEYS.reduce((o,p)=>{o[p.k]=true;return o;},{}),
-  manager: {view_dashboard_all:true,view_dash_emp_count:true,view_dash_total_sales:true,view_dash_total_comm:true,view_dash_ranking:true,view_dash_recent_sales:true,view_employees:true,view_sales_all:true,manage_sales:true,view_salary_all:true,view_attendance_all:true,view_inspection_all:true,manage_inspection:true,view_support_all:true,manage_support:true,view_calendar_all:true},
+  manager: {view_dashboard_all:true,view_dash_emp_count:true,view_dash_total_sales:true,view_dash_total_comm:true,view_dash_ranking:true,view_dash_recent_sales:true,view_employees:true,view_sales_all:true,manage_sales:true,view_salary_all:true,view_attendance_all:true,view_inspection_all:true,manage_inspection:true,view_support_all:true,manage_support:true,view_calendar_all:true,manage_notice:true,manage_refresh:true,manage_menu:true,manage_cleaning:true,manage_partner_card:true,manage_promotion:true,manage_global_event:true},
   sales:   {view_sales_all:true,manage_sales:true,view_salary_self:true,view_dash_ranking:true,view_dash_recent_sales:true},
   service: {view_inspection_all:true,manage_inspection:true,view_salary_self:true},
   none:    {view_salary_self:true},
@@ -1252,6 +1751,17 @@ function applyRole(){
   // 급여 직원 필터 (전체 보기 권한 있을 때만)
   const payEmpWrap=document.getElementById('pay-emp-wrap');
   if(payEmpWrap) payEmpWrap.style.display = (canDo('view_salary_all')||isAdmin) ? 'flex' : 'none';
+  // 마감검증 탭 (관리자만)
+  const verifyTab=document.getElementById('tab-verify');
+  if(verifyTab) verifyTab.style.display = isAdmin ? '' : 'none';
+
+  // Phase 1: 대시보드 추가 버튼 권한별 표시
+  const btnRefresh = document.getElementById('btn-add-refresh');
+  if(btnRefresh) btnRefresh.style.display = (canDo('manage_refresh') || isAdmin) ? 'inline-flex' : 'none';
+  const btnCard = document.getElementById('btn-add-card');
+  if(btnCard) btnCard.style.display = (canDo('manage_partner_card') || isAdmin) ? 'inline-flex' : 'none';
+  const btnPromo = document.getElementById('btn-add-promo');
+  if(btnPromo) btnPromo.style.display = (canDo('manage_promotion') || isAdmin) ? 'inline-flex' : 'none';
 
   // 날짜 필터 초기값
   document.getElementById('sal-ym').value=thisMonth();
@@ -1264,6 +1774,7 @@ const DEFAULT_MENUS = [
   {id:'dashboard',  label:'대시보드',   icon:'🏠', perm:null},
   {id:'employees',  label:'직원 관리',  icon:'👥', perm:'view_employees'},
   {id:'sales',      label:'매출 관리',  icon:'📊', perm:null},
+  {id:'quote',      label:'견적서 관리', icon:'📄', perm:null},
   {id:'inspection', label:'점검 관리',  icon:'🔧', perm:null},
   {id:'support',    label:'지원 관리',  icon:'💰', perm:null},
   {id:'salary',     label:'급여 관리',  icon:'💳', perm:null},
@@ -1320,12 +1831,17 @@ async function syncAll(){
   const isAdmin = CU.name===ADMIN_NAME;
   try{
     // 직원 목록은 항상 로드 (담당자 선택 드롭다운 등에 필요)
-    const tasks=[loadEmployees(), loadSales(), loadEvents(), loadInspections(), loadSupports(), loadResignees(), loadRegulations()];
+    const tasks=[loadEmployees(), loadSales(), loadEvents(), loadInspections(), loadSupports(), loadResignees(), loadRegulations(), loadQuoteProducts(), loadQuotes(), loadNotices(), loadRefreshes(), loadPartnerCards(), loadPromotions()];
     if(canDo('view_salary_all') || canDo('view_salary_self') || canDo('manage_salary')) tasks.push(loadSalary());
     if(canDo('view_attendance_all') || isAdmin) tasks.push(loadAttendance());
     await Promise.all(tasks);
     loadDashboard();
+    renderRefreshes();
+    renderPartnerCards();
+    renderPromotions();
     if(isAdmin) { loadPermList(); renderMenuConfig(); }
+    // 공지사항 팝업 (로그인 후 한번만)
+    if(!window._noticeShown){ window._noticeShown=true; setTimeout(()=>showNoticePopup(),500); }
     toast('동기화 완료 ✅','s');
   }catch(e){toast('실패: '+e.message,'e');}
 }
@@ -1362,13 +1878,30 @@ function loadDashboard(){
 
   // 이번 달 매출만 필터
   const monthSales = sales.filter(r=>String(r['등록일']||'').startsWith(ym));
+  const branchSales = monthSales.filter(r=>(r['출처']||'지국')==='지국');
+  const dealerSales = monthSales.filter(r=>r['출처']==='총판');
   const totalFinal=monthSales.reduce((s,r)=>s+(Number(r['최종수수료'])||0),0);
+  const branchFinal=branchSales.reduce((s,r)=>s+(Number(r['최종수수료'])||0),0);
+  const dealerFinal=dealerSales.reduce((s,r)=>s+(Number(r['최종수수료'])||0),0);
   const totalPerf=monthSales.reduce((s,r)=>s+(Number(r['실적인정'])||0),0);
+
   if(showSales){
     document.getElementById('d-sales').textContent=fm(totalPerf);
     document.getElementById('d-ssub').textContent='실적인정 합계';
   }
-  if(showComm) document.getElementById('d-comm').textContent=fm(totalFinal);
+  if(showComm){
+    document.getElementById('d-comm').textContent=fm(totalFinal);
+    // 지국/총판 분리 표시
+    const commCard = document.getElementById('d-card-comm');
+    let split = commCard.querySelector('.d-split');
+    if(!split){
+      split = document.createElement('div');
+      split.className = 'd-split';
+      split.style.cssText = 'margin-top:8px;font-size:10px;color:var(--text-3);display:flex;gap:10px';
+      commCard.appendChild(split);
+    }
+    split.innerHTML = `📊 지국 ${fm(branchFinal)}<br>🏢 총판 ${fm(dealerFinal)}`;
+  }
 
   // 급여 실지급액
   if(isAdmin || canDo('view_salary_all')){
@@ -1525,15 +2058,53 @@ async function loadSales(){
 }
 
 function renderSales(list){
+  // 현재 탭에 따라 필터링
+  const tab = currentSalesTab||'branch';
+  if(tab==='branch'){
+    list = list.filter(r=>(r['출처']||'지국')==='지국');
+  } else if(tab==='dealer'){
+    list = list.filter(r=>r['출처']==='총판');
+  }
+  // verify 탭일 때는 전체 표시 (검증 마진 컬럼 추가)
+  const isVerify = tab==='verify';
+
   const total=list.reduce((s,r)=>s+(Number(r['최종수수료'])||0),0);
   const totalPerf=list.reduce((s,r)=>s+(Number(r['실적인정'])||0),0);
+  let totalMargin = 0;
+  if(isVerify){
+    list.forEach(r=>{
+      const m = calcVerifyMargin(r);
+      r._verifyMargin = m;
+      totalMargin += m;
+    });
+  }
+
+  // 마감검증 마진 컬럼 표시/숨김
+  const marginTh = document.getElementById('verify-margin-th');
+  if(marginTh) marginTh.style.display = isVerify ? '' : 'none';
+
+  // 합계
   document.getElementById('sale-sub').textContent=list.length+'건';
-  document.getElementById('sale-total').textContent=`최종수수료 합계: ${fm(total)} | 실적인정 합계: ${fm(totalPerf)}`;
+  if(isVerify){
+    document.getElementById('sale-total').innerHTML = `최종수수료 합계: ${fm(total)} | <span style="color:var(--purple)">검증 마진 합계: ${fm(totalMargin)}</span>`;
+  } else {
+    document.getElementById('sale-total').textContent=`최종수수료 합계: ${fm(total)} | 실적인정 합계: ${fm(totalPerf)}`;
+  }
+
   const tb=document.getElementById('sale-tbody');
-  const role=getRoleOf(CU.name);
-  const canEdit=role==='admin'||role==='manager';
-  if(!list.length){tb.innerHTML='<tr><td colspan="19" style="text-align:center;padding:30px;color:var(--text-3)">데이터가 없습니다</td></tr>';renderSaleTfoot([]);return;}
-  tb.innerHTML=list.map(r=>`<tr>
+  const isAdmin = CU.name===ADMIN_NAME;
+  const canEdit = isAdmin || canDo('manage_sales');
+  if(!list.length){tb.innerHTML='<tr><td colspan="20" style="text-align:center;padding:30px;color:var(--text-3)">데이터가 없습니다</td></tr>';renderSaleTfoot([],isVerify);return;}
+
+  tb.innerHTML=list.map(r=>{
+    const sourceBadge = (r['출처']||'지국')==='총판'
+      ? '<span class="badge bp">🏢 총판</span>'
+      : '<span class="badge bg">📊 지국</span>';
+    const verifyCell = isVerify
+      ? `<td class="td-num" style="color:var(--purple);font-weight:700;background:rgba(107,78,230,.05)">${fmN(r._verifyMargin)}</td>`
+      : '';
+    return `<tr>
+    <td>${sourceBadge}</td>
     <td class="td-m" style="font-size:10px">${r['고객번호']||''}</td>
     <td style="min-width:80px">${r['고객명']||''}</td>
     <td>${r['모델명']||''}</td>
@@ -1552,24 +2123,63 @@ function renderSales(list){
     <td>${r['판매인']||''}</td>
     <td class="td-num">${fmN(r['실적인정'])}</td>
     <td style="text-align:center">${r['사업자']==='1'||r['사업자']===1?'<span class="badge bb">사업자</span>':'<span class="badge bgr">개인</span>'}</td>
+    ${verifyCell}
     <td>${canEdit?`<div style="display:flex;gap:3px"><button class="btn btn-secondary btn-sm" onclick="openSaleModal('${r['매출ID']}')">수정</button><button class="btn btn-danger btn-sm" onclick="delSale('${r['매출ID']}')">삭제</button></div>`:'<span style="color:var(--text-3);font-size:10px">-</span>'}</td>
-  </tr>`).join('');
-  renderSaleTfoot(list);
+  </tr>`;}).join('');
+  renderSaleTfoot(list,isVerify);
 }
 
-function renderSaleTfoot(list){
-  const cols=['고객번호','고객명','모델명','상품명','의무','렌탈료','지급율(기본)','판매수수료(기본)',
+// 마감검증 마진 계산 (직원용 % → 마감검증용 %로 차액)
+function calcVerifyMargin(r){
+  if(!REGULATIONS) return 0;
+  const rental = Number(r['렌탈료'])||0;
+  const duty = Number(r['의무'])||0;
+  const rate1 = Number(r['지급율(기본)'])||0;
+  const rate2 = Number(r['지급율(툴별)'])||0;
+
+  // 사업장주력에서 마감검증용 % 찾기
+  let verifyRate1 = rate1;
+  if(rate1 > 0){
+    const sj = (REGULATIONS.saupjang||[]).find(x=>{
+      return Number(x['직원용%']) === rate1;
+    });
+    if(sj) verifyRate1 = Number(sj['마감검증용%'])||rate1;
+  }
+
+  // 툴별에서 마감검증용 % 찾기
+  let verifyRate2 = rate2;
+  if(rate2 > 0){
+    const tb = (REGULATIONS.toolbyul||[]).find(x=>{
+      return Number(x['직원용%']) === rate2;
+    });
+    if(tb) verifyRate2 = Number(tb['마감검증용%'])||rate2;
+  }
+
+  // 마감검증용 - 직원용 = 회사 마진
+  const diff1 = Math.round(rental*duty*(verifyRate1-rate1)/100);
+  const diff2 = Math.round(rental*duty*(verifyRate2-rate2)/100);
+  return diff1 + diff2;
+}
+
+function renderSaleTfoot(list, isVerify){
+  const cols=['출처','고객번호','고객명','모델명','상품명','의무','렌탈료','지급율(기본)','판매수수료(기본)',
     '지급율(툴별)','툴별추가수수료','사업장추가수수료','개인고객추가수수료','셀프','최종수수료',
     '실판매인','판매인','실적인정','사업자'];
   const numCols=['렌탈료','판매수수료(기본)','툴별추가수수료','사업장추가수수료','개인고객추가수수료','셀프','최종수수료','실적인정'];
-  document.getElementById('sale-tfoot').innerHTML='<tr>'+cols.map((c,i)=>{
+  let html='<tr>'+cols.map((c,i)=>{
     if(i===0) return '<td style="font-weight:700">합계</td>';
     if(numCols.includes(c)){
       const s=list.reduce((acc,r)=>acc+(Number(r[c])||0),0);
       return `<td class="td-num">${s?s.toLocaleString():'-'}</td>`;
     }
     return '<td>-</td>';
-  }).join('')+'<td></td></tr>';
+  }).join('');
+  if(isVerify){
+    const marginSum = list.reduce((acc,r)=>acc+(r._verifyMargin||0),0);
+    html += `<td class="td-num" style="color:var(--purple);font-weight:700">${marginSum?marginSum.toLocaleString():'-'}</td>`;
+  }
+  html += '<td></td></tr>';
+  document.getElementById('sale-tfoot').innerHTML = html;
 }
 
 // 수수료 자동 계산
@@ -1603,6 +2213,7 @@ function openSaleModal(id){
   if(id){
     const r=sales.find(x=>x['매출ID']===id);if(!r)return;
     document.getElementById('sf-id').value=id;
+    document.getElementById('sf-source').value=r['출처']||'지국';
     document.getElementById('sf-cno').value=r['고객번호']||'';
     document.getElementById('sf-cname').value=r['고객명']||'';
     document.getElementById('sf-model').value=r['모델명']||'';
@@ -1626,6 +2237,9 @@ function openSaleModal(id){
      'sf-rate1','sf-fee1','sf-rate2','sf-fee2','sf-biz-fee','sf-pers-fee','sf-self','sf-final','sf-perf']
       .forEach(id=>document.getElementById(id).value='');
     document.getElementById('sf-biz-type').value='1';
+    // 현재 탭에 따라 기본 출처 설정
+    const defaultSource = (currentSalesTab==='dealer')?'총판':'지국';
+    document.getElementById('sf-source').value=defaultSource;
     // 기본값: 로그인 사용자
     document.getElementById('sf-real-seller').value=CU.name;
     document.getElementById('sf-seller').value=CU.name;
@@ -1637,6 +2251,7 @@ async function submitSale(){
   const id=document.getElementById('sf-id').value;
   const p={
     id,
+    출처:document.getElementById('sf-source').value,
     고객번호:document.getElementById('sf-cno').value,
     고객명:document.getElementById('sf-cname').value,
     모델명:document.getElementById('sf-model').value,
@@ -1808,6 +2423,7 @@ const PAGES={
   dashboard: {title:'대시보드',sub:'전체 현황 요약',act:false},
   employees: {title:'직원 관리',sub:'직원 정보 관리',act:true,label:'＋ 직원 추가',fn:()=>openEmpModal()},
   sales:     {title:'매출 관리',sub:'지국 매출 정리표',act:true,label:'＋ 매출 입력',fn:()=>openSaleModal()},
+  quote:     {title:'견적서 관리',sub:'견적서 작성 및 발송',act:true,label:'＋ 새 견적서',fn:()=>openQuoteWizard()},
   inspection:{title:'점검 관리',sub:'점검 일정 및 일일급여',act:true,label:'＋ 점검 추가',fn:()=>openInspModal()},
   support:   {title:'지원 관리',sub:'회사 지원 항목',act:true,label:'＋ 지원 추가',fn:()=>openSupportModal()},
   salary:    {title:'급여 관리',sub:'급여 계산 및 명세',act:false},
@@ -1817,6 +2433,13 @@ const PAGES={
 };
 
 function go(page){
+  // 대시보드 진입 시 공지 관련 버튼 표시
+  const isAdmin = CU && CU.name===ADMIN_NAME;
+  const noticeBtn = document.getElementById('btn-notice-popup');
+  const noticeAddBtn = document.getElementById('btn-add-notice');
+  if(noticeBtn) noticeBtn.style.display = (page==='dashboard' && NOTICES && NOTICES.length) ? 'inline-flex' : 'none';
+  if(noticeAddBtn) noticeAddBtn.style.display = (page==='dashboard' && (isAdmin || canDo('manage_notice'))) ? 'inline-flex' : 'none';
+
   // 권한 체크
   if(page==='admin' && CU.name!==ADMIN_NAME){toast('관리자만 접근할 수 있습니다.','e');return;}
   if(page==='employees' && !canDo('view_employees')){toast('접근 권한이 없습니다.','e');return;}
@@ -1845,7 +2468,7 @@ function go(page){
   } else {
     btn.style.display='none';
   }
-  if(page==='admin')      { loadPermList(); renderMenuConfig(); }
+  if(page==='admin')      { loadPermList(); renderMenuConfig(); renderAdminNoticeList(); }
   if(page==='attendance')   loadAttendance();
   if(page==='calendar')     initCalendar();
   if(page==='inspection')   initInspection();
@@ -2144,6 +2767,45 @@ async function deleteEvent(){
 
 
 
+
+// ════ 매출 관리 탭 전환 (지국/총판/마감검증) ══════════════════
+let currentSalesTab = 'branch';
+
+function switchSalesTab(tab){
+  currentSalesTab = tab;
+  document.querySelectorAll('.sales-tab').forEach(b=>{
+    if(b.dataset.tab===tab){
+      b.classList.add('active');
+      b.style.background='var(--surface)';
+      b.style.color = tab==='verify' ? 'var(--purple)' : 'var(--text)';
+      b.style.fontWeight='600';
+      b.style.boxShadow='var(--shadow)';
+    } else {
+      b.classList.remove('active');
+      b.style.background='none';
+      b.style.color = b.dataset.tab==='verify' ? 'var(--purple)' : 'var(--text-2)';
+      b.style.fontWeight='500';
+      b.style.boxShadow='none';
+    }
+  });
+
+  // 카드 제목 변경
+  const cardTitle = document.getElementById('sale-card-title');
+  if(tab==='branch') cardTitle.textContent='📊 지국 매출 정리표';
+  else if(tab==='dealer') cardTitle.textContent='🏢 총판 매출 정리표';
+  else if(tab==='verify') cardTitle.textContent='🔐 마감 검증 정리표';
+
+  // 마감검증 배너 표시
+  const banner = document.getElementById('verify-banner');
+  if(banner) banner.style.display = (tab==='verify') ? '' : 'none';
+
+  // 매출 입력 버튼은 verify 탭에서 숨김
+  const btnAdd = document.getElementById('btn-add-sale');
+  if(btnAdd) btnAdd.style.display = (tab==='verify') ? 'none' : 'inline-flex';
+
+  // 리렌더링
+  renderSales(sales);
+}
 
 // ════ 직원 관리 탭 전환 ══════════════════════════════════════
 function switchEmpTab(tab){
@@ -2776,6 +3438,1172 @@ function applyRegulation(idx){
   toast('✅ 규정 자동 입력됨 (필요시 수정 가능)','s');
 }
 
+
+
+// ════ Phase 1: 대시보드 확장 ═══════════════════════════════
+let NOTICES = [], REFRESHES = [], PARTNER_CARDS = [], PROMOTIONS = [];
+
+// ─── 로드 함수 ───
+async function loadNotices(){
+  try{ const r = await api('getNotices'); NOTICES = r.data || []; }
+  catch(e){ NOTICES = []; }
+}
+async function loadRefreshes(){
+  try{ const r = await api('getRefreshes'); REFRESHES = r.data || []; }
+  catch(e){ REFRESHES = []; }
+}
+async function loadPartnerCards(){
+  try{ const r = await api('getPartnerCards'); PARTNER_CARDS = r.data || []; }
+  catch(e){ PARTNER_CARDS = []; }
+}
+async function loadPromotions(){
+  try{ const r = await api('getPromotions'); PROMOTIONS = r.data || []; }
+  catch(e){ PROMOTIONS = []; }
+}
+
+// ═══════════════════════════════════════════════════════════
+// 📢 공지사항 팝업
+// ═══════════════════════════════════════════════════════════
+function showNoticePopup(){
+  if(!NOTICES.length) return;
+  // "오늘 하루 안 보기" 확인
+  const hideUntil = lGet('notice_hide_until', null);
+  const today_ = today();
+  if(hideUntil === today_) return;
+
+  // 우선순위 높은 순으로 정렬
+  const sorted = [...NOTICES].sort((a,b)=>(Number(b['우선순위'])||0)-(Number(a['우선순위'])||0));
+  const html = sorted.map((n,i)=>`
+    <div style="background:white;border-left:4px solid ${n['색상']||'#1D9E75'};border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <div style="font-size:13px;font-weight:700;color:var(--text)">${n['제목']||'공지'}</div>
+        ${n['종료일']?`<span style="font-size:10px;color:var(--text-3)">~ ${n['종료일']}</span>`:''}
+      </div>
+      <div style="font-size:12px;color:var(--text-2);white-space:pre-wrap;line-height:1.5">${n['내용']||''}</div>
+      <div style="font-size:10px;color:var(--text-3);margin-top:8px">${n['등록일']||''} · ${n['등록자']||''}</div>
+    </div>
+  `).join('');
+  document.getElementById('notice-popup-content').innerHTML = html;
+  document.getElementById('notice-hide-today').checked = false;
+  openM('m-notice-popup');
+}
+
+function closeNoticePopup(){
+  if(document.getElementById('notice-hide-today').checked){
+    lSet('notice_hide_until', today());
+  }
+  closeM('m-notice-popup');
+}
+
+// 공지사항 추가/수정 모달
+function openNoticeModal(id){
+  document.getElementById('m-notice-title').textContent = id ? '공지사항 수정' : '공지사항 등록';
+  document.getElementById('nt-del-btn').style.display = id ? 'inline-flex' : 'none';
+  if(id){
+    const n = NOTICES.find(x=>x['공지ID']===id);
+    if(!n) return;
+    document.getElementById('nt-id').value = id;
+    document.getElementById('nt-title').value = n['제목']||'';
+    document.getElementById('nt-content').value = n['내용']||'';
+    document.getElementById('nt-end').value = n['종료일']||'';
+    document.getElementById('nt-color').value = n['색상']||'#1D9E75';
+    document.getElementById('nt-priority').value = n['우선순위']||1;
+  } else {
+    ['nt-id','nt-title','nt-content','nt-end'].forEach(f=>document.getElementById(f).value='');
+    document.getElementById('nt-color').value = '#1D9E75';
+    document.getElementById('nt-priority').value = 1;
+  }
+  openM('m-notice');
+}
+
+async function submitNotice(){
+  const id = document.getElementById('nt-id').value;
+  const p = {
+    id,
+    author: CU.name,
+    title: document.getElementById('nt-title').value.trim(),
+    content: document.getElementById('nt-content').value.trim(),
+    endDate: document.getElementById('nt-end').value,
+    color: document.getElementById('nt-color').value,
+    priority: document.getElementById('nt-priority').value,
+  };
+  if(!p.title || !p.content){toast('제목과 내용은 필수입니다.','e');return;}
+  try{
+    const r = await api(id ? 'updateNotice' : 'addNotice', p);
+    toast(r.message, 's');
+    closeM('m-notice');
+    await loadNotices();
+    renderAdminNoticeList();
+  }catch(e){toast(e.message,'e');}
+}
+
+async function delNotice(){
+  const id = document.getElementById('nt-id').value;
+  if(!id) return;
+  if(!confirm('공지사항을 삭제하시겠습니까?'))return;
+  try{
+    const r = await api('deleteNotice',{id});
+    toast(r.message,'s');
+    closeM('m-notice');
+    await loadNotices();
+    renderAdminNoticeList();
+  }catch(e){toast(e.message,'e');}
+}
+
+function renderAdminNoticeList(){
+  const div = document.getElementById('admin-notice-list');
+  if(!div) return;
+  if(!NOTICES.length){
+    div.innerHTML = '<div class="empty"><div class="empty-icon">📢</div><div class="empty-title">등록된 공지가 없습니다</div></div>';
+    return;
+  }
+  const sorted = [...NOTICES].sort((a,b)=>(Number(b['우선순위'])||0)-(Number(a['우선순위'])||0));
+  div.innerHTML = sorted.map(n=>`
+    <div style="border-left:4px solid ${n['색상']||'#1D9E75'};background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:14px">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:700;margin-bottom:3px">${n['제목']||''}</div>
+        <div style="font-size:11px;color:var(--text-2);margin-bottom:3px">${(n['내용']||'').substring(0,80)}${(n['내용']||'').length>80?'...':''}</div>
+        <div style="font-size:10px;color:var(--text-3)">${n['등록일']||''} · ${n['등록자']||''} · 우선순위 ${n['우선순위']||1} ${n['종료일']?`· ~ ${n['종료일']}`:''}</div>
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="openNoticeModal('${n['공지ID']}')">수정</button>
+    </div>
+  `).join('');
+}
+
+
+
+// ═══════════════════════════════════════════════════════════
+// 🎉 Refresh 회식
+// ═══════════════════════════════════════════════════════════
+function renderRefreshes(){
+  const list = REFRESHES;
+  const container = document.getElementById('dash-refresh-list');
+  if(!list.length){
+    container.innerHTML = '<div class="empty" style="grid-column:1/-1"><div class="empty-icon">🎉</div><div class="empty-title">등록된 회식 일정이 없습니다</div></div>';
+    return;
+  }
+  const canEdit = canDo('manage_refresh') || CU.name===ADMIN_NAME;
+  container.innerHTML = list.map(r=>`
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:all .15s" onmouseover="this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.boxShadow=''">
+      ${r['이미지URL'] ? `<div style="height:140px;background:#f5f5f5;overflow:hidden"><img src="${r['이미지URL']}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'"></div>` : `<div style="height:80px;background:linear-gradient(135deg,#1D9E75 0%,#0F6E56 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-size:36px">🎉</div>`}
+      <div style="padding:14px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:6px">${r['회식명']||'회식'}</div>
+        ${r['일시']?`<div style="font-size:11px;color:var(--text-2);margin-bottom:3px">📅 ${formatDateTime(r['일시'])}</div>`:''}
+        ${r['장소']?`<div style="font-size:11px;color:var(--text-2);margin-bottom:3px">📍 ${r['장소']}</div>`:''}
+        ${r['메뉴']?`<div style="font-size:11px;color:var(--text-2);margin-bottom:3px">🍴 ${r['메뉴']}</div>`:''}
+        ${r['메모']?`<div style="font-size:11px;color:var(--text-3);margin-top:6px;line-height:1.4">${r['메모']}</div>`:''}
+        ${canEdit?`<div style="display:flex;gap:4px;margin-top:10px"><button class="btn btn-secondary btn-sm" style="flex:1" onclick="openRefreshModal('${r['회식ID']}')">수정</button></div>`:''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function formatDateTime(dt){
+  if(!dt) return '';
+  try{
+    const d = new Date(dt);
+    if(isNaN(d.getTime())) return dt;
+    return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+  }catch(e){ return dt; }
+}
+
+function openRefreshModal(id){
+  document.getElementById('m-refresh-title').textContent = id ? '회식 정보 수정' : '회식 정보 등록';
+  document.getElementById('rf-del-btn').style.display = id ? 'inline-flex' : 'none';
+  if(id){
+    const r = REFRESHES.find(x=>x['회식ID']===id);
+    if(!r) return;
+    document.getElementById('rf-id').value = id;
+    document.getElementById('rf-title').value = r['회식명']||'';
+    document.getElementById('rf-datetime').value = r['일시']||'';
+    document.getElementById('rf-place').value = r['장소']||'';
+    document.getElementById('rf-menu').value = r['메뉴']||'';
+    document.getElementById('rf-memo').value = r['메모']||'';
+    document.getElementById('rf-image-url').value = r['이미지URL']||'';
+    document.getElementById('rf-image-preview').innerHTML = r['이미지URL']
+      ? `<img src="${r['이미지URL']}" style="max-width:200px;border-radius:6px">` : '';
+  } else {
+    ['rf-id','rf-title','rf-datetime','rf-place','rf-menu','rf-memo','rf-image-url'].forEach(f=>document.getElementById(f).value='');
+    document.getElementById('rf-image-preview').innerHTML = '';
+  }
+  openM('m-refresh');
+}
+
+async function uploadRefreshImage(input){
+  const file = input.files[0];
+  if(!file) return;
+  const preview = document.getElementById('rf-image-preview');
+  preview.innerHTML = '<div style="font-size:11px;color:var(--text-3)"><span class="spinner"></span> 업로드 중...</div>';
+  try{
+    const url = await uploadToGoogleDrive(file);
+    document.getElementById('rf-image-url').value = url;
+    preview.innerHTML = `<img src="${url}" style="max-width:200px;border-radius:6px"> <button class="btn btn-secondary btn-sm" style="margin-left:8px" onclick="document.getElementById('rf-image-url').value='';this.parentElement.innerHTML='';">제거</button>`;
+    toast('이미지 업로드 완료 ✅','s');
+  }catch(e){
+    preview.innerHTML = '<div style="font-size:11px;color:var(--danger)">업로드 실패: '+e.message+'</div>';
+  }
+}
+
+async function submitRefresh(){
+  const id = document.getElementById('rf-id').value;
+  const p = {
+    id,
+    author: CU.name,
+    title: document.getElementById('rf-title').value.trim(),
+    datetime: document.getElementById('rf-datetime').value,
+    place: document.getElementById('rf-place').value,
+    menu: document.getElementById('rf-menu').value,
+    imageUrl: document.getElementById('rf-image-url').value,
+    memo: document.getElementById('rf-memo').value,
+  };
+  if(!p.title || !p.datetime){toast('회식명과 일시는 필수입니다.','e');return;}
+  const btn = document.getElementById('rf-save-btn');
+  btn.disabled = true; btn.textContent = '저장 중...';
+  try{
+    const r = await api(id ? 'updateRefresh' : 'addRefresh', p);
+    toast(r.message, 's');
+    closeM('m-refresh');
+    await loadRefreshes();
+    renderRefreshes();
+  }catch(e){toast(e.message,'e');}
+  finally{btn.disabled=false;btn.textContent='저장';}
+}
+
+async function delRefresh(){
+  const id = document.getElementById('rf-id').value;
+  if(!confirm('회식 정보를 삭제하시겠습니까?'))return;
+  try{
+    const r = await api('deleteRefresh',{id});
+    toast(r.message,'s');
+    closeM('m-refresh');
+    await loadRefreshes();
+    renderRefreshes();
+  }catch(e){toast(e.message,'e');}
+}
+
+// ═══════════════════════════════════════════════════════════
+// 💳 제휴카드
+// ═══════════════════════════════════════════════════════════
+function renderPartnerCards(){
+  const filter = document.getElementById('card-brand-filter').value;
+  let list = PARTNER_CARDS;
+  if(filter) list = list.filter(c=>c['브랜드']===filter);
+  const container = document.getElementById('dash-card-list');
+  if(!list.length){
+    container.innerHTML = '<div class="empty" style="grid-column:1/-1"><div class="empty-icon">💳</div><div class="empty-title">등록된 제휴카드가 없습니다</div></div>';
+    return;
+  }
+  const canEdit = canDo('manage_partner_card') || CU.name===ADMIN_NAME;
+  container.innerHTML = list.map(c=>{
+    const isImage = c['이미지URL'] && (c['이미지URL'].includes('drive.google.com/uc') || /\.(jpg|jpeg|png|gif|webp)$/i.test(c['이미지URL']||''));
+    return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden">
+      ${isImage ? `<div style="height:140px;background:#f5f5f5;overflow:hidden;cursor:pointer" onclick="window.open('${c['이미지URL']}','_blank')"><img src="${c['이미지URL']}" style="width:100%;height:100%;object-fit:contain" onerror="this.parentElement.innerHTML='<div style=\\'padding:40px;text-align:center;color:#999\\'>📄 파일</div>'"></div>` : `<div style="height:140px;background:var(--accent-light);display:flex;align-items:center;justify-content:center;color:var(--accent-2);font-size:36px">📄</div>`}
+      <div style="padding:12px">
+        <div style="font-size:10px;color:var(--text-3);margin-bottom:3px">${c['브랜드']||''}</div>
+        <div style="font-size:12px;font-weight:600;margin-bottom:8px">${c['카드명']||''}</div>
+        ${c['메모']?`<div style="font-size:10px;color:var(--text-3);margin-bottom:8px">${c['메모']}</div>`:''}
+        <div style="display:flex;gap:4px">
+          <a href="${c['파일URL']||c['이미지URL']||'#'}" target="_blank" class="btn btn-secondary btn-sm" style="flex:1;text-decoration:none">📥 다운로드</a>
+          ${canEdit?`<button class="btn btn-danger btn-sm" onclick="delPartnerCard('${c['카드ID']}')">✕</button>`:''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openPartnerCardModal(){
+  ['cd-title','cd-image-url','cd-file-url','cd-memo'].forEach(f=>document.getElementById(f).value='');
+  document.getElementById('cd-file-preview').innerHTML='';
+  openM('m-card');
+}
+
+async function uploadCardFile(input){
+  const file = input.files[0];
+  if(!file) return;
+  const preview = document.getElementById('cd-file-preview');
+  preview.innerHTML = '<div style="font-size:11px;color:var(--text-3)"><span class="spinner"></span> 업로드 중...</div>';
+  try{
+    const url = await uploadToGoogleDrive(file);
+    document.getElementById('cd-image-url').value = url;
+    document.getElementById('cd-file-url').value = url;
+    const isImage = file.type.startsWith('image/');
+    preview.innerHTML = isImage
+      ? `<img src="${url}" style="max-width:200px;border-radius:6px">`
+      : `<div style="font-size:11px;color:var(--text-2)">📄 ${file.name}</div>`;
+    toast('파일 업로드 완료 ✅','s');
+  }catch(e){
+    preview.innerHTML = '<div style="font-size:11px;color:var(--danger)">업로드 실패: '+e.message+'</div>';
+  }
+}
+
+async function submitPartnerCard(){
+  const p = {
+    author: CU.name,
+    brand: document.getElementById('cd-brand').value,
+    title: document.getElementById('cd-title').value.trim(),
+    imageUrl: document.getElementById('cd-image-url').value,
+    fileUrl: document.getElementById('cd-file-url').value,
+    memo: document.getElementById('cd-memo').value,
+  };
+  if(!p.title || !p.imageUrl){toast('카드명과 파일은 필수입니다.','e');return;}
+  const btn = document.getElementById('cd-save-btn');
+  btn.disabled = true; btn.textContent = '저장 중...';
+  try{
+    const r = await api('addPartnerCard', p);
+    toast(r.message, 's');
+    closeM('m-card');
+    await loadPartnerCards();
+    renderPartnerCards();
+  }catch(e){toast(e.message,'e');}
+  finally{btn.disabled=false;btn.textContent='저장';}
+}
+
+async function delPartnerCard(id){
+  if(!confirm('제휴카드를 삭제하시겠습니까?'))return;
+  try{
+    const r = await api('deletePartnerCard',{id});
+    toast(r.message,'s');
+    await loadPartnerCards();
+    renderPartnerCards();
+  }catch(e){toast(e.message,'e');}
+}
+
+// ═══════════════════════════════════════════════════════════
+// 🎁 프로모션
+// ═══════════════════════════════════════════════════════════
+function renderPromotions(){
+  const filter = document.getElementById('promo-brand-filter').value;
+  let list = PROMOTIONS;
+  if(filter) list = list.filter(c=>c['브랜드']===filter);
+  const container = document.getElementById('dash-promo-list');
+  if(!list.length){
+    container.innerHTML = '<div class="empty" style="grid-column:1/-1"><div class="empty-icon">🎁</div><div class="empty-title">등록된 프로모션이 없습니다</div></div>';
+    return;
+  }
+  const canEdit = canDo('manage_promotion') || CU.name===ADMIN_NAME;
+  const today_ = today();
+  container.innerHTML = list.map(p=>{
+    const isImage = p['이미지URL'] && (p['이미지URL'].includes('drive.google.com/uc') || /\.(jpg|jpeg|png|gif|webp)$/i.test(p['이미지URL']||''));
+    const expired = p['종료일'] && p['종료일'] < today_;
+    return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;${expired?'opacity:.6':''}">
+      ${isImage ? `<div style="height:160px;background:#f5f5f5;overflow:hidden;cursor:pointer;position:relative" onclick="window.open('${p['이미지URL']}','_blank')"><img src="${p['이미지URL']}" style="width:100%;height:100%;object-fit:contain" onerror="this.parentElement.innerHTML='<div style=\\'padding:40px;text-align:center;color:#999\\'>📄 파일</div>'">${expired?'<span style="position:absolute;top:8px;right:8px;background:var(--danger);color:#fff;font-size:10px;padding:2px 8px;border-radius:4px">종료</span>':''}</div>` : `<div style="height:120px;background:linear-gradient(135deg,#BA7517 0%,#EF8E1E 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-size:36px">🎁</div>`}
+      <div style="padding:12px">
+        <div style="font-size:10px;color:var(--text-3);margin-bottom:3px">${p['브랜드']||''}</div>
+        <div style="font-size:12px;font-weight:600;margin-bottom:6px">${p['제목']||''}</div>
+        ${p['시작일']||p['종료일']?`<div style="font-size:10px;color:var(--text-2);margin-bottom:6px">📅 ${p['시작일']||''} ~ ${p['종료일']||''}</div>`:''}
+        ${p['메모']?`<div style="font-size:10px;color:var(--text-3);margin-bottom:8px;line-height:1.4">${p['메모']}</div>`:''}
+        <div style="display:flex;gap:4px">
+          <a href="${p['파일URL']||p['이미지URL']||'#'}" target="_blank" class="btn btn-secondary btn-sm" style="flex:1;text-decoration:none">📥 다운로드</a>
+          ${canEdit?`<button class="btn btn-danger btn-sm" onclick="delPromotion('${p['프로모션ID']}')">✕</button>`:''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openPromotionModal(){
+  ['pm-title','pm-start','pm-end','pm-image-url','pm-file-url','pm-memo'].forEach(f=>document.getElementById(f).value='');
+  document.getElementById('pm-file-preview').innerHTML='';
+  openM('m-promo');
+}
+
+async function uploadPromoFile(input){
+  const file = input.files[0];
+  if(!file) return;
+  const preview = document.getElementById('pm-file-preview');
+  preview.innerHTML = '<div style="font-size:11px;color:var(--text-3)"><span class="spinner"></span> 업로드 중...</div>';
+  try{
+    const url = await uploadToGoogleDrive(file);
+    document.getElementById('pm-image-url').value = url;
+    document.getElementById('pm-file-url').value = url;
+    const isImage = file.type.startsWith('image/');
+    preview.innerHTML = isImage
+      ? `<img src="${url}" style="max-width:200px;border-radius:6px">`
+      : `<div style="font-size:11px;color:var(--text-2)">📄 ${file.name}</div>`;
+    toast('파일 업로드 완료 ✅','s');
+  }catch(e){
+    preview.innerHTML = '<div style="font-size:11px;color:var(--danger)">업로드 실패: '+e.message+'</div>';
+  }
+}
+
+async function submitPromotion(){
+  const p = {
+    author: CU.name,
+    brand: document.getElementById('pm-brand').value,
+    title: document.getElementById('pm-title').value.trim(),
+    startDate: document.getElementById('pm-start').value,
+    endDate: document.getElementById('pm-end').value,
+    imageUrl: document.getElementById('pm-image-url').value,
+    fileUrl: document.getElementById('pm-file-url').value,
+    memo: document.getElementById('pm-memo').value,
+  };
+  if(!p.title || !p.imageUrl){toast('제목과 파일은 필수입니다.','e');return;}
+  const btn = document.getElementById('pm-save-btn');
+  btn.disabled = true; btn.textContent = '저장 중...';
+  try{
+    const r = await api('addPromotion', p);
+    toast(r.message, 's');
+    closeM('m-promo');
+    await loadPromotions();
+    renderPromotions();
+  }catch(e){toast(e.message,'e');}
+  finally{btn.disabled=false;btn.textContent='저장';}
+}
+
+async function delPromotion(id){
+  if(!confirm('프로모션을 삭제하시겠습니까?'))return;
+  try{
+    const r = await api('deletePromotion',{id});
+    toast(r.message,'s');
+    await loadPromotions();
+    renderPromotions();
+  }catch(e){toast(e.message,'e');}
+}
+
+// ═══════════════════════════════════════════════════════════
+// 📤 파일 업로드 (구글 드라이브) - POST 사용
+// ═══════════════════════════════════════════════════════════
+async function uploadToGoogleDrive(file){
+  // 파일 크기 체크 (5MB)
+  if(file.size > 5*1024*1024) throw new Error('파일은 5MB 이하만 가능합니다.');
+  // Base64 변환
+  const base64 = await new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onload = ()=>resolve(reader.result);
+    reader.onerror = ()=>reject(new Error('파일 읽기 실패'));
+    reader.readAsDataURL(file);
+  });
+  // POST로 전송
+  const response = await fetch(GAS, {
+    method: 'POST',
+    body: JSON.stringify({
+      action: 'uploadFile',
+      payload: {
+        fileName: file.name,
+        mimeType: file.type,
+        data: base64,
+      }
+    }),
+  });
+  const data = await response.json();
+  if(!data.ok) throw new Error(data.error || '업로드 실패');
+  return data.url;
+}
+
+// ════ 견적서 시스템 ══════════════════════════════════════════
+let QUOTE_PRODUCTS = [];
+let QUOTES = [];
+let currentQuoteTab = 'list';
+let qwState = {
+  step: 1,
+  type: null, // single / compare / multiple
+  customer: {},
+  products: [], // 선택된 제품 목록
+  totalAmount: 0,
+};
+
+async function initQuotePage(){
+  const isAdmin = CU.name===ADMIN_NAME;
+  document.getElementById('quote-tab-template').style.display = isAdmin ? '' : 'none';
+  await Promise.all([loadQuoteProducts(), loadQuotes()]);
+  renderQuoteList();
+  renderResponseStats();
+}
+
+async function loadQuoteProducts(){
+  try{
+    const r = await api('getQuoteProducts');
+    QUOTE_PRODUCTS = r.data || [];
+  }catch(e){ QUOTE_PRODUCTS = []; }
+}
+
+async function loadQuotes(){
+  try{
+    const payload = {};
+    // 본인 것만 보거나 전체 보거나
+    if(CU.name !== ADMIN_NAME && !canDo('view_quote_all')) payload.author = CU.name;
+    const r = await api('getQuotes', payload);
+    QUOTES = r.data || [];
+  }catch(e){ QUOTES = []; }
+}
+
+// ─── 견적서 탭 전환 ───
+function switchQuoteTab(tab){
+  currentQuoteTab = tab;
+  document.querySelectorAll('.quote-tab').forEach(b=>{
+    if(b.dataset.tab===tab){
+      b.classList.add('active');
+      b.style.background='var(--surface)';
+      b.style.color = tab==='template' ? 'var(--purple)' : 'var(--text)';
+      b.style.fontWeight='600';
+      b.style.boxShadow='var(--shadow)';
+    } else {
+      b.classList.remove('active');
+      b.style.background='none';
+      b.style.color = b.dataset.tab==='template' ? 'var(--purple)' : 'var(--text-2)';
+      b.style.fontWeight='500';
+      b.style.boxShadow='none';
+    }
+  });
+  document.getElementById('quote-tab-list').style.display = tab==='list' ? '' : 'none';
+  document.getElementById('quote-tab-response').style.display = tab==='response' ? '' : 'none';
+  document.getElementById('quote-tab-template').style.display = tab==='template' ? '' : 'none';
+
+  if(tab==='response') renderResponseStats();
+  if(tab==='template') renderProductList();
+}
+
+// ─── 견적서 목록 렌더링 ───
+function renderQuoteList(){
+  let list = QUOTES.slice();
+  const status = document.getElementById('q-filter-status').value;
+  const search = (document.getElementById('q-filter-search').value||'').toLowerCase();
+  if(status) list = list.filter(q=>q['상태']===status);
+  if(search) list = list.filter(q=>
+    (q['고객명']||'').toLowerCase().includes(search) ||
+    (q['견적ID']||'').toLowerCase().includes(search)
+  );
+
+  document.getElementById('q-sub').textContent = '전체 '+list.length+'건';
+  const total = list.reduce((s,r)=>s+(Number(r['총금액'])||0),0);
+  document.getElementById('q-total').textContent = '총액 합계: '+fm(total);
+
+  const tb = document.getElementById('q-tbody');
+  if(!list.length){tb.innerHTML='<tr><td colspan="9" style="text-align:center;padding:30px;color:var(--text-3)">견적서가 없습니다</td></tr>';return;}
+
+  tb.innerHTML = list.map(q=>{
+    const statusBadge = q['상태']==='수락'?'<span class="badge bg">✅ 수락</span>'
+      : q['상태']==='거절'?'<span class="badge" style="background:var(--danger-light);color:var(--danger)">❌ 거절</span>'
+      : q['상태']==='검토중'?'<span class="badge by">🔍 검토중</span>'
+      : '<span class="badge bb">⏸ 대기</span>';
+    return `<tr>
+      <td><span style="font-family:monospace;font-size:11px;color:var(--accent-2);font-weight:600">${q['견적ID']}</span></td>
+      <td class="td-m">${q['작성일']||''}</td>
+      <td>${q['작성자']||''}</td>
+      <td>${q['종류']||'단일'}</td>
+      <td>${q['회사']||'-'}</td>
+      <td>${q['고객명']||'-'}</td>
+      <td class="td-r td-g">${fm(q['총금액'])}</td>
+      <td>${statusBadge}</td>
+      <td><div style="display:flex;gap:3px">
+        <button class="btn btn-secondary btn-sm" onclick="viewQuote('${q['견적ID']}')">보기</button>
+        <button class="btn btn-secondary btn-sm" onclick="reopenQuoteWizard('${q['견적ID']}')">수정</button>
+        <button class="btn btn-danger btn-sm" onclick="delQuote('${q['견적ID']}')">삭제</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+// ─── 응답 통계 ───
+function renderResponseStats(){
+  const counts = {수락:0, 거절:0, 검토중:0, 대기:0};
+  QUOTES.forEach(q=>{
+    const s = q['상태']||'대기';
+    if(counts[s]!==undefined) counts[s]++;
+  });
+  document.getElementById('qr-accept').textContent = counts.수락;
+  document.getElementById('qr-reject').textContent = counts.거절;
+  document.getElementById('qr-review').textContent = counts.검토중;
+  document.getElementById('qr-pending').textContent = counts.대기;
+
+  // 응답 내역 테이블
+  const responded = QUOTES.filter(q=>q['응답일']);
+  const tb = document.getElementById('qr-tbody');
+  if(!responded.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-3)">응답 내역 없음</td></tr>';return;}
+  tb.innerHTML = responded.map(q=>{
+    const statusBadge = q['상태']==='수락'?'<span class="badge bg">✅ 수락</span>'
+      : q['상태']==='거절'?'<span class="badge" style="background:var(--danger-light);color:var(--danger)">❌ 거절</span>'
+      : '<span class="badge by">🔍 검토중</span>';
+    return `<tr>
+      <td><span style="font-family:monospace;font-size:11px">${q['견적ID']}</span></td>
+      <td class="td-m">${q['응답일']||''}</td>
+      <td>${q['고객명']||''}</td>
+      <td>${q['회사']||''}</td>
+      <td class="td-r td-g">${fm(q['총금액'])}</td>
+      <td>${statusBadge}</td>
+      <td><button class="btn btn-secondary btn-sm" onclick="viewQuote('${q['견적ID']}')">보기</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// ─── 제품 관리 ───
+function renderProductList(){
+  // 브랜드/카테고리 필터 옵션 채우기
+  const brands = [...new Set(QUOTE_PRODUCTS.map(p=>p['브랜드']))].filter(Boolean);
+  const cats = [...new Set(QUOTE_PRODUCTS.map(p=>p['카테고리']))].filter(Boolean);
+  const brandSel = document.getElementById('qp-brand-filter');
+  const catSel = document.getElementById('qp-cat-filter');
+  const curB = brandSel.value, curC = catSel.value;
+  brandSel.innerHTML = '<option value="">전체 브랜드</option>'+brands.map(b=>`<option value="${b}">${b}</option>`).join('');
+  catSel.innerHTML = '<option value="">전체 카테고리</option>'+cats.map(c=>`<option value="${c}">${c}</option>`).join('');
+  brandSel.value = curB; catSel.value = curC;
+
+  const search = (document.getElementById('qp-search').value||'').toLowerCase();
+  let list = QUOTE_PRODUCTS.slice();
+  if(curB) list = list.filter(p=>p['브랜드']===curB);
+  if(curC) list = list.filter(p=>p['카테고리']===curC);
+  if(search) list = list.filter(p=>
+    (p['제품명']||'').toLowerCase().includes(search) ||
+    (p['모델명']||'').toLowerCase().includes(search)
+  );
+
+  document.getElementById('qp-count').textContent = `${list.length}개 / 전체 ${QUOTE_PRODUCTS.length}개`;
+  document.getElementById('qp-sub').textContent = `전체 ${QUOTE_PRODUCTS.length}개 제품`;
+
+  const div = document.getElementById('qp-list');
+  if(!list.length){div.innerHTML='<div class="empty">📭 검색 결과가 없습니다</div>';return;}
+  div.innerHTML = list.map(p=>{
+    const tag = `qw-product-tag brand-${p['브랜드코드']||'wells'}`;
+    return `<div class="qw-product-card">
+      <img class="qw-product-img" src="${p['이미지URL']||''}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2250%22 height=%2250%22><rect width=%2250%22 height=%2250%22 fill=%22%23eee%22/><text x=%2225%22 y=%2225%22 font-size=%2210%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22 fill=%22%23999%22>이미지</text></svg>'">
+      <div class="qw-product-info">
+        <div class="qw-product-name">${p['제품명']||'-'}</div>
+        <div class="qw-product-code">모델: ${p['모델명']||'-'}</div>
+        <div class="qw-product-meta">
+          <span class="${tag}">${p['브랜드']||''}</span>
+          <span class="qw-product-tag">${p['카테고리']||''}</span>
+          <span class="qw-product-tag">${p['타입']||''}</span>
+          <span style="color:var(--text-3)">${p['크기']||''}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─── JSON 백업 가져오기 ───
+async function importProductsJson(input){
+  const file = input.files[0];
+  if(!file) return;
+  if(!confirm('JSON 백업을 가져오면 기존 제품 데이터가 모두 교체됩니다. 진행할까요?'))return;
+  try{
+    const text = await file.text();
+    const data = JSON.parse(text);
+    const products = data.products || [];
+    if(!products.length){toast('제품 데이터가 없는 파일입니다.','e');return;}
+
+    toast(`${products.length}개 제품 업로드 중...`,'i');
+    const r = await api('importQuoteProducts', {products: products});
+    toast(r.message,'s');
+    await loadQuoteProducts();
+    renderProductList();
+  }catch(e){
+    toast('가져오기 실패: '+e.message,'e');
+  }
+  input.value = '';
+}
+
+// ═══ 견적서 작성 마법사 ═══════════════════════════════════════
+function openQuoteWizard(){
+  qwState = {step:1, type:null, customer:{}, products:[], totalAmount:0, editId:null};
+  renderQuoteStep();
+  openM('m-quote');
+}
+
+function reopenQuoteWizard(id){
+  const q = QUOTES.find(x=>x['견적ID']===id);
+  if(!q){toast('견적서를 찾을 수 없습니다.','e');return;}
+  let data = {};
+  try { data = JSON.parse(q['데이터JSON']||'{}'); } catch(e){}
+  qwState = {
+    step: 1,
+    type: data.type || 'single',
+    customer: data.customer || {},
+    products: data.products || [],
+    totalAmount: Number(q['총금액'])||0,
+    editId: id
+  };
+  // 모달 값 채우기
+  renderQuoteStep();
+  openM('m-quote');
+}
+
+function closeQuoteWizard(){ closeM('m-quote'); }
+
+function selectQuoteType(type){
+  qwState.type = type;
+  document.querySelectorAll('.qw-type-card').forEach(c=>{
+    c.classList.toggle('selected', c.dataset.type===type);
+  });
+}
+
+function nextQuoteStep(){
+  // 단계별 검증
+  if(qwState.step===1){
+    if(!qwState.type){toast('견적서 종류를 선택해주세요.','e');return;}
+  } else if(qwState.step===2){
+    qwState.customer = {
+      name: document.getElementById('qw-cname').value.trim(),
+      addr: document.getElementById('qw-caddr').value.trim(),
+      addr2: document.getElementById('qw-caddr2').value.trim(),
+      contact: document.getElementById('qw-ccontact').value.trim(),
+      phone: document.getElementById('qw-cphone').value.trim(),
+      email: document.getElementById('qw-cemail').value.trim(),
+      ref: document.getElementById('qw-cref').value.trim(),
+    };
+    if(!qwState.customer.name){toast('고객명은 필수입니다.','e');return;}
+  } else if(qwState.step===3){
+    // 제품 검증
+    if(!qwState.products || qwState.products.length===0){toast('제품을 1개 이상 추가해주세요.','e');return;}
+  }
+  if(qwState.step < 4){
+    qwState.step++;
+    renderQuoteStep();
+  }
+}
+
+function prevQuoteStep(){
+  if(qwState.step > 1){
+    qwState.step--;
+    renderQuoteStep();
+  }
+}
+
+function renderQuoteStep(){
+  // 단계 표시 업데이트
+  document.querySelectorAll('.qw-step').forEach(el=>{
+    const s = Number(el.dataset.step);
+    el.classList.remove('active','done');
+    if(s < qwState.step) el.classList.add('done');
+    else if(s===qwState.step) el.classList.add('active');
+  });
+  const stepNames = ['', '견적서 종류 선택', '고객 정보 입력', '제품 선택', '미리보기 및 저장'];
+  document.getElementById('m-quote-step-info').textContent = `${qwState.step}단계: ${stepNames[qwState.step]}`;
+  // 내용 표시
+  for(let i=1;i<=4;i++){
+    document.getElementById('qw-'+i).style.display = i===qwState.step ? '' : 'none';
+  }
+  // 1단계 - 선택값 복원
+  if(qwState.step===1 && qwState.type){
+    document.querySelectorAll('.qw-type-card').forEach(c=>{
+      c.classList.toggle('selected', c.dataset.type===qwState.type);
+    });
+  }
+  // 2단계 - 고객 정보 복원
+  if(qwState.step===2){
+    document.getElementById('qw-cname').value = qwState.customer.name||'';
+    document.getElementById('qw-caddr').value = qwState.customer.addr||'';
+    document.getElementById('qw-caddr2').value = qwState.customer.addr2||'';
+    document.getElementById('qw-ccontact').value = qwState.customer.contact||'';
+    document.getElementById('qw-cphone').value = qwState.customer.phone||'';
+    document.getElementById('qw-cemail').value = qwState.customer.email||'';
+    document.getElementById('qw-cref').value = qwState.customer.ref||'';
+  }
+  // 3단계 - 제품 영역 렌더링
+  if(qwState.step===3) renderProductSelectionStep();
+  // 4단계 - 미리보기
+  if(qwState.step===4){
+    document.getElementById('qw-preview').innerHTML = generateQuoteHTML();
+  }
+
+  // 버튼 표시
+  document.getElementById('qw-prev-btn').style.display = qwState.step > 1 ? '' : 'none';
+  document.getElementById('qw-next-btn').style.display = qwState.step < 4 ? '' : 'none';
+  document.getElementById('qw-save-btn').style.display = qwState.step === 4 ? '' : 'none';
+}
+
+// 제품 선택 단계 (종류별 다름)
+function renderProductSelectionStep(){
+  const area = document.getElementById('qw-product-area');
+  let html = '';
+  if(qwState.type==='single'){
+    html = `<div style="font-size:13px;font-weight:600;margin-bottom:14px">제품을 선택하세요 (1개)</div>
+      ${renderProductAddSection(0, '제품')}`;
+  } else if(qwState.type==='compare'){
+    html = `<div style="font-size:13px;font-weight:600;margin-bottom:14px">기존 제품과 교체 제품을 선택하세요</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div>${renderProductAddSection(0, '기존 제품')}</div>
+        <div>${renderProductAddSection(1, '교체 제품')}</div>
+      </div>`;
+  } else if(qwState.type==='multiple'){
+    html = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:600">여러 제품을 추가하세요</div>
+        <button class="btn btn-primary btn-sm" onclick="addProductSlot()">＋ 제품 추가</button>
+      </div>
+      <div id="qw-multi-slots">`;
+    const slotCount = Math.max(1, qwState.products.length);
+    for(let i=0; i<slotCount; i++){
+      html += renderProductAddSection(i, `제품 #${i+1}`, true);
+    }
+    html += '</div>';
+  }
+  area.innerHTML = html;
+  // 선택된 제품 표시 업데이트
+  qwState.products.forEach((p,i)=>{
+    if(p) updateProductSlotDisplay(i, p);
+  });
+}
+
+function renderProductAddSection(idx, label, removable){
+  const removeBtn = removable
+    ? `<button class="btn btn-danger btn-sm" style="position:absolute;top:8px;right:8px" onclick="removeProductSlot(${idx})">✕</button>` : '';
+  return `<div class="qw-product-slot" data-idx="${idx}" style="position:relative;border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px;background:var(--surface-2)">
+    ${removeBtn}
+    <div style="font-size:11px;font-weight:700;color:var(--text-2);margin-bottom:8px">${label}</div>
+    <div id="qw-slot-${idx}-selected" style="display:${qwState.products[idx]?'block':'none'};margin-bottom:8px"></div>
+    <button class="btn btn-secondary btn-sm" onclick="openProductPicker(${idx})">🔍 제품 검색·선택</button>
+    <div id="qw-slot-${idx}-options" style="display:${qwState.products[idx]?'grid':'none'};grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px"></div>
+  </div>`;
+}
+
+function addProductSlot(){
+  qwState.products.push(null);
+  renderProductSelectionStep();
+}
+
+function removeProductSlot(idx){
+  qwState.products.splice(idx, 1);
+  renderProductSelectionStep();
+}
+
+// 제품 선택기 모달 (인라인 표시)
+function openProductPicker(idx){
+  // 별도 모달 대신 alert로 간단 검색 (단순화)
+  // 실제로는 검색 input + 결과 목록을 인라인으로 보여줌
+  const slot = document.querySelector(`.qw-product-slot[data-idx="${idx}"]`);
+  if(!slot) return;
+  let picker = slot.querySelector('.qw-picker');
+  if(picker){ picker.remove(); return; }
+  picker = document.createElement('div');
+  picker.className = 'qw-picker';
+  picker.style.cssText = 'margin-top:10px;background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px;max-height:300px;overflow-y:auto';
+  picker.innerHTML = `
+    <input type="text" class="fc" placeholder="🔍 제품명·모델·브랜드 검색"
+      oninput="searchProductForSlot(${idx}, this.value)"
+      style="margin-bottom:8px;font-size:12px">
+    <div id="qw-picker-${idx}-results"></div>
+  `;
+  slot.appendChild(picker);
+  searchProductForSlot(idx, '');
+}
+
+function searchProductForSlot(idx, query){
+  const q = (query||'').toLowerCase().trim();
+  let results = QUOTE_PRODUCTS;
+  if(q){
+    results = QUOTE_PRODUCTS.filter(p=>
+      (p['제품명']||'').toLowerCase().includes(q) ||
+      (p['모델명']||'').toLowerCase().includes(q) ||
+      (p['브랜드']||'').toLowerCase().includes(q)
+    );
+  }
+  results = results.slice(0, 30);
+  const div = document.getElementById('qw-picker-'+idx+'-results');
+  if(!div) return;
+  if(!results.length){div.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-3);font-size:11px">검색 결과가 없습니다.<br>제품/템플릿 관리에서 JSON을 가져와주세요.</div>';return;}
+  div.innerHTML = results.map(p=>`
+    <div class="qw-product-card" onclick="selectProductForSlot(${idx},'${p['제품ID']}')">
+      <img class="qw-product-img" src="${p['이미지URL']||''}" onerror="this.style.display='none'">
+      <div class="qw-product-info">
+        <div class="qw-product-name">${p['제품명']||'-'}</div>
+        <div class="qw-product-code">${p['모델명']||''}</div>
+        <div class="qw-product-meta">
+          <span class="qw-product-tag brand-${p['브랜드코드']||'wells'}">${p['브랜드']||''}</span>
+          <span class="qw-product-tag">${p['카테고리']||''}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function selectProductForSlot(idx, productId){
+  const p = QUOTE_PRODUCTS.find(x=>x['제품ID']===productId);
+  if(!p) return;
+  // 기본값으로 의무/관리/가격 채우기
+  const productInfo = {
+    productId: productId,
+    brand: p['브랜드'],
+    name: p['제품명'],
+    code: p['모델명'],
+    image: p['이미지URL'],
+    category: p['카테고리'],
+    type: p['타입'],
+    duty: 60, // 기본 60개월
+    manage: '방문', // 방문/자가
+    quantity: 1,
+    monthlyRental: 0, // 직원이 직접 입력
+    installFee: 0,
+    discount: 0,
+    gift: '',
+    note: '',
+  };
+  qwState.products[idx] = productInfo;
+  // 슬롯 표시 업데이트
+  updateProductSlotDisplay(idx, productInfo);
+}
+
+function updateProductSlotDisplay(idx, p){
+  const sel = document.getElementById(`qw-slot-${idx}-selected`);
+  const opts = document.getElementById(`qw-slot-${idx}-options`);
+  if(!sel || !opts) return;
+
+  sel.style.display = 'block';
+  sel.innerHTML = `<div class="qw-product-card selected" style="margin:0">
+    <img class="qw-product-img" src="${p.image||''}" onerror="this.style.display='none'">
+    <div class="qw-product-info">
+      <div class="qw-product-name">${p.name}</div>
+      <div class="qw-product-code">${p.code} · ${p.brand}</div>
+    </div>
+  </div>`;
+
+  opts.style.display = 'grid';
+  opts.innerHTML = `
+    <div class="fgroup"><label class="flabel">의무 기간(개월)</label><input class="fc" type="number" value="${p.duty}" oninput="updateProductField(${idx},'duty',this.value)"></div>
+    <div class="fgroup"><label class="flabel">관리</label>
+      <select class="fc" onchange="updateProductField(${idx},'manage',this.value)">
+        <option value="방문" ${p.manage==='방문'?'selected':''}>방문 관리</option>
+        <option value="자가" ${p.manage==='자가'?'selected':''}>자가 관리</option>
+      </select>
+    </div>
+    <div class="fgroup"><label class="flabel">수량</label><input class="fc" type="number" value="${p.quantity}" oninput="updateProductField(${idx},'quantity',this.value)"></div>
+    <div class="fgroup"><label class="flabel">월 렌탈료(원)</label><input class="fc" type="number" value="${p.monthlyRental}" oninput="updateProductField(${idx},'monthlyRental',this.value)" placeholder="직접 입력"></div>
+    <div class="fgroup"><label class="flabel">설치비(원)</label><input class="fc" type="number" value="${p.installFee}" oninput="updateProductField(${idx},'installFee',this.value)"></div>
+    <div class="fgroup"><label class="flabel">할인(원)</label><input class="fc" type="number" value="${p.discount}" oninput="updateProductField(${idx},'discount',this.value)"></div>
+    <div class="fgroup full"><label class="flabel">사은품</label><input class="fc" value="${p.gift||''}" oninput="updateProductField(${idx},'gift',this.value)"></div>
+    <div class="fgroup full"><label class="flabel">비고</label><input class="fc" value="${p.note||''}" oninput="updateProductField(${idx},'note',this.value)"></div>
+  `;
+}
+
+function updateProductField(idx, field, value){
+  if(!qwState.products[idx]) return;
+  if(['duty','quantity','monthlyRental','installFee','discount'].includes(field)){
+    qwState.products[idx][field] = Number(value)||0;
+  } else {
+    qwState.products[idx][field] = value;
+  }
+}
+
+// 견적서 HTML 생성 (미리보기 + PDF)
+function generateQuoteHTML(){
+  const c = qwState.customer;
+  const ps = (qwState.products||[]).filter(p=>p);
+  const today_ = new Date().toLocaleDateString('ko-KR');
+  const typeLabel = qwState.type==='single'?'단일 견적서':qwState.type==='compare'?'비교 견적서':'다수 견적서';
+
+  // 총합 계산
+  let total = 0;
+  ps.forEach(p=>{
+    const monthly = (Number(p.monthlyRental)||0) * (Number(p.quantity)||1);
+    const totalRental = monthly * (Number(p.duty)||0);
+    const lineTotal = totalRental + (Number(p.installFee)||0) - (Number(p.discount)||0);
+    total += lineTotal;
+  });
+  qwState.totalAmount = total;
+
+  let html = `<div class="quote-preview">
+    <h1>📋 ${typeLabel}</h1>
+    <div style="display:flex;justify-content:space-between;margin-bottom:14px;font-size:11px;color:var(--text-2)">
+      <div>발행일: ${today_}</div>
+      <div>견적번호: ${qwState.editId || '(저장 시 자동생성)'}</div>
+    </div>
+
+    <h2>고객 정보</h2>
+    <table>
+      <tr><td style="width:30%;background:var(--surface-2);font-weight:600">고객명/기업명</td><td>${c.name||'-'}</td></tr>
+      ${c.contact?`<tr><td style="background:var(--surface-2);font-weight:600">담당자</td><td>${c.contact}</td></tr>`:''}
+      ${c.phone?`<tr><td style="background:var(--surface-2);font-weight:600">연락처</td><td>${c.phone}</td></tr>`:''}
+      ${c.email?`<tr><td style="background:var(--surface-2);font-weight:600">이메일</td><td>${c.email}</td></tr>`:''}
+      ${c.addr?`<tr><td style="background:var(--surface-2);font-weight:600">주소</td><td>${c.addr} ${c.addr2||''}</td></tr>`:''}
+      ${c.ref?`<tr><td style="background:var(--surface-2);font-weight:600">관련번호</td><td>${c.ref}</td></tr>`:''}
+    </table>
+
+    <h2>제품 정보</h2>
+    <table>
+      <thead><tr>
+        <th style="width:8%">No.</th>
+        <th>제품명</th>
+        <th style="width:14%">모델</th>
+        <th style="width:8%">의무</th>
+        <th style="width:8%">관리</th>
+        <th style="width:8%">수량</th>
+        <th style="width:14%">월 렌탈료</th>
+        <th style="width:14%">소계</th>
+      </tr></thead>
+      <tbody>
+        ${ps.map((p,i)=>{
+          const monthly = (Number(p.monthlyRental)||0)*(Number(p.quantity)||1);
+          const subTotal = monthly*(Number(p.duty)||0) + (Number(p.installFee)||0) - (Number(p.discount)||0);
+          return `<tr>
+            <td style="text-align:center">${i+1}</td>
+            <td>${p.name||'-'}<br><span style="font-size:9px;color:var(--text-3)">${p.brand||''}</span>${p.gift?`<br><span style="font-size:9px;color:var(--accent-2)">🎁 ${p.gift}</span>`:''}</td>
+            <td>${p.code||'-'}</td>
+            <td style="text-align:center">${p.duty}개월</td>
+            <td style="text-align:center">${p.manage}</td>
+            <td style="text-align:center">${p.quantity}</td>
+            <td style="text-align:right">${(Number(p.monthlyRental)||0).toLocaleString()}원</td>
+            <td style="text-align:right;font-weight:600">${subTotal.toLocaleString()}원</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+
+    <div class="quote-total">총 합계: ${total.toLocaleString()}원</div>
+
+    <div class="quote-footer">
+      본 견적은 발행일로부터 30일간 유효합니다.<br>
+      문의: 언빌리버블 컴퍼니 · 작성자: ${CU.name}
+    </div>
+  </div>`;
+  return html;
+}
+
+async function saveQuote(){
+  if(!qwState.products || !qwState.products.filter(p=>p).length){
+    toast('제품을 추가해주세요.','e');return;
+  }
+  const products = qwState.products.filter(p=>p);
+  // 회사 추출 (첫번째 제품의 브랜드)
+  const company = products[0]?.brand || '-';
+
+  const payload = {
+    id: qwState.editId || '',
+    author: CU.name,
+    authorEmail: CU.email || '',
+    type: qwState.type==='single'?'단일':qwState.type==='compare'?'비교':'다수',
+    company: company,
+    customerName: qwState.customer.name,
+    customerPhone: qwState.customer.phone,
+    customerEmail: qwState.customer.email,
+    totalAmount: qwState.totalAmount,
+    pdfLink: '',
+    memo: '',
+    data: {
+      type: qwState.type,
+      customer: qwState.customer,
+      products: products,
+    }
+  };
+
+  const action = qwState.editId ? 'updateQuote' : 'addQuote';
+  try{
+    const r = await api(action, payload);
+    toast(r.message, 's');
+    closeM('m-quote');
+    if(r.id) qwState.editId = r.id;
+    document.getElementById('qa-id').textContent = qwState.editId || '저장됨';
+    openM('m-quote-actions');
+    await loadQuotes();
+    renderQuoteList();
+    renderResponseStats();
+  }catch(e){ toast(e.message,'e'); }
+}
+
+// ─── 견적서 보기 ───
+function viewQuote(id){
+  const q = QUOTES.find(x=>x['견적ID']===id);
+  if(!q) return;
+  let data = {};
+  try { data = JSON.parse(q['데이터JSON']||'{}'); } catch(e){}
+  qwState = {
+    step: 4,
+    type: data.type || 'single',
+    customer: data.customer || {},
+    products: data.products || [],
+    totalAmount: Number(q['총금액'])||0,
+    editId: id
+  };
+  document.getElementById('qv-title').textContent = `견적서 ${id}`;
+  document.getElementById('qv-content').innerHTML = generateQuoteHTML();
+  openM('m-quote-view');
+}
+
+async function delQuote(id){
+  if(!confirm('견적서 '+id+'를 삭제하시겠습니까?'))return;
+  try{
+    const r = await api('deleteQuote', {id});
+    toast(r.message, 's');
+    await loadQuotes();
+    renderQuoteList();
+    renderResponseStats();
+  }catch(e){ toast(e.message, 'e'); }
+}
+
+// ─── 액션: PDF 다운로드 ───
+function downloadQuotePdf(){
+  // window.print()를 사용한 간단한 PDF 다운로드
+  printQuoteWindow();
+}
+
+function downloadQuotePdfFromView(){
+  printQuoteWindow();
+}
+
+function printQuoteWindow(){
+  const html = generateQuoteHTML();
+  const w = window.open('', '_blank');
+  if(!w){toast('팝업 차단을 해제해주세요.','e');return;}
+  w.document.write(`<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8">
+    <title>견적서 ${qwState.editId||''}</title>
+    <style>
+      body{font-family:'Noto Sans KR',sans-serif;color:#222;padding:30px;max-width:800px;margin:0 auto}
+      h1{text-align:center;color:#0F6E56;border-bottom:3px double #1D9E75;padding-bottom:16px}
+      h2{font-size:14px;background:#f5f5f5;padding:6px 12px;border-left:3px solid #1D9E75;margin:18px 0 8px}
+      table{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:14px}
+      th{background:#E1F5EE;color:#0F6E56;padding:8px;text-align:left;border:1px solid #ddd}
+      td{padding:8px;border:1px solid #ddd}
+      .quote-total{font-size:16px;font-weight:700;color:#0F6E56;text-align:right;padding:12px;background:#E1F5EE;border-radius:6px;margin-top:14px}
+      .quote-footer{margin-top:24px;padding-top:14px;border-top:1px solid #ddd;font-size:10px;color:#888;text-align:center}
+      @media print{button{display:none}}
+    </style>
+  </head><body>
+    ${html}
+    <div style="text-align:center;margin-top:30px">
+      <button onclick="window.print()" style="padding:10px 24px;background:#1D9E75;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:14px">📥 PDF로 저장 (Ctrl+P → PDF 선택)</button>
+    </div>
+  </body></html>`);
+  w.document.close();
+}
+
+// ─── Gmail로 발송 ───
+function openGmailForQuote(){
+  const c = qwState.customer || {};
+  const id = qwState.editId || '';
+  const subject = encodeURIComponent(`[견적서 ${id}] ${c.name||''}님 견적서를 보내드립니다`);
+  const body = encodeURIComponent(
+    `${c.name||''}님 안녕하세요,\n\n` +
+    `요청하신 견적서를 보내드립니다.\n` +
+    `견적번호: ${id}\n` +
+    `총 금액: ${qwState.totalAmount.toLocaleString()}원\n\n` +
+    `자세한 내용은 별도로 첨부하는 PDF를 확인해주세요.\n` +
+    `(PDF는 "PDF 다운로드"로 받은 뒤 첨부해주세요)\n\n` +
+    `─────────────────\n` +
+    `📌 응답 추적 링크:\n` +
+    `✅ 수락: ${GAS}?action=updateQuoteStatus&payload=${encodeURIComponent(JSON.stringify({id, status:'수락'}))}\n` +
+    `❌ 거절: ${GAS}?action=updateQuoteStatus&payload=${encodeURIComponent(JSON.stringify({id, status:'거절'}))}\n` +
+    `🔍 검토 중: ${GAS}?action=updateQuoteStatus&payload=${encodeURIComponent(JSON.stringify({id, status:'검토중'}))}\n` +
+    `─────────────────\n\n` +
+    `감사합니다.\n${CU.name} 드림\n언빌리버블 컴퍼니`
+  );
+  const to = c.email ? encodeURIComponent(c.email) : '';
+  const url = `https://mail.google.com/mail/?view=cm&fs=1&to=${to}&su=${subject}&body=${body}`;
+  window.open(url, '_blank');
+  toast('📧 Gmail이 새 창에서 열렸어요. PDF 첨부 후 발송하세요!','s');
+}
+
+// ─── 카카오톡 공유 (링크) ───
+function shareKakaoQuote(){
+  const id = qwState.editId || '';
+  const c = qwState.customer || {};
+  const text = `[견적서 ${id}]\n${c.name||''}님 견적서\n총 금액: ${qwState.totalAmount.toLocaleString()}원\n\n자세한 내용은 PDF를 확인해주세요.`;
+  // 카카오톡 SDK 없이 단순 텍스트 복사 후 안내
+  if(navigator.share){
+    navigator.share({
+      title: `견적서 ${id}`,
+      text: text,
+    }).then(()=>toast('공유 완료','s')).catch(()=>{});
+  } else {
+    // 클립보드 복사
+    navigator.clipboard.writeText(text).then(()=>{
+      toast('💬 견적서 내용이 클립보드에 복사됐어요. 카카오톡에 붙여넣기하세요!','s');
+    });
+  }
+}
+
+function previewQuoteFull(){
+  closeM('m-quote-actions');
+  printQuoteWindow();
+}
+
+
 // ══ 유틸 ════════════════════════════════════════════════════
 function fm(n){const v=Number(n)||0;return '₩'+v.toLocaleString('ko-KR');}
 function fmN(n){const v=Number(n)||0;if(v===0)return '-';return v.toLocaleString('ko-KR');}
@@ -2783,6 +4611,24 @@ function bdg(s){const m={재직중:'bg',수습중:'bb',휴직중:'by',퇴사:'bg
 const AC=[['#E1F5EE','#0F6E56'],['#E6F1FB','#185FA5'],['#FAEEDA','#854F0B'],['#EEEDFE','#3C3489'],['#FCEBEB','#A32D2D'],['#EAF3DE','#3B6D11']];
 function abg(n){return AC[((n||'').charCodeAt(0)||0)%AC.length][0];}
 function afg(n){return AC[((n||'').charCodeAt(0)||0)%AC.length][1];}
+</script>
+<script>
+// PWA 서비스 워커 등록
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => console.log('✅ 서비스 워커 등록 완료'))
+      .catch(err => console.log('❌ 서비스 워커 등록 실패:', err));
+  });
+}
+
+// 설치 버튼 처리 (선택사항)
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  console.log('💡 앱 설치 가능합니다');
+});
 </script>
 </body>
 </html>
