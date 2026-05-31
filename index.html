@@ -6,6 +6,8 @@
 <title>언빌리버블 컴퍼니 관리 시스템</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
 
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json">
@@ -319,7 +321,7 @@ tbody td{padding:9px 12px;vertical-align:middle}
 .cal-day-owner{font-size:11px;color:var(--text-3)}
 .cal-empty-day{text-align:center;padding:40px;color:var(--text-3);font-size:13px}
 
-@media(max-width:900px){.metrics{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}.fg{grid-template-columns:1fr}.cal-cell{min-height:70px}#dash-row-2{grid-template-columns:1fr !important}}
+@media(max-width:1200px){#dash-row-3{grid-template-columns:1fr 1fr !important}#dash-row-3 > div:nth-child(3){grid-column:1/-1}}@media(max-width:900px){.metrics{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}.fg{grid-template-columns:1fr}.cal-cell{min-height:70px}#dash-row-2{grid-template-columns:1fr !important}#dash-row-3{grid-template-columns:1fr !important}#dash-row-3 > div:nth-child(3){grid-column:auto}}
 </style>
 </head>
 <body>
@@ -601,29 +603,41 @@ tbody td{padding:9px 12px;vertical-align:middle}
         </div>
       </div>
 
-      <!-- ====== 2단 배치: Refresh 회식 + 공지사항 ====== -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:24px" id="dash-row-2">
-        <!-- 좌: Refresh 회식 -->
+      <!-- ====== 3단 배치: Refresh / 공지사항 / 프로모션 ====== -->
+      <div style="display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:14px;margin-top:24px" id="dash-row-3">
+        <!-- 좌: Refresh 회식 (이미지 슬라이드) -->
         <div id="dash-refresh-section">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-            <h2 style="font-size:15px;font-weight:700;color:var(--text)">🎉 Refresh 회식 일정</h2>
+            <h2 style="font-size:14px;font-weight:700;color:var(--text)">🎉 Refresh 회식 일정</h2>
             <div style="flex:1;height:1px;background:var(--border)"></div>
             <button class="btn btn-primary btn-sm" id="btn-add-refresh" onclick="openRefreshModal()" style="display:none">＋ 회식 추가</button>
           </div>
-          <div id="dash-refresh-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px">
-            <div class="empty" style="grid-column:1/-1"><div class="empty-icon">🎉</div><div class="empty-title">등록된 회식 일정이 없습니다</div></div>
+          <div id="dash-refresh-slider" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;min-height:280px;display:flex;align-items:center;justify-content:center">
+            <div class="empty"><div class="empty-icon">🎉</div><div class="empty-title">등록된 회식 일정이 없습니다</div></div>
           </div>
         </div>
 
-        <!-- 우: 공지사항 목록 -->
+        <!-- 중: 공지사항 -->
         <div id="dash-notice-section">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-            <h2 style="font-size:15px;font-weight:700;color:var(--text)">📢 공지사항</h2>
+            <h2 style="font-size:14px;font-weight:700;color:var(--text)">📢 공지사항</h2>
             <div style="flex:1;height:1px;background:var(--border)"></div>
             <button class="btn btn-purple btn-sm" id="btn-add-notice-dash" onclick="openNoticeModal()" style="display:none">＋ 공지 등록</button>
           </div>
-          <div id="dash-notice-list" style="display:flex;flex-direction:column;gap:8px">
+          <div id="dash-notice-list" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:8px;min-height:280px;display:flex;flex-direction:column;gap:4px">
             <div class="empty"><div class="empty-icon">📢</div><div class="empty-title">등록된 공지사항이 없습니다</div></div>
+          </div>
+        </div>
+
+        <!-- 우: 프로모션 (목록 형태) -->
+        <div id="dash-promo-list-section">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+            <h2 style="font-size:14px;font-weight:700;color:var(--text)">🎁 브랜드사별 프로모션</h2>
+            <div style="flex:1;height:1px;background:var(--border);min-width:20px"></div>
+            <button class="btn btn-primary btn-sm" id="btn-add-promo-list" onclick="openPromotionModal()" style="display:none">＋</button>
+          </div>
+          <div id="dash-promo-list-items" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:8px;min-height:280px;display:flex;flex-direction:column;gap:4px">
+            <div class="empty"><div class="empty-icon">🎁</div><div class="empty-title">등록된 프로모션이 없습니다</div></div>
           </div>
         </div>
       </div>
@@ -647,24 +661,6 @@ tbody td{padding:9px 12px;vertical-align:middle}
         </div>
       </div>
 
-      <!-- ====== 🎁 브랜드사별 프로모션 ====== -->
-      <div id="dash-promo-section" style="margin-top:24px;margin-bottom:24px">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-          <h2 style="font-size:15px;font-weight:700;color:var(--text)">🎁 브랜드사별 프로모션</h2>
-          <div style="flex:1;height:1px;background:var(--border);min-width:20px"></div>
-          <select class="fc" id="promo-brand-filter" style="width:140px;padding:6px 9px" onchange="renderPromotions()">
-            <option value="">전체 브랜드</option>
-            <option value="코웨이">코웨이</option>
-            <option value="청호나이스">청호나이스</option>
-            <option value="쿠쿠">쿠쿠</option>
-            <option value="교원">교원</option>
-          </select>
-          <button class="btn btn-primary btn-sm" id="btn-add-promo" onclick="openPromotionModal()" style="display:none">＋ 프로모션 추가</button>
-        </div>
-        <div id="dash-promo-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px">
-          <div class="empty" style="grid-column:1/-1"><div class="empty-icon">🎁</div><div class="empty-title">등록된 프로모션이 없습니다</div></div>
-        </div>
-      </div>
     </div>
 
     <!-- 직원 관리 (재직/퇴사 탭) -->
@@ -781,22 +777,59 @@ tbody td{padding:9px 12px;vertical-align:middle}
 
     <!-- 출퇴근 기록 -->
     <div class="section" id="s-attendance">
+      <!-- 빠른 기록 카드 (본인용) -->
+      <div class="card" style="margin-bottom:14px;background:linear-gradient(135deg,#1D9E75 0%,#0F6E56 100%);color:#fff;border:none">
+        <div class="card-body" style="padding:20px 24px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+            <div>
+              <div style="font-size:11px;opacity:.85;margin-bottom:3px" id="att-quick-date">오늘 출퇴근 기록</div>
+              <div style="font-size:18px;font-weight:700" id="att-quick-name">-</div>
+            </div>
+            <div id="att-quick-summary" style="font-size:11px;opacity:.85;text-align:right">근무: -</div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+            <button onclick="recordAtt('출근')" style="padding:12px 8px;border:none;background:rgba(255,255,255,.2);color:#fff;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;backdrop-filter:blur(10px);transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,.3)'" onmouseout="this.style.background='rgba(255,255,255,.2)'">
+              ☀️ 출근<br><span style="font-size:10px;opacity:.85" id="att-time-in">-</span>
+            </button>
+            <button onclick="recordAtt('외출')" style="padding:12px 8px;border:none;background:rgba(255,255,255,.2);color:#fff;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;backdrop-filter:blur(10px);transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,.3)'" onmouseout="this.style.background='rgba(255,255,255,.2)'">
+              🍽 외출<br><span style="font-size:10px;opacity:.85" id="att-time-out">-</span>
+            </button>
+            <button onclick="recordAtt('복귀')" style="padding:12px 8px;border:none;background:rgba(255,255,255,.2);color:#fff;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;backdrop-filter:blur(10px);transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,.3)'" onmouseout="this.style.background='rgba(255,255,255,.2)'">
+              🏢 복귀<br><span style="font-size:10px;opacity:.85" id="att-time-back">-</span>
+            </button>
+            <button onclick="recordAtt('퇴근')" style="padding:12px 8px;border:none;background:rgba(255,255,255,.2);color:#fff;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;backdrop-filter:blur(10px);transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,.3)'" onmouseout="this.style.background='rgba(255,255,255,.2)'">
+              🌙 퇴근<br><span style="font-size:10px;opacity:.85" id="att-time-leave">-</span>
+            </button>
+          </div>
+          <div style="font-size:10px;opacity:.75;margin-top:10px;text-align:center">💡 외출 시간은 자동 차감되며, 점심 1시간은 별도 차감됩니다</div>
+        </div>
+      </div>
+
+      <!-- 조회 영역 -->
       <div class="fbar">
         <div class="fgroup"><label class="flabel">날짜</label><input class="fc" type="date" id="att-date" style="width:150px"></div>
         <div class="fgroup" id="att-name-wrap"><label class="flabel">직원</label><select class="fc" id="att-name-sel" style="width:130px"><option value="">전체</option></select></div>
         <button class="btn btn-primary" style="margin-top:auto" onclick="loadAttendance()">조회</button>
       </div>
+
       <div class="card">
-        <div class="card-header"><div class="card-title">출퇴근 기록</div><div class="card-sub" id="att-sub"></div></div>
+        <div class="card-header"><div><div class="card-title">📋 출퇴근 기록</div><div class="card-sub" id="att-sub"></div></div></div>
         <div class="card-body np"><div class="tw"><table>
-          <thead><tr><th>날짜</th><th>이름</th><th>구분</th><th>시간</th><th>비고</th></tr></thead>
-          <tbody id="att-tbody"><tr class="loading-row"><td colspan="5"><span class="spinner"></span> 불러오는 중...</td></tr></tbody>
+          <thead><tr><th>날짜</th><th>이름</th><th>출근</th><th>외출</th><th>복귀</th><th>퇴근</th><th>근무시간</th></tr></thead>
+          <tbody id="att-tbody"><tr class="loading-row"><td colspan="7"><span class="spinner"></span> 불러오는 중...</td></tr></tbody>
         </table></div></div>
       </div>
     </div>
 
     <!-- 캘린더 -->
     <div class="section" id="s-calendar">
+      <!-- 캘린더 종류 탭 -->
+      <div style="display:flex;gap:4px;margin-bottom:14px;background:var(--surface-2);border-radius:8px;padding:3px;width:fit-content">
+        <button class="cal-type-tab active" data-type="personal" onclick="switchCalType('personal')" style="padding:7px 16px;border:none;background:var(--surface);font-size:12px;font-weight:600;cursor:pointer;border-radius:6px;font-family:var(--font);color:var(--text);box-shadow:var(--shadow)">📅 개인 스케줄</button>
+        <button class="cal-type-tab" data-type="menu" onclick="switchCalType('menu')" style="padding:7px 16px;border:none;background:none;font-size:12px;font-weight:500;cursor:pointer;border-radius:6px;font-family:var(--font);color:var(--text-2)">🍽 식단표</button>
+        <button class="cal-type-tab" data-type="cleaning" onclick="switchCalType('cleaning')" style="padding:7px 16px;border:none;background:none;font-size:12px;font-weight:500;cursor:pointer;border-radius:6px;font-family:var(--font);color:var(--text-2)">🧹 청소 당번</button>
+      </div>
+
       <div class="cal-toolbar">
         <div class="cal-nav">
           <button class="btn btn-secondary btn-sm" onclick="calPrev()">‹</button>
@@ -813,14 +846,25 @@ tbody td{padding:9px 12px;vertical-align:middle}
             <button class="cal-view-tab" data-view="week" onclick="setCalView('week')">주</button>
             <button class="cal-view-tab" data-view="day" onclick="setCalView('day')">일</button>
           </div>
-          <button class="btn btn-primary btn-sm" onclick="openEventModal()">＋ 일정 추가</button>
+          <button class="btn btn-primary btn-sm" id="cal-add-btn" onclick="openCalAddModal()">＋ 일정 추가</button>
         </div>
       </div>
-      <div class="card" style="margin-bottom:0">
+      <div class="card" style="margin-bottom:14px">
         <div class="card-body np">
           <div id="cal-month-view"></div>
           <div id="cal-week-view" style="display:none"></div>
           <div id="cal-day-view" style="display:none"></div>
+        </div>
+      </div>
+
+      <!-- 자유 메모 (Quill 에디터) -->
+      <div class="card" style="margin-bottom:0">
+        <div class="card-header">
+          <div><div class="card-title">📝 내 메모</div><div class="card-sub">자유롭게 작성하세요 (자동 저장됨, 본인만 보임)</div></div>
+          <div id="memo-saved-info" style="font-size:10px;color:var(--text-3)">아직 저장된 메모 없음</div>
+        </div>
+        <div class="card-body" style="padding:14px">
+          <div id="memo-editor" style="height:280px;background:#fff"></div>
         </div>
       </div>
     </div>
@@ -1106,6 +1150,13 @@ tbody td{padding:9px 12px;vertical-align:middle}
         <label class="flabel">담당 직원</label>
         <select class="fc" id="ev-owner" style="font-size:14px;padding:11px 14px"><option value="">선택</option></select>
       </div>
+      <div class="fgroup" id="ev-global-wrap" style="margin-bottom:18px;display:none;background:var(--surface-2);border-radius:8px;padding:12px 14px">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" id="ev-global" style="width:16px;height:16px;cursor:pointer;accent-color:var(--purple)">
+          <span style="font-size:13px;font-weight:600;color:var(--text)">📢 전체 직원에게 표시</span>
+        </label>
+        <div style="font-size:11px;color:var(--text-3);margin-top:4px;margin-left:24px">체크하면 모든 직원의 캘린더에 자동으로 보입니다.<br>(예: 접수마감, 설치마감, Refresh 회식 등)</div>
+      </div>
       <div class="fgroup">
         <label class="flabel">상세 내용 / 메모</label>
         <textarea class="fc" id="ev-memo" rows="6" placeholder="일정에 대한 상세 내용을 작성해주세요&#10;여러 줄로 자유롭게 작성 가능합니다" style="font-size:14px;padding:12px 14px;resize:vertical;min-height:140px;line-height:1.6;font-family:var(--font)"></textarea>
@@ -1333,6 +1384,58 @@ tbody td{padding:9px 12px;vertical-align:middle}
     <div class="mf">
       <button class="btn btn-secondary" onclick="closeM('m-perm')">취소</button>
       <button class="btn btn-primary" onclick="savePermDetail()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 모달: 식단표 등록 -->
+<div class="modal-overlay" id="m-menu">
+  <div class="modal modal-sm">
+    <div class="mh"><div class="mt" id="m-menu-title">🍽 식단표 등록</div><button class="mc" onclick="closeM('m-menu')">✕</button></div>
+    <div class="mb"><input type="hidden" id="mn-id">
+      <div class="fgroup" style="margin-bottom:12px">
+        <label class="flabel">날짜<span class="req">*</span></label>
+        <input class="fc" id="mn-date" type="date">
+      </div>
+      <div class="fgroup" style="margin-bottom:12px">
+        <label class="flabel">점심 메뉴<span class="req">*</span></label>
+        <textarea class="fc" id="mn-menu" rows="3" placeholder="예: 김치찌개, 계란말이, 콩나물무침, 김치, 밥" style="resize:vertical;line-height:1.5"></textarea>
+      </div>
+      <div class="fgroup">
+        <label class="flabel">메모</label>
+        <input class="fc" id="mn-memo" placeholder="선택 사항">
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn btn-danger" id="mn-del-btn" onclick="delMenu()" style="display:none;margin-right:auto">삭제</button>
+      <button class="btn btn-secondary" onclick="closeM('m-menu')">취소</button>
+      <button class="btn btn-primary" onclick="submitMenu()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 모달: 청소당번 등록 -->
+<div class="modal-overlay" id="m-cleaning">
+  <div class="modal modal-sm">
+    <div class="mh"><div class="mt" id="m-cleaning-title">🧹 청소당번 등록</div><button class="mc" onclick="closeM('m-cleaning')">✕</button></div>
+    <div class="mb"><input type="hidden" id="cl-id">
+      <div class="fg" style="gap:12px;margin-bottom:12px">
+        <div class="fgroup"><label class="flabel">날짜<span class="req">*</span></label><input class="fc" id="cl-date" type="date"></div>
+        <div class="fgroup"><label class="flabel">담당자<span class="req">*</span></label><select class="fc" id="cl-person"><option value="">선택</option></select></div>
+      </div>
+      <div class="fgroup" style="margin-bottom:12px">
+        <label class="flabel">청소 구역<span class="req">*</span></label>
+        <input class="fc" id="cl-area" placeholder="예: 사무실 / 회의실 / 탕비실">
+      </div>
+      <div class="fgroup">
+        <label class="flabel">메모</label>
+        <input class="fc" id="cl-memo" placeholder="선택 사항">
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn btn-danger" id="cl-del-btn" onclick="delCleaning()" style="display:none;margin-right:auto">삭제</button>
+      <button class="btn btn-secondary" onclick="closeM('m-cleaning')">취소</button>
+      <button class="btn btn-primary" onclick="submitCleaning()">저장</button>
     </div>
   </div>
 </div>
@@ -1773,12 +1876,18 @@ function applyRole(){
   // Phase 1: 대시보드 추가 버튼 권한별 표시
   const btnNoticeDash = document.getElementById('btn-add-notice-dash');
   if(btnNoticeDash) btnNoticeDash.style.display = (canDo('manage_notice') || isAdmin) ? 'inline-flex' : 'none';
+
+  // Phase 2: 캘린더 전체공지 체크박스 (관리자/권한자만)
+  const evGlobalWrap = document.getElementById('ev-global-wrap');
+  if(evGlobalWrap) evGlobalWrap.style.display = (canDo('manage_global_event') || isAdmin) ? 'block' : 'none';
   const btnRefresh = document.getElementById('btn-add-refresh');
   if(btnRefresh) btnRefresh.style.display = (canDo('manage_refresh') || isAdmin) ? 'inline-flex' : 'none';
   const btnCard = document.getElementById('btn-add-card');
   if(btnCard) btnCard.style.display = (canDo('manage_partner_card') || isAdmin) ? 'inline-flex' : 'none';
   const btnPromo = document.getElementById('btn-add-promo');
   if(btnPromo) btnPromo.style.display = (canDo('manage_promotion') || isAdmin) ? 'inline-flex' : 'none';
+  const btnPromoList = document.getElementById('btn-add-promo-list');
+  if(btnPromoList) btnPromoList.style.display = (canDo('manage_promotion') || isAdmin) ? 'inline-flex' : 'none';
 
   // 날짜 필터 초기값
   document.getElementById('sal-ym').value=thisMonth();
@@ -1848,7 +1957,7 @@ async function syncAll(){
   const isAdmin = CU.name===ADMIN_NAME;
   try{
     // 직원 목록은 항상 로드 (담당자 선택 드롭다운 등에 필요)
-    const tasks=[loadEmployees(), loadSales(), loadEvents(), loadInspections(), loadSupports(), loadResignees(), loadRegulations(), loadQuoteProducts(), loadQuotes(), loadNotices(), loadRefreshes(), loadPartnerCards(), loadPromotions()];
+    const tasks=[loadEmployees(), loadSales(), loadEvents(), loadInspections(), loadSupports(), loadResignees(), loadRegulations(), loadQuoteProducts(), loadQuotes(), loadNotices(), loadRefreshes(), loadPartnerCards(), loadPromotions(), loadMenus(), loadCleanings()];
     if(canDo('view_salary_all') || canDo('view_salary_self') || canDo('manage_salary')) tasks.push(loadSalary());
     if(canDo('view_attendance_all') || isAdmin) tasks.push(loadAttendance());
     await Promise.all(tasks);
@@ -2369,27 +2478,159 @@ async function doCalcSalary(){
 // ══ 출퇴근 기록 ══════════════════════════════════════════════
 async function loadAttendance(){
   const date=document.getElementById('att-date').value;
-  const role=getRoleOf(CU.name);
+  const isAdmin = CU.name===ADMIN_NAME;
   const payload={};
   if(date) payload.date=date;
-  if(role==='staff') payload.name=CU.name;
+  // 전체 보기 권한 없으면 본인 것만
+  if(!isAdmin && !canDo('view_attendance_all')) payload.name=CU.name;
   else {
     const sel=document.getElementById('att-name-sel').value;
     if(sel) payload.name=sel;
   }
   const r=await api('getAttendance',payload);
   attendances=r.data||[];
-  document.getElementById('att-sub').textContent=date+' 출퇴근 기록 ('+attendances.length+'건)';
-  const tb=document.getElementById('att-tbody');
-  if(!attendances.length){tb.innerHTML='<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--text-3)">기록 없음</td></tr>';return;}
-  tb.innerHTML=attendances.map(r=>`<tr>
-    <td class="td-m">${r['날짜']||''}</td>
-    <td>${r['이름']||''}</td>
-    <td>${r['구분']==='출근'?'<span class="badge bg">☀️ 출근</span>':'<span class="badge bb">🌙 퇴근</span>'}</td>
-    <td class="td-m">${r['시간']||''}</td>
-    <td class="td-m">${r['비고']||''}</td>
-  </tr>`).join('');
+  // 본인 빠른 기록 영역 업데이트
+  updateAttendanceQuick();
+  // 테이블 렌더링 - 날짜+이름별 그룹화
+  renderAttendanceTable();
 }
+
+// 빠른 기록 영역 업데이트 (오늘 본인 기록 표시)
+function updateAttendanceQuick(){
+  const today_ = ymd(new Date());
+  document.getElementById('att-quick-date').textContent = today_ + ' 출퇴근 기록';
+  document.getElementById('att-quick-name').textContent = CU.name;
+
+  // 오늘 본인 기록만 필터
+  const myToday = (attendances||[]).filter(r=>r['날짜']===today_ && r['이름']===CU.name);
+
+  // 각 타입별 마지막 시간 추출
+  const findLast = (type)=>{
+    const items = myToday.filter(r=>r['구분']===type).sort((a,b)=>(b['시간']||'').localeCompare(a['시간']||''));
+    return items[0] ? items[0]['시간'] : null;
+  };
+  const tIn = findLast('출근');
+  const tOut = findLast('외출');
+  const tBack = findLast('복귀');
+  const tLeave = findLast('퇴근');
+
+  document.getElementById('att-time-in').textContent = tIn || '-';
+  document.getElementById('att-time-out').textContent = tOut || '-';
+  document.getElementById('att-time-back').textContent = tBack || '-';
+  document.getElementById('att-time-leave').textContent = tLeave || '-';
+
+  // 근무시간 계산
+  const workMinutes = calcWorkMinutes(tIn, tOut, tBack, tLeave);
+  const hours = Math.floor(workMinutes/60);
+  const mins = workMinutes % 60;
+  if(workMinutes > 0){
+    document.getElementById('att-quick-summary').innerHTML = `근무: <strong>${hours}시간 ${mins}분</strong><br><span style="font-size:9px">(점심 1시간 차감)</span>`;
+  } else {
+    document.getElementById('att-quick-summary').textContent = '근무: 출근 후 계산됩니다';
+  }
+}
+
+// 시간 계산: 출근→퇴근 - (외출→복귀) - 점심1시간
+function calcWorkMinutes(tIn, tOut, tBack, tLeave){
+  if(!tIn) return 0;
+  const toMin = (t)=>{
+    if(!t) return null;
+    const [h,m] = t.split(':').map(Number);
+    return h*60 + (m||0);
+  };
+  const inM = toMin(tIn);
+  // 퇴근 안 했으면 현재 시간으로 계산
+  const now = new Date();
+  const nowM = now.getHours()*60 + now.getMinutes();
+  const leaveM = toMin(tLeave) || nowM;
+
+  let total = leaveM - inM;
+  if(total < 0) return 0;
+
+  // 외출 시간 차감
+  if(tOut && tBack){
+    const outM = toMin(tOut);
+    const backM = toMin(tBack);
+    if(backM > outM) total -= (backM - outM);
+  }
+  // 점심 1시간 차감 (출근→퇴근이 4시간 이상일 때만)
+  if(total >= 240) total -= 60;
+
+  return Math.max(0, total);
+}
+
+// 출퇴근 테이블 렌더링 - 날짜+이름별 그룹화하여 한 줄에 표시
+function renderAttendanceTable(){
+  const tb = document.getElementById('att-tbody');
+  // 그룹화
+  const groups = {};
+  (attendances||[]).forEach(r=>{
+    const key = (r['날짜']||'') + '|' + (r['이름']||'');
+    if(!groups[key]) groups[key] = {날짜:r['날짜'], 이름:r['이름'], 출근:null, 외출:null, 복귀:null, 퇴근:null};
+    const type = r['구분'];
+    if(['출근','외출','복귀','퇴근'].includes(type)){
+      // 같은 타입이 여러개면 가장 마지막(또는 가장 처음)
+      if(type==='출근'||type==='외출'){
+        // 처음 기록
+        if(!groups[key][type] || r['시간'] < groups[key][type]) groups[key][type] = r['시간'];
+      } else {
+        // 퇴근/복귀는 가장 마지막
+        if(!groups[key][type] || r['시간'] > groups[key][type]) groups[key][type] = r['시간'];
+      }
+    }
+  });
+  const list = Object.values(groups).sort((a,b)=>{
+    if(a.날짜 !== b.날짜) return String(b.날짜).localeCompare(String(a.날짜));
+    return String(a.이름).localeCompare(String(b.이름));
+  });
+  document.getElementById('att-sub').textContent = '전체 '+list.length+'건';
+
+  if(!list.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-3)">기록 없음</td></tr>';return;}
+
+  tb.innerHTML = list.map(g=>{
+    const workMin = calcWorkMinutes(g.출근, g.외출, g.복귀, g.퇴근);
+    const hours = Math.floor(workMin/60);
+    const mins = workMin % 60;
+    const workStr = workMin > 0 ? `${hours}시간 ${mins}분` : '-';
+    return `<tr>
+      <td class="td-m">${g.날짜||''}</td>
+      <td>${g.이름||''}</td>
+      <td class="td-m">${g.출근?'<span style="color:var(--accent-2);font-weight:600">☀️ '+g.출근+'</span>':'<span style="color:var(--text-3)">-</span>'}</td>
+      <td class="td-m">${g.외출?'<span style="color:var(--warn)">🍽 '+g.외출+'</span>':'<span style="color:var(--text-3)">-</span>'}</td>
+      <td class="td-m">${g.복귀?'<span style="color:var(--info)">🏢 '+g.복귀+'</span>':'<span style="color:var(--text-3)">-</span>'}</td>
+      <td class="td-m">${g.퇴근?'<span style="color:var(--purple);font-weight:600">🌙 '+g.퇴근+'</span>':'<span style="color:var(--text-3)">-</span>'}</td>
+      <td class="td-r" style="font-weight:700;color:var(--accent-2)">${workStr}</td>
+    </tr>`;
+  }).join('');
+}
+
+// 출퇴근 기록 (출근/외출/복귀/퇴근)
+async function recordAtt(type){
+  const now = new Date();
+  const time = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+  const today_ = ymd(now);
+
+  // 같은 타입 중복 체크
+  const myToday = (attendances||[]).filter(r=>r['날짜']===today_ && r['이름']===CU.name && r['구분']===type);
+  if(myToday.length > 0){
+    if(!confirm(`이미 오늘 ${type} 기록이 있습니다 (${myToday[0]['시간']}).\n다시 ${type} 기록을 추가하시겠습니까?`)) return;
+  }
+
+  try{
+    const r = await api('recordAttendance', {
+      name: CU.name,
+      date: today_,
+      type: type,
+      time: time
+    });
+    toast(`✅ ${type} ${time} 기록 완료`, 's');
+    await loadAttendance();
+  }catch(e){
+    toast('기록 실패: '+e.message, 'e');
+  }
+}
+
+
 
 // ══ 권한 관리 (관리자) ══════════════════════════════════════
 function loadPermList(){
@@ -2495,7 +2736,7 @@ function go(page){
   }
   if(page==='admin')      { loadPermList(); renderMenuConfig(); renderAdminNoticeList(); }
   if(page==='attendance')   loadAttendance();
-  if(page==='calendar')     initCalendar();
+  if(page==='calendar')     { initCalendar(); setTimeout(()=>{initMemoEditor(); switchCalType('personal');}, 100); }
   if(page==='inspection')   initInspection();
   if(page==='support')      loadSupports();
   if(page==='salary')       loadSalary();
@@ -2619,7 +2860,8 @@ function renderMonthView(){
   const startDow=first.getDay();
   const daysInMonth=last.getDate();
   const todayStr=ymd(new Date());
-  const evs=getFilteredEvents();
+  // 현재 캘린더 타입에 맞는 데이터 가져오기
+  const evs = getCurrentCalData();
 
   const dows=['일','월','화','수','목','금','토'];
   let html='<div class="cal-grid">';
@@ -2635,16 +2877,16 @@ function renderMonthView(){
     const dateStr=y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
     const dow=new Date(y,m,d).getDay();
     const isToday=dateStr===todayStr;
-    const dayEvents=evs.filter(e=>e['날짜']===dateStr).sort((a,b)=>(a['시작시간']||'').localeCompare(b['시작시간']||''));
+    const dayEvents=evs.filter(e=>e.date===dateStr).sort((a,b)=>(a.time||'').localeCompare(b.time||''));
     let evHtml='';
     dayEvents.slice(0,3).forEach(e=>{
-      evHtml+=`<div class="cal-event" style="background:${e['색상']||'#2461d4'}" onclick="event.stopPropagation();openEventModal('${e['일정ID']}')" title="${(e['시작시간']?e['시작시간']+' ':'')+(e['제목']||'')}">${e['제목']||''}</div>`;
+      const globalTag = e.isGlobal ? '📢 ' : '';
+      evHtml+=`<div class="cal-event" style="background:${e.color}" onclick="event.stopPropagation();calEventClick('${e.id}')" title="${globalTag}${(e.time?e.time+' ':'')+(e.title||'')}">${globalTag}${e.title||''}</div>`;
     });
     if(dayEvents.length>3) evHtml+=`<div class="cal-more">+${dayEvents.length-3}개 더보기</div>`;
-    html+=`<div class="cal-cell ${isToday?'today':''}" onclick="openEventModalForDate('${dateStr}')">
+    html+=`<div class="cal-cell ${isToday?'today':''}" onclick="calCellClick('${dateStr}')">
       <div class="cal-date ${dow===0?'sun':dow===6?'sat':''}">${d}</div>${evHtml}</div>`;
   }
-  // 다음달 채우기
   const total=startDow+daysInMonth;
   const remain=(7-total%7)%7;
   for(let i=1;i<=remain;i++){
@@ -2663,7 +2905,7 @@ function renderWeekView(){
   for(let i=0;i<7;i++){ const d=new Date(sunday); d.setDate(sunday.getDate()+i); days.push(d); }
   document.getElementById('cal-title').textContent=`${sunday.getFullYear()}년 ${sunday.getMonth()+1}월 ${sunday.getDate()}일 주`;
   const todayStr=ymd(new Date());
-  const evs=getFilteredEvents();
+  const evs=getCurrentCalData();
   const dows=['일','월','화','수','목','금','토'];
 
   let head='<div class="cal-week-head"><div></div>';
@@ -2673,21 +2915,36 @@ function renderWeekView(){
   });
   head+='</div>';
 
+  // 종일 일정 영역 (시간 없는 식단/청소/일정)
+  let allDayRow='<div class="cal-week-grid" style="grid-template-rows:auto"><div style="font-size:9px;color:var(--text-3);padding:4px;text-align:right">종일</div>';
+  days.forEach(d=>{
+    const ds=ymd(d);
+    const allDay=evs.filter(e=>e.date===ds && !e.time);
+    let se='';
+    allDay.forEach(e=>{
+      const globalTag = e.isGlobal ? '📢 ' : '';
+      se+=`<div class="cal-tevent" style="position:static;margin:1px;background:${e.color}" onclick="event.stopPropagation();calEventClick('${e.id}')" title="${globalTag}${e.title||''}">${globalTag}${e.title||''}</div>`;
+    });
+    allDayRow+=`<div class="cal-time-slot" style="height:auto;min-height:24px;padding:2px" onclick="calCellClick('${ds}')">${se}</div>`;
+  });
+  allDayRow+='</div>';
+
   let grid='<div class="cal-week-grid">';
   for(let h=7;h<=22;h++){
     grid+=`<div class="cal-time-label">${h}:00</div>`;
     days.forEach(d=>{
       const ds=ymd(d);
-      const slotEvents=evs.filter(e=>e['날짜']===ds&&e['시작시간']&&parseInt(e['시작시간'])===h);
+      const slotEvents=evs.filter(e=>e.date===ds && e.time && parseInt(e.time)===h);
       let se='';
       slotEvents.forEach(e=>{
-        se+=`<div class="cal-tevent" style="background:${e['색상']||'#2461d4'}" onclick="event.stopPropagation();openEventModal('${e['일정ID']}')" title="${e['시작시간']||''} ${e['제목']||''}">${e['제목']||''}</div>`;
+        const globalTag = e.isGlobal ? '📢 ' : '';
+        se+=`<div class="cal-tevent" style="background:${e.color}" onclick="event.stopPropagation();calEventClick('${e.id}')" title="${globalTag}${e.time||''} ${e.title||''}">${globalTag}${e.title||''}</div>`;
       });
-      grid+=`<div class="cal-time-slot" onclick="openEventModalForDateTime('${ds}','${String(h).padStart(2,'0')}:00')">${se}</div>`;
+      grid+=`<div class="cal-time-slot" onclick="calCellClick('${ds}')">${se}</div>`;
     });
   }
   grid+='</div>';
-  document.getElementById('cal-week-view').innerHTML=head+grid;
+  document.getElementById('cal-week-view').innerHTML=head+allDayRow+grid;
 }
 
 // ── 일간 뷰 ──
@@ -2695,17 +2952,21 @@ function renderDayView(){
   const ds=ymd(calCurrent);
   const dows=['일','월','화','수','목','금','토'];
   document.getElementById('cal-title').textContent=`${calCurrent.getFullYear()}년 ${calCurrent.getMonth()+1}월 ${calCurrent.getDate()}일 (${dows[calCurrent.getDay()]})`;
-  const evs=getFilteredEvents().filter(e=>e['날짜']===ds).sort((a,b)=>(a['시작시간']||'').localeCompare(b['시작시간']||''));
+  const evs=getCurrentCalData().filter(e=>e.date===ds).sort((a,b)=>(a.time||'').localeCompare(b.time||''));
   let html='<div class="cal-day-list">';
   if(!evs.length){
-    html+='<div class="cal-empty-day">📅 이 날의 일정이 없습니다.<br>날짜 셀을 클릭하거나 "일정 추가"를 눌러보세요.</div>';
+    const emptyMsg = currentCalType==='personal' ? '📅 이 날의 일정이 없습니다.' :
+                     currentCalType==='menu' ? '🍽 이 날의 식단 정보가 없습니다.' :
+                     '🧹 이 날의 청소당번이 없습니다.';
+    html+=`<div class="cal-empty-day">${emptyMsg}<br>날짜 셀을 클릭하거나 추가 버튼을 눌러보세요.</div>`;
   } else {
     evs.forEach(e=>{
-      const time=e['시작시간']?(e['시작시간']+(e['종료시간']?' ~ '+e['종료시간']:'')):'종일';
-      html+=`<div class="cal-day-event" style="border-left-color:${e['색상']||'#2461d4'}" onclick="openEventModal('${e['일정ID']}')">
+      const time=e.time?(e.time+(e.endTime?' ~ '+e.endTime:'')):'종일';
+      const globalTag = e.isGlobal ? '<span class="badge bp" style="margin-right:4px">📢 전체</span>' : '';
+      html+=`<div class="cal-day-event" style="border-left-color:${e.color}" onclick="calEventClick('${e.id}')">
         <div class="cal-day-time">${time}</div>
-        <div style="flex:1"><div class="cal-day-title">${e['제목']}</div>${e['메모']?'<div style="font-size:11px;color:var(--text-3);margin-top:2px">'+e['메모']+'</div>':''}</div>
-        <div class="cal-day-owner">${e['담당자']||''}</div>
+        <div style="flex:1"><div class="cal-day-title">${globalTag}${e.title}</div>${e.memo?'<div style="font-size:11px;color:var(--text-3);margin-top:2px">'+e.memo+'</div>':''}</div>
+        <div class="cal-day-owner">${e.owner||''}</div>
       </div>`;
     });
   }
@@ -2730,11 +2991,16 @@ function openEventModal(id){
     document.getElementById('ev-end').value=e['종료시간']||'';
     document.getElementById('ev-memo').value=e['메모']||'';
     if(document.getElementById('ev-owner')) document.getElementById('ev-owner').value=e['담당자']||'';
+    // 전체공지 체크박스
+    const evGlobal=document.getElementById('ev-global');
+    if(evGlobal) evGlobal.checked = Number(e['전체공지'])===1;
   }else{
     ['ev-id','ev-title','ev-start','ev-end','ev-memo'].forEach(f=>document.getElementById(f).value='');
     document.getElementById('ev-date').value=ymd(new Date());
     document.getElementById('ev-color').value='#2461d4';
     if(document.getElementById('ev-owner')) document.getElementById('ev-owner').value=CU.name;
+    const evGlobal=document.getElementById('ev-global');
+    if(evGlobal) evGlobal.checked = false;
   }
   openM('m-event');
 }
@@ -2756,6 +3022,8 @@ async function submitEvent(){
   if((role==='admin'||role==='manager')&&document.getElementById('ev-owner').value){
     owner=document.getElementById('ev-owner').value;
   }
+  const evGlobal = document.getElementById('ev-global');
+  const isGlobal = evGlobal && evGlobal.checked && (canDo('manage_global_event') || CU.name===ADMIN_NAME);
   const p={
     id, owner,
     title:document.getElementById('ev-title').value,
@@ -2764,6 +3032,7 @@ async function submitEvent(){
     startTime:document.getElementById('ev-start').value,
     endTime:document.getElementById('ev-end').value,
     memo:document.getElementById('ev-memo').value,
+    isGlobal: isGlobal,
   };
   if(!p.title||!p.date){toast('제목과 날짜는 필수입니다.','e');return;}
   const btn=document.getElementById('ev-save-btn');btn.disabled=true;btn.textContent='저장 중...';
@@ -3465,6 +3734,293 @@ function applyRegulation(idx){
 
 
 
+
+// ════ Phase 2: 캘린더 확장 ═══════════════════════════════════
+let currentCalType = 'personal'; // personal / menu / cleaning
+let MENUS = [], CLEANINGS = [];
+let memoEditor = null;
+
+// ─── 로드 함수 ───
+async function loadMenus(){
+  try{ const r = await api('getMenus'); MENUS = r.data || []; }
+  catch(e){ MENUS = []; }
+}
+async function loadCleanings(){
+  try{ const r = await api('getCleanings'); CLEANINGS = r.data || []; }
+  catch(e){ CLEANINGS = []; }
+}
+
+// ─── 캘린더 타입 전환 ───
+function switchCalType(type){
+  currentCalType = type;
+  document.querySelectorAll('.cal-type-tab').forEach(b=>{
+    if(b.dataset.type===type){
+      b.classList.add('active');
+      b.style.background='var(--surface)';
+      b.style.color='var(--text)';
+      b.style.fontWeight='600';
+      b.style.boxShadow='var(--shadow)';
+    } else {
+      b.classList.remove('active');
+      b.style.background='none';
+      b.style.color='var(--text-2)';
+      b.style.fontWeight='500';
+      b.style.boxShadow='none';
+    }
+  });
+
+  // 추가 버튼 라벨/표시 변경
+  const addBtn = document.getElementById('cal-add-btn');
+  const isAdmin = CU.name===ADMIN_NAME;
+  if(addBtn){
+    if(type==='personal'){
+      addBtn.textContent = '＋ 일정 추가';
+      addBtn.style.display = 'inline-flex';
+    } else if(type==='menu'){
+      addBtn.textContent = '＋ 식단 추가';
+      addBtn.style.display = (isAdmin || canDo('manage_menu')) ? 'inline-flex' : 'none';
+    } else if(type==='cleaning'){
+      addBtn.textContent = '＋ 청소당번 추가';
+      addBtn.style.display = (isAdmin || canDo('manage_cleaning')) ? 'inline-flex' : 'none';
+    }
+  }
+
+  renderCalendar();
+}
+
+// ─── 추가 버튼 클릭 (캘린더 타입에 따라 분기) ───
+function openCalAddModal(){
+  if(currentCalType==='personal') openEventModal();
+  else if(currentCalType==='menu') openMenuModal();
+  else if(currentCalType==='cleaning') openCleaningModal();
+}
+
+// ─── 캘린더 렌더링 - 타입별 데이터 사용 ───
+function getCurrentCalData(){
+  if(currentCalType==='personal'){
+    return getFilteredEvents().map(e=>({
+      id: e['일정ID'],
+      date: e['날짜'],
+      title: e['제목'],
+      time: e['시작시간'],
+      endTime: e['종료시간'],
+      color: e['색상']||'#2461d4',
+      memo: e['메모'],
+      owner: e['담당자'],
+      isGlobal: Number(e['전체공지'])===1,
+      type: 'event',
+      raw: e,
+    }));
+  } else if(currentCalType==='menu'){
+    return (MENUS||[]).map(m=>({
+      id: m['식단ID'],
+      date: m['날짜'],
+      title: m['메뉴'],
+      color: '#BA7517',
+      memo: m['메모'],
+      type: 'menu',
+      raw: m,
+    }));
+  } else if(currentCalType==='cleaning'){
+    return (CLEANINGS||[]).map(c=>({
+      id: c['청소ID'],
+      date: c['날짜'],
+      title: `${c['담당자']||''}${c['구역']?' · '+c['구역']:''}`,
+      color: '#6B4EE6',
+      memo: c['메모'],
+      type: 'cleaning',
+      raw: c,
+    }));
+  }
+  return [];
+}
+
+// 캘린더 클릭 시 분기 (타입별)
+function calCellClick(dateStr){
+  if(currentCalType==='personal') openEventModalForDate(dateStr);
+  else if(currentCalType==='menu'){
+    if(!canDo('manage_menu') && CU.name!==ADMIN_NAME){toast('식단표 등록 권한이 없습니다.','e');return;}
+    openMenuModal(null, dateStr);
+  } else if(currentCalType==='cleaning'){
+    if(!canDo('manage_cleaning') && CU.name!==ADMIN_NAME){toast('청소당번 등록 권한이 없습니다.','e');return;}
+    openCleaningModal(null, dateStr);
+  }
+}
+
+function calEventClick(itemId){
+  if(currentCalType==='personal') openEventModal(itemId);
+  else if(currentCalType==='menu'){
+    if(!canDo('manage_menu') && CU.name!==ADMIN_NAME){
+      const m = MENUS.find(x=>x['식단ID']===itemId);
+      if(m) toast('🍽 '+(m['메뉴']||''),'i');
+      return;
+    }
+    openMenuModal(itemId);
+  } else if(currentCalType==='cleaning'){
+    if(!canDo('manage_cleaning') && CU.name!==ADMIN_NAME){
+      const c = CLEANINGS.find(x=>x['청소ID']===itemId);
+      if(c) toast('🧹 '+(c['담당자']||'')+(c['구역']?' · '+c['구역']:''),'i');
+      return;
+    }
+    openCleaningModal(itemId);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// 🍽 식단표 모달
+// ═══════════════════════════════════════════════════════════
+function openMenuModal(id, dateStr){
+  document.getElementById('m-menu-title').textContent = id ? '🍽 식단 수정' : '🍽 식단 등록';
+  document.getElementById('mn-del-btn').style.display = id ? 'inline-flex' : 'none';
+  if(id){
+    const m = MENUS.find(x=>x['식단ID']===id);
+    if(!m) return;
+    document.getElementById('mn-id').value = id;
+    document.getElementById('mn-date').value = m['날짜']||'';
+    document.getElementById('mn-menu').value = m['메뉴']||'';
+    document.getElementById('mn-memo').value = m['메모']||'';
+  } else {
+    ['mn-id','mn-menu','mn-memo'].forEach(f=>document.getElementById(f).value='');
+    document.getElementById('mn-date').value = dateStr || ymd(new Date());
+  }
+  openM('m-menu');
+}
+
+async function submitMenu(){
+  const id = document.getElementById('mn-id').value;
+  const p = {
+    id,
+    author: CU.name,
+    date: document.getElementById('mn-date').value,
+    menu: document.getElementById('mn-menu').value.trim(),
+    memo: document.getElementById('mn-memo').value,
+  };
+  if(!p.date || !p.menu){toast('날짜와 메뉴는 필수입니다.','e');return;}
+  try{
+    const r = await api(id ? 'updateMenu' : 'addMenu', p);
+    toast(r.message, 's');
+    closeM('m-menu');
+    await loadMenus();
+    renderCalendar();
+  }catch(e){toast(e.message,'e');}
+}
+
+async function delMenu(){
+  const id = document.getElementById('mn-id').value;
+  if(!confirm('식단을 삭제하시겠습니까?'))return;
+  try{
+    const r = await api('deleteMenu',{id});
+    toast(r.message,'s');
+    closeM('m-menu');
+    await loadMenus();
+    renderCalendar();
+  }catch(e){toast(e.message,'e');}
+}
+
+// ═══════════════════════════════════════════════════════════
+// 🧹 청소당번 모달
+// ═══════════════════════════════════════════════════════════
+function openCleaningModal(id, dateStr){
+  document.getElementById('m-cleaning-title').textContent = id ? '🧹 청소당번 수정' : '🧹 청소당번 등록';
+  document.getElementById('cl-del-btn').style.display = id ? 'inline-flex' : 'none';
+
+  // 담당자 옵션 채우기
+  const active = emps.filter(e=>e['상태']!=='퇴사');
+  document.getElementById('cl-person').innerHTML = '<option value="">선택</option>' +
+    active.map(e=>`<option value="${e['이름']}">${e['이름']}</option>`).join('');
+
+  if(id){
+    const c = CLEANINGS.find(x=>x['청소ID']===id);
+    if(!c) return;
+    document.getElementById('cl-id').value = id;
+    document.getElementById('cl-date').value = c['날짜']||'';
+    document.getElementById('cl-person').value = c['담당자']||'';
+    document.getElementById('cl-area').value = c['구역']||'';
+    document.getElementById('cl-memo').value = c['메모']||'';
+  } else {
+    ['cl-id','cl-area','cl-memo'].forEach(f=>document.getElementById(f).value='');
+    document.getElementById('cl-date').value = dateStr || ymd(new Date());
+    document.getElementById('cl-person').value = '';
+  }
+  openM('m-cleaning');
+}
+
+async function submitCleaning(){
+  const id = document.getElementById('cl-id').value;
+  const p = {
+    id,
+    author: CU.name,
+    date: document.getElementById('cl-date').value,
+    person: document.getElementById('cl-person').value,
+    area: document.getElementById('cl-area').value.trim(),
+    memo: document.getElementById('cl-memo').value,
+  };
+  if(!p.date || !p.person || !p.area){toast('날짜, 담당자, 구역은 필수입니다.','e');return;}
+  try{
+    const r = await api(id ? 'updateCleaning' : 'addCleaning', p);
+    toast(r.message, 's');
+    closeM('m-cleaning');
+    await loadCleanings();
+    renderCalendar();
+  }catch(e){toast(e.message,'e');}
+}
+
+async function delCleaning(){
+  const id = document.getElementById('cl-id').value;
+  if(!confirm('청소당번을 삭제하시겠습니까?'))return;
+  try{
+    const r = await api('deleteCleaning',{id});
+    toast(r.message,'s');
+    closeM('m-cleaning');
+    await loadCleanings();
+    renderCalendar();
+  }catch(e){toast(e.message,'e');}
+}
+
+// ═══════════════════════════════════════════════════════════
+// 📝 Quill 메모 에디터
+// ═══════════════════════════════════════════════════════════
+function initMemoEditor(){
+  if(memoEditor) return; // 이미 초기화됨
+  if(typeof Quill === 'undefined') return; // Quill 라이브러리 로드 안됨
+  const el = document.getElementById('memo-editor');
+  if(!el) return;
+  memoEditor = new Quill('#memo-editor', {
+    theme: 'snow',
+    modules: {
+      toolbar: [
+        [{ 'header': [1, 2, 3, false] }],
+        ['bold', 'italic', 'underline', 'strike'],
+        [{ 'color': [] }, { 'background': [] }],
+        [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
+        [{ 'align': [] }],
+        ['blockquote', 'code-block'],
+        ['link'],
+        ['clean']
+      ]
+    },
+    placeholder: '자유롭게 메모를 작성하세요... (자동 저장됨)'
+  });
+  // 저장된 메모 로드
+  const saved = lGet('user_memo_' + CU.name, null);
+  if(saved){
+    memoEditor.root.innerHTML = saved.html || '';
+    document.getElementById('memo-saved-info').textContent = '마지막 저장: ' + (saved.savedAt || '');
+  }
+  // 자동 저장 (5초마다 변경 시)
+  let saveTimer = null;
+  memoEditor.on('text-change', ()=>{
+    if(saveTimer) clearTimeout(saveTimer);
+    saveTimer = setTimeout(()=>{
+      const html = memoEditor.root.innerHTML;
+      const savedAt = new Date().toLocaleTimeString('ko-KR', {hour:'2-digit',minute:'2-digit'});
+      lSet('user_memo_' + CU.name, {html, savedAt});
+      document.getElementById('memo-saved-info').textContent = '💾 저장됨 ' + savedAt;
+    }, 2000); // 2초 후 저장
+  });
+}
+
+
 // ════ Phase 1: 대시보드 확장 ═══════════════════════════════
 let NOTICES = [], REFRESHES = [], PARTNER_CARDS = [], PROMOTIONS = [];
 
@@ -3489,29 +4045,56 @@ async function loadPromotions(){
 // ═══════════════════════════════════════════════════════════
 // 📢 공지사항 팝업
 // ═══════════════════════════════════════════════════════════
-// 대시보드 공지사항 렌더링
+// 대시보드 공지사항 렌더링 (텍스트 목록 형태)
 function renderNoticesDash(){
   const div = document.getElementById('dash-notice-list');
   if(!div) return;
   if(!NOTICES.length){
-    div.innerHTML = '<div class="empty"><div class="empty-icon">📢</div><div class="empty-title">등록된 공지사항이 없습니다</div></div>';
+    div.innerHTML = '<div class="empty" style="margin:auto"><div class="empty-icon">📢</div><div class="empty-title">등록된 공지사항이 없습니다</div></div>';
     return;
   }
-  const sorted = [...NOTICES].sort((a,b)=>(Number(b['우선순위'])||0)-(Number(a['우선순위'])||0));
+  const sorted = [...NOTICES].sort((a,b)=>{
+    // 우선순위 → 등록일 역순
+    const pa = Number(a['우선순위'])||0, pb = Number(b['우선순위'])||0;
+    if(pa !== pb) return pb - pa;
+    return String(b['등록일']||'').localeCompare(String(a['등록일']||''));
+  });
   const canEdit = canDo('manage_notice') || CU.name===ADMIN_NAME;
-  div.innerHTML = sorted.slice(0,5).map(n=>`
-    <div style="background:var(--surface);border:1px solid var(--border);border-left:4px solid ${n['색상']||'#1D9E75'};border-radius:8px;padding:12px 14px;cursor:pointer" ${canEdit?`onclick="openNoticeModal('${n['공지ID']}')"`:'onclick="showNoticePopup()"'}>
-      <div style="display:flex;justify-content:space-between;align-items:start;gap:8px;margin-bottom:6px">
-        <div style="font-size:13px;font-weight:700;color:var(--text);flex:1;min-width:0">${n['제목']||''}</div>
-        ${n['종료일']?`<span style="font-size:9px;color:var(--text-3);white-space:nowrap">~${n['종료일']}</span>`:''}
+  div.innerHTML = sorted.slice(0,10).map(n=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s" onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background=''" onclick="viewNoticeDetail('${n['공지ID']}')">
+      <div style="width:6px;height:6px;border-radius:50%;background:${n['색상']||'#1D9E75'};flex-shrink:0"></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${n['제목']||''}</div>
+        <div style="font-size:10px;color:var(--text-3)">${n['등록일']||''} · ${n['등록자']||''}</div>
       </div>
-      <div style="font-size:11px;color:var(--text-2);line-height:1.5;white-space:pre-wrap;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${n['내용']||''}</div>
-      <div style="font-size:10px;color:var(--text-3);margin-top:6px">${n['등록일']||''} · ${n['등록자']||''}</div>
+      ${canEdit?`<button class="btn btn-secondary btn-sm" style="padding:3px 8px;font-size:10px" onclick="event.stopPropagation();openNoticeModal('${n['공지ID']}')">✏️</button>`:''}
     </div>
   `).join('');
-  if(sorted.length > 5){
-    div.innerHTML += `<button class="btn btn-secondary btn-sm" style="width:100%" onclick="showNoticePopup()">📋 전체 ${sorted.length}개 보기</button>`;
+  if(sorted.length > 10){
+    div.innerHTML += `<button class="btn btn-secondary btn-sm" style="margin:8px;width:calc(100% - 16px)" onclick="showNoticePopup()">📋 전체 ${sorted.length}개 보기</button>`;
   }
+}
+
+// 공지사항 상세 보기 (텍스트 항목 클릭 시)
+function viewNoticeDetail(id){
+  const n = NOTICES.find(x=>x['공지ID']===id);
+  if(!n) return;
+  // 단일 공지 팝업 표시
+  const sorted = [n];
+  const html = sorted.map(n=>`
+    <div style="background:white;border-left:4px solid ${n['색상']||'#1D9E75'};border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <div style="font-size:13px;font-weight:700;color:var(--text)">${n['제목']||'공지'}</div>
+        ${n['종료일']?`<span style="font-size:10px;color:var(--text-3)">~ ${n['종료일']}</span>`:''}
+      </div>
+      <div style="font-size:12px;color:var(--text-2);white-space:pre-wrap;line-height:1.5">${n['내용']||''}</div>
+      <div style="font-size:10px;color:var(--text-3);margin-top:8px">${n['등록일']||''} · ${n['등록자']||''}</div>
+    </div>
+  `).join('');
+  document.getElementById('notice-popup-content').innerHTML = html;
+  // 이 단일 보기에선 "오늘 하루 안 보기" 숨김
+  document.getElementById('notice-hide-today').parentElement.style.display='none';
+  openM('m-notice-popup');
 }
 
 function showNoticePopup(){
@@ -3539,10 +4122,13 @@ function showNoticePopup(){
 }
 
 function closeNoticePopup(){
-  if(document.getElementById('notice-hide-today').checked){
+  const cb = document.getElementById('notice-hide-today');
+  if(cb && cb.checked){
     lSet('notice_hide_until', today());
   }
   closeM('m-notice-popup');
+  // 다음에 보일 때 위해서 라벨 복원
+  if(cb && cb.parentElement) cb.parentElement.style.display='';
 }
 
 // 공지사항 추가/수정 모달
@@ -3627,28 +4213,61 @@ function renderAdminNoticeList(){
 // ═══════════════════════════════════════════════════════════
 // 🎉 Refresh 회식
 // ═══════════════════════════════════════════════════════════
+// 회식 슬라이더 (좌/우: 이미지 / 상세)
+let refreshSlideIdx = 0;
 function renderRefreshes(){
-  const list = REFRESHES;
-  const container = document.getElementById('dash-refresh-list');
+  const list = REFRESHES || [];
+  const container = document.getElementById('dash-refresh-slider');
+  if(!container) return;
   if(!list.length){
-    container.innerHTML = '<div class="empty" style="grid-column:1/-1"><div class="empty-icon">🎉</div><div class="empty-title">등록된 회식 일정이 없습니다</div></div>';
+    container.innerHTML = '<div class="empty"><div class="empty-icon">🎉</div><div class="empty-title">등록된 회식 일정이 없습니다</div></div>';
     return;
   }
+  // 최신 등록 순 정렬
+  const sorted = [...list].sort((a,b)=>String(b['등록일']||'').localeCompare(String(a['등록일']||'')));
+  if(refreshSlideIdx >= sorted.length) refreshSlideIdx = 0;
+  const r = sorted[refreshSlideIdx];
   const canEdit = canDo('manage_refresh') || CU.name===ADMIN_NAME;
-  container.innerHTML = list.map(r=>`
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:all .15s" onmouseover="this.style.boxShadow='var(--shadow-md)'" onmouseout="this.style.boxShadow=''">
-      ${r['이미지URL'] ? `<div style="height:140px;background:#f5f5f5;overflow:hidden;cursor:pointer" onclick="window.open('${r['이미지URL']}','_blank')"><img src="${gdriveImgUrl(r['이미지URL'])}" referrerpolicy="no-referrer" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='<div style=\'background:linear-gradient(135deg,#1D9E75 0%,#0F6E56 100%);width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:36px\'>🎉</div>'"></div>` : `<div style="height:80px;background:linear-gradient(135deg,#1D9E75 0%,#0F6E56 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-size:36px">🎉</div>`}
-      <div style="padding:14px">
-        <div style="font-size:13px;font-weight:700;margin-bottom:6px">${r['회식명']||'회식'}</div>
-        ${r['일시']?`<div style="font-size:11px;color:var(--text-2);margin-bottom:3px">📅 ${formatDateTime(r['일시'])}</div>`:''}
-        ${r['장소']?`<div style="font-size:11px;color:var(--text-2);margin-bottom:3px">📍 ${r['장소']}</div>`:''}
-        ${r['메뉴']?`<div style="font-size:11px;color:var(--text-2);margin-bottom:3px">🍴 ${r['메뉴']}</div>`:''}
-        ${r['메모']?`<div style="font-size:11px;color:var(--text-3);margin-top:6px;line-height:1.4">${r['메모']}</div>`:''}
-        ${canEdit?`<div style="display:flex;gap:4px;margin-top:10px"><button class="btn btn-secondary btn-sm" style="flex:1" onclick="openRefreshModal('${r['회식ID']}')">수정</button></div>`:''}
+  const hasMultiple = sorted.length > 1;
+
+  container.style.display = 'block';
+  container.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;min-height:280px">
+      <!-- 좌: 이미지 -->
+      <div style="position:relative;background:#f5f5f5;display:flex;align-items:center;justify-content:center;overflow:hidden">
+        ${r['이미지URL']
+          ? `<img src="${gdriveImgUrl(r['이미지URL'])}" referrerpolicy="no-referrer" style="width:100%;height:100%;object-fit:cover;cursor:pointer" onclick="window.open('${r['이미지URL']}','_blank')" onerror="this.parentElement.innerHTML='<div style=\'width:100%;height:100%;background:linear-gradient(135deg,#1D9E75 0%,#0F6E56 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-size:48px\'>🎉</div>'">`
+          : '<div style="width:100%;height:100%;background:linear-gradient(135deg,#1D9E75 0%,#0F6E56 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-size:48px">🎉</div>'
+        }
+        ${hasMultiple ? `
+          <button onclick="slideRefresh(-1)" style="position:absolute;left:6px;top:50%;transform:translateY(-50%);width:30px;height:30px;border-radius:50%;border:none;background:rgba(0,0,0,.5);color:#fff;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center">‹</button>
+          <button onclick="slideRefresh(1)" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);width:30px;height:30px;border-radius:50%;border:none;background:rgba(0,0,0,.5);color:#fff;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center">›</button>
+          <div style="position:absolute;bottom:6px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.5);color:#fff;font-size:10px;padding:2px 8px;border-radius:100px">${refreshSlideIdx+1} / ${sorted.length}</div>
+        ` : ''}
+      </div>
+      <!-- 우: 정보 -->
+      <div style="padding:18px;display:flex;flex-direction:column;justify-content:space-between">
+        <div>
+          <div style="font-size:15px;font-weight:700;margin-bottom:12px">${r['회식명']||'회식'}</div>
+          ${r['일시']?`<div style="font-size:12px;color:var(--text-2);margin-bottom:6px">📅 ${formatDateTime(r['일시'])}</div>`:''}
+          ${r['장소']?`<div style="font-size:12px;color:var(--text-2);margin-bottom:6px">📍 ${r['장소']}</div>`:''}
+          ${r['메뉴']?`<div style="font-size:12px;color:var(--text-2);margin-bottom:6px">🍴 ${r['메뉴']}</div>`:''}
+          ${r['메모']?`<div style="font-size:11px;color:var(--text-3);margin-top:10px;line-height:1.5;padding:8px;background:var(--surface-2);border-radius:6px">${r['메모']}</div>`:''}
+        </div>
+        ${canEdit?`<div style="display:flex;gap:4px;margin-top:12px"><button class="btn btn-secondary btn-sm" style="flex:1" onclick="openRefreshModal('${r['회식ID']}')">수정</button></div>`:''}
       </div>
     </div>
-  `).join('');
+  `;
 }
+
+function slideRefresh(dir){
+  const len = (REFRESHES||[]).length;
+  if(!len) return;
+  refreshSlideIdx = (refreshSlideIdx + dir + len) % len;
+  renderRefreshes();
+}
+
+
 
 function formatDateTime(dt){
   if(!dt) return '';
@@ -3824,10 +4443,92 @@ async function delPartnerCard(id){
 // 🎁 프로모션
 // ═══════════════════════════════════════════════════════════
 function renderPromotions(){
-  const filter = document.getElementById('promo-brand-filter').value;
+  // 텍스트 목록 형태로 표시
+  const div = document.getElementById('dash-promo-list-items');
+  if(!div) return;
+  const list = PROMOTIONS || [];
+  if(!list.length){
+    div.innerHTML = '<div class="empty" style="margin:auto"><div class="empty-icon">🎁</div><div class="empty-title">등록된 프로모션이 없습니다</div></div>';
+    return;
+  }
+  // 최신 등록 순 정렬
+  const sorted = [...list].sort((a,b)=>String(b['등록일']||'').localeCompare(String(a['등록일']||'')));
+  const canEdit = canDo('manage_promotion') || CU.name===ADMIN_NAME;
+  const today_ = today();
+
+  // 브랜드별 색상
+  const brandColor = {
+    '코웨이':'#2461d4',
+    '청호나이스':'#1D9E75',
+    '쿠쿠':'#BA7517',
+    '교원':'#6B4EE6',
+  };
+
+  div.innerHTML = sorted.slice(0,10).map(p=>{
+    const expired = p['종료일'] && p['종료일'] < today_;
+    const color = brandColor[p['브랜드']] || '#1D9E75';
+    return `
+    <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;${expired?'opacity:.5':''}" onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background=''" onclick="downloadPromotion('${p['프로모션ID']}')">
+      <div style="width:6px;height:6px;border-radius:50%;background:${color};flex-shrink:0"></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+          ${p['브랜드']?`<span style="color:${color};font-weight:700">${p['브랜드']}</span> `:''}${p['제목']||''}
+          ${expired?'<span style="font-size:9px;background:var(--surface-2);color:var(--text-3);padding:1px 5px;border-radius:100px;margin-left:4px">종료</span>':''}
+        </div>
+        <div style="font-size:10px;color:var(--text-3)">
+          ${p['시작일']||p['종료일']?`📅 ${p['시작일']||''} ~ ${p['종료일']||''}`:''}${p['등록일']?` · ${p['등록일']}`:''}
+        </div>
+      </div>
+      ${canEdit?`<button class="btn btn-danger btn-sm" style="padding:3px 8px;font-size:10px" onclick="event.stopPropagation();delPromotion('${p['프로모션ID']}')">✕</button>`:''}
+      <span style="font-size:14px">📥</span>
+    </div>
+  `;}).join('');
+  if(sorted.length > 10){
+    div.innerHTML += `<button class="btn btn-secondary btn-sm" style="margin:8px;width:calc(100% - 16px)" onclick="showAllPromotions()">📋 전체 ${sorted.length}개 보기</button>`;
+  }
+}
+
+// 프로모션 다운로드 (클릭 시)
+function downloadPromotion(id){
+  const p = PROMOTIONS.find(x=>x['프로모션ID']===id);
+  if(!p) return;
+  const url = p['파일URL'] || p['이미지URL'];
+  if(!url){toast('파일이 없습니다.','e');return;}
+  window.open(url, '_blank');
+  toast('📥 다운로드 시작','s');
+}
+
+// 전체 프로모션 보기 (팝업)
+function showAllPromotions(){
+  const list = [...(PROMOTIONS||[])].sort((a,b)=>String(b['등록일']||'').localeCompare(String(a['등록일']||'')));
+  const today_ = today();
+  const brandColor = {'코웨이':'#2461d4','청호나이스':'#1D9E75','쿠쿠':'#BA7517','교원':'#6B4EE6'};
+  const html = list.map(p=>{
+    const expired = p['종료일'] && p['종료일'] < today_;
+    const color = brandColor[p['브랜드']] || '#1D9E75';
+    return `
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer;${expired?'opacity:.5':''}" onclick="downloadPromotion('${p['프로모션ID']}');closeM('m-notice-popup')">
+        <div style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0"></div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:600"><span style="color:${color}">${p['브랜드']||''}</span> ${p['제목']||''}${expired?' <span style="font-size:9px;background:#eee;padding:1px 5px;border-radius:100px">종료</span>':''}</div>
+          <div style="font-size:10px;color:var(--text-3)">${p['시작일']||''} ~ ${p['종료일']||''} · ${p['등록일']||''}</div>
+        </div>
+        <span>📥</span>
+      </div>`;
+  }).join('');
+  document.getElementById('notice-popup-content').innerHTML = '<div style="font-size:13px;font-weight:700;padding:8px 12px;color:var(--text-2)">🎁 전체 프로모션 (' + list.length + '개)</div>' + html;
+  const cb = document.getElementById('notice-hide-today');
+  if(cb && cb.parentElement) cb.parentElement.style.display='none';
+  openM('m-notice-popup');
+}
+
+// 기존 카드 형태 렌더링 (사용 안 함, 호환성 유지)
+function renderPromotionCards_unused(){
+  const filter = document.getElementById('promo-brand-filter') ? document.getElementById('promo-brand-filter').value : '';
   let list = PROMOTIONS;
   if(filter) list = list.filter(c=>c['브랜드']===filter);
   const container = document.getElementById('dash-promo-list');
+  if(!container) return;
   if(!list.length){
     container.innerHTML = '<div class="empty" style="grid-column:1/-1"><div class="empty-icon">🎁</div><div class="empty-title">등록된 프로모션이 없습니다</div></div>';
     return;
