@@ -788,20 +788,19 @@ tbody td{padding:9px 12px;vertical-align:middle}
             <div id="att-quick-summary" style="font-size:11px;opacity:.85;text-align:right">근무: -</div>
           </div>
           <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
-            <button onclick="recordAtt('출근')" style="padding:12px 8px;border:none;background:rgba(255,255,255,.2);color:#fff;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;backdrop-filter:blur(10px);transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,.3)'" onmouseout="this.style.background='rgba(255,255,255,.2)'">
-              ☀️ 출근<br><span style="font-size:10px;opacity:.85" id="att-time-in">-</span>
+            <button onclick="recordAtt('출근')" style="padding:18px 10px;border:none;background:rgba(255,255,255,.2);color:#fff;border-radius:10px;cursor:pointer;font-size:16px;font-weight:700;backdrop-filter:blur(10px);transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,.3)'" onmouseout="this.style.background='rgba(255,255,255,.2)'">
+              ☀️ 출근<div style="font-size:14px;font-weight:500;opacity:.95;margin-top:6px" id="att-time-in">-</div>
             </button>
-            <button onclick="recordAtt('외출')" style="padding:12px 8px;border:none;background:rgba(255,255,255,.2);color:#fff;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;backdrop-filter:blur(10px);transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,.3)'" onmouseout="this.style.background='rgba(255,255,255,.2)'">
-              🍽 외출<br><span style="font-size:10px;opacity:.85" id="att-time-out">-</span>
+            <button onclick="recordAtt('외출')" style="padding:18px 10px;border:none;background:rgba(255,255,255,.2);color:#fff;border-radius:10px;cursor:pointer;font-size:16px;font-weight:700;backdrop-filter:blur(10px);transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,.3)'" onmouseout="this.style.background='rgba(255,255,255,.2)'">
+              🍽 외출<div style="font-size:14px;font-weight:500;opacity:.95;margin-top:6px" id="att-time-out">-</div>
             </button>
-            <button onclick="recordAtt('복귀')" style="padding:12px 8px;border:none;background:rgba(255,255,255,.2);color:#fff;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;backdrop-filter:blur(10px);transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,.3)'" onmouseout="this.style.background='rgba(255,255,255,.2)'">
-              🏢 복귀<br><span style="font-size:10px;opacity:.85" id="att-time-back">-</span>
+            <button onclick="recordAtt('복귀')" style="padding:18px 10px;border:none;background:rgba(255,255,255,.2);color:#fff;border-radius:10px;cursor:pointer;font-size:16px;font-weight:700;backdrop-filter:blur(10px);transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,.3)'" onmouseout="this.style.background='rgba(255,255,255,.2)'">
+              🏢 복귀<div style="font-size:14px;font-weight:500;opacity:.95;margin-top:6px" id="att-time-back">-</div>
             </button>
-            <button onclick="recordAtt('퇴근')" style="padding:12px 8px;border:none;background:rgba(255,255,255,.2);color:#fff;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;backdrop-filter:blur(10px);transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,.3)'" onmouseout="this.style.background='rgba(255,255,255,.2)'">
-              🌙 퇴근<br><span style="font-size:10px;opacity:.85" id="att-time-leave">-</span>
+            <button onclick="recordAtt('퇴근')" style="padding:18px 10px;border:none;background:rgba(255,255,255,.2);color:#fff;border-radius:10px;cursor:pointer;font-size:16px;font-weight:700;backdrop-filter:blur(10px);transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,.3)'" onmouseout="this.style.background='rgba(255,255,255,.2)'">
+              🌙 퇴근<div style="font-size:14px;font-weight:500;opacity:.95;margin-top:6px" id="att-time-leave">-</div>
             </button>
           </div>
-          <div style="font-size:10px;opacity:.75;margin-top:10px;text-align:center">💡 외출 시간은 자동 차감되며, 점심 1시간은 별도 차감됩니다</div>
         </div>
       </div>
 
@@ -1011,7 +1010,8 @@ tbody td{padding:9px 12px;vertical-align:middle}
       <!-- 직원 권한 관리 -->
       <div class="card">
         <div class="card-header">
-          <div><div class="card-title">🔐 직원 권한 관리</div><div class="card-sub">직원별 직책과 세부 권한을 설정합니다.</div></div>
+          <div><div class="card-title">🔐 직원 권한 관리</div><div class="card-sub">직원 추가/삭제 및 권한 설정</div></div>
+          <button class="btn btn-purple btn-sm" onclick="openQuickAddEmpModal()">＋ 직원 추가</button>
         </div>
         <div class="card-body np">
           <div id="perm-list" style="padding:16px"><div class="empty"><span class="spinner"></span> 불러오는 중...</div></div>
@@ -1388,6 +1388,44 @@ tbody td{padding:9px 12px;vertical-align:middle}
   </div>
 </div>
 
+<!-- 모달: 빠른 직원 추가 (관리자 페이지용) -->
+<div class="modal-overlay" id="m-quick-emp">
+  <div class="modal modal-sm">
+    <div class="mh"><div class="mt">＋ 직원 추가</div><button class="mc" onclick="closeM('m-quick-emp')">✕</button></div>
+    <div class="mb">
+      <div class="fgroup" style="margin-bottom:12px">
+        <label class="flabel">이름<span class="req">*</span></label>
+        <input class="fc" id="qe-name" placeholder="홍길동">
+      </div>
+      <div class="fg" style="gap:12px;margin-bottom:12px">
+        <div class="fgroup"><label class="flabel">부서</label><input class="fc" id="qe-dept" placeholder="영업부"></div>
+        <div class="fgroup"><label class="flabel">직책</label>
+          <select class="fc" id="qe-pos">
+            <option>영업부직원</option>
+            <option>용역부직원</option>
+            <option>팀장</option>
+            <option>영업부실장</option>
+            <option>용역부실장</option>
+            <option>총괄실장</option>
+          </select>
+        </div>
+      </div>
+      <div class="fgroup">
+        <label class="flabel">기본급 (선택)</label>
+        <input class="fc" id="qe-pay" type="number" placeholder="0">
+      </div>
+      <div style="font-size:11px;color:var(--text-3);margin-top:10px;padding:8px;background:var(--accent-light);border-radius:6px">
+        💡 회원가입은 직원이 직접 진행합니다. 이 이름과 정확히 일치해야만 가입할 수 있어요.<br>
+        💡 추가 정보(연락처, 보험율 등)는 "직원 관리"에서 편집 가능합니다.
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn btn-secondary" onclick="closeM('m-quick-emp')">취소</button>
+      <button class="btn btn-primary" id="qe-save-btn" onclick="submitQuickEmp()">저장</button>
+    </div>
+  </div>
+</div>
+
 <!-- 모달: 식단표 등록 -->
 <div class="modal-overlay" id="m-menu">
   <div class="modal modal-sm">
@@ -1735,7 +1773,7 @@ function resetFindForm(){
   });
 }
 
-function doSignup(){
+async function doSignup(){
   const name=document.getElementById('su-name').value.trim();
   const id=document.getElementById('su-id').value.trim();
   const pw=document.getElementById('su-pw').value;
@@ -1754,6 +1792,26 @@ function doSignup(){
   if(!answer){err.textContent='답변을 입력해주세요.';return;}
   if(getAccounts().find(a=>a.id===id)){err.textContent='이미 사용 중인 아이디입니다.';return;}
   if(getAccounts().find(a=>a.email===email)){err.textContent='이미 사용 중인 이메일입니다.';return;}
+
+  // 🔒 직원 시트에 등록된 이름인지 검증
+  err.textContent='⏳ 직원 정보 확인 중...';
+  try{
+    const r = await api('getEmployeeNames');
+    const validNames = r.data || [];
+    if(!validNames.includes(name)){
+      err.textContent='❌ 등록되지 않은 이름입니다. 관리자에게 등록을 요청해주세요.';
+      return;
+    }
+    // 이미 가입된 이름인지 확인
+    if(getAccounts().find(a=>a.name===name)){
+      err.textContent='❌ 이미 이 이름으로 가입된 계정이 있습니다. (1인 1계정)';
+      return;
+    }
+  }catch(e){
+    err.textContent='직원 정보 확인 실패: '+e.message;
+    return;
+  }
+
   saveAccount({id,pw,name,email,question,answer});
   alert('🎉 가입 완료! 로그인 해주세요.');
   document.getElementById('ls-id').value=id;
@@ -2422,13 +2480,38 @@ function exportSales(){
 // ══ 급여 ════════════════════════════════════════════════════
 async function loadSalary(){
   const ym=document.getElementById('pay-ym').value||thisMonth();
-  // 자동 계산 권한이 있는 사람은 페이지 들어올 때 자동 계산
-  if(canDo('manage_salary') || CU.name===ADMIN_NAME){
-    try{ await api('calcSalary',{ym}); }
-    catch(e){ console.warn('자동 계산 실패:',e.message); }
+  document.getElementById('pay-ym').value = ym;
+
+  // 일단 기존 데이터 가져오기
+  let r;
+  try{
+    r = await api('getSalary',{ym});
+  }catch(e){
+    toast('급여 데이터 로드 실패: '+e.message,'e');
+    salary=[];
+    renderSalary(salary,ym);
+    return;
   }
-  const r=await api('getSalary',{ym});
-  salary=r.data||[];
+  salary = r.data || [];
+
+  // 데이터가 없고, 자동계산 권한 있으면 자동 실행
+  const canCalc = canDo('manage_salary') || CU.name===ADMIN_NAME;
+  if(salary.length === 0 && canCalc){
+    try{
+      toast('급여 자동 계산 중...','i');
+      const calcResult = await api('calcSalary',{ym});
+      if(calcResult.ok === false){
+        toast(calcResult.error || '계산 실패','e');
+      } else {
+        // 다시 조회
+        const r2 = await api('getSalary',{ym});
+        salary = r2.data || [];
+        if(salary.length > 0) toast(`${salary.length}명 급여 계산 완료 ✅`,'s');
+      }
+    }catch(e){
+      toast('자동 계산 실패: '+e.message,'e');
+    }
+  }
   renderSalary(salary,ym);
 }
 function renderSalary(list,ym){
@@ -2452,7 +2535,15 @@ function renderSalary(list,ym){
   document.getElementById('pay-sub').textContent=(ym||thisMonth())+' 급여 명세';
   document.getElementById('pay-total').textContent='실지급 합계: '+fm(total);
   const tb=document.getElementById('pay-tbody');
-  if(!list.length){tb.innerHTML='<tr><td colspan="11" style="text-align:center;padding:30px;color:var(--text-3)">데이터 없음. ⚡ 급여 자동 계산을 눌러주세요.</td></tr>';return;}
+  if(!list.length){
+    const isAdmin = CU.name===ADMIN_NAME;
+    const canCalc = canDo('manage_salary') || isAdmin;
+    const msg = canCalc
+      ? '⚡ "급여 자동 계산" 버튼을 눌러주세요.<br><span style="font-size:10px">또는 직원 관리에서 재직 직원을 추가해주세요.</span>'
+      : '⏳ 관리자가 급여 계산 후 표시됩니다.';
+    tb.innerHTML='<tr><td colspan="11" style="text-align:center;padding:40px;color:var(--text-3);line-height:1.6">'+msg+'</td></tr>';
+    return;
+  }
   tb.innerHTML=list.map(r=>`<tr>
     <td><div class="ec"><div class="avatar" style="background:${abg(r['직원명'])};color:${afg(r['직원명'])}">${(r['직원명']||'?')[0]}</div><span class="en">${r['직원명']}</span></div></td>
     <td class="td-r">${fm(r['기본급'])}</td>
@@ -2495,6 +2586,65 @@ async function loadAttendance(){
   renderAttendanceTable();
 }
 
+// 시간 문자열을 깔끔하게 변환 (ISO/Date → "오전 9:00" 형식)
+function fmtTime(timeStr){
+  if(!timeStr) return '-';
+  let s = String(timeStr);
+  // ISO 형식 (예: 1899-12-30T15:13:08.000Z) → HH:MM 추출
+  if(s.includes('T')){
+    const m = s.match(/T(\d{2}):(\d{2})/);
+    if(m){
+      // ISO UTC → 한국 시간으로 변환
+      try{
+        const d = new Date(s);
+        if(!isNaN(d.getTime())){
+          const hh = d.getHours();
+          const mm = d.getMinutes();
+          return formatKoreanTime(hh, mm);
+        }
+      }catch(e){}
+      // 변환 실패 시 그냥 추출한 시간
+      return formatKoreanTime(parseInt(m[1]), parseInt(m[2]));
+    }
+  }
+  // HH:MM 형식
+  const m2 = s.match(/^(\d{1,2}):(\d{2})/);
+  if(m2){
+    return formatKoreanTime(parseInt(m2[1]), parseInt(m2[2]));
+  }
+  return s;
+}
+
+// 24시간 → 오전/오후 HH:MM
+function formatKoreanTime(h, m){
+  if(isNaN(h)||isNaN(m)) return '-';
+  const ampm = h < 12 ? '오전' : '오후';
+  const h12 = h === 0 ? 12 : (h > 12 ? h - 12 : h);
+  const mm = String(m).padStart(2,'0');
+  return `${ampm} ${h12}:${mm}`;
+}
+
+// 시간 문자열을 HH:MM 24시간 형식으로 정규화 (계산용)
+function toHHMM(timeStr){
+  if(!timeStr) return null;
+  let s = String(timeStr);
+  // ISO 형식
+  if(s.includes('T')){
+    try{
+      const d = new Date(s);
+      if(!isNaN(d.getTime())){
+        return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+      }
+    }catch(e){}
+    const m = s.match(/T(\d{2}):(\d{2})/);
+    if(m) return m[1] + ':' + m[2];
+  }
+  // 이미 HH:MM
+  const m2 = s.match(/^(\d{1,2}):(\d{2})/);
+  if(m2) return String(m2[1]).padStart(2,'0') + ':' + m2[2];
+  return null;
+}
+
 // 빠른 기록 영역 업데이트 (오늘 본인 기록 표시)
 function updateAttendanceQuick(){
   const today_ = ymd(new Date());
@@ -2506,7 +2656,7 @@ function updateAttendanceQuick(){
 
   // 각 타입별 마지막 시간 추출
   const findLast = (type)=>{
-    const items = myToday.filter(r=>r['구분']===type).sort((a,b)=>(b['시간']||'').localeCompare(a['시간']||''));
+    const items = myToday.filter(r=>r['구분']===type).sort((a,b)=>(toHHMM(b['시간'])||'').localeCompare(toHHMM(a['시간'])||''));
     return items[0] ? items[0]['시간'] : null;
   };
   const tIn = findLast('출근');
@@ -2514,17 +2664,17 @@ function updateAttendanceQuick(){
   const tBack = findLast('복귀');
   const tLeave = findLast('퇴근');
 
-  document.getElementById('att-time-in').textContent = tIn || '-';
-  document.getElementById('att-time-out').textContent = tOut || '-';
-  document.getElementById('att-time-back').textContent = tBack || '-';
-  document.getElementById('att-time-leave').textContent = tLeave || '-';
+  document.getElementById('att-time-in').textContent = fmtTime(tIn);
+  document.getElementById('att-time-out').textContent = fmtTime(tOut);
+  document.getElementById('att-time-back').textContent = fmtTime(tBack);
+  document.getElementById('att-time-leave').textContent = fmtTime(tLeave);
 
-  // 근무시간 계산
-  const workMinutes = calcWorkMinutes(tIn, tOut, tBack, tLeave);
+  // 근무시간 계산 (HH:MM으로 정규화)
+  const workMinutes = calcWorkMinutes(toHHMM(tIn), toHHMM(tOut), toHHMM(tBack), toHHMM(tLeave));
   const hours = Math.floor(workMinutes/60);
   const mins = workMinutes % 60;
   if(workMinutes > 0){
-    document.getElementById('att-quick-summary').innerHTML = `근무: <strong>${hours}시간 ${mins}분</strong><br><span style="font-size:9px">(점심 1시간 차감)</span>`;
+    document.getElementById('att-quick-summary').innerHTML = `근무: <strong style="font-size:14px">${hours}시간 ${mins}분</strong><br><span style="font-size:9px">(점심 1시간 차감)</span>`;
   } else {
     document.getElementById('att-quick-summary').textContent = '근무: 출근 후 계산됩니다';
   }
@@ -2568,14 +2718,14 @@ function renderAttendanceTable(){
     const key = (r['날짜']||'') + '|' + (r['이름']||'');
     if(!groups[key]) groups[key] = {날짜:r['날짜'], 이름:r['이름'], 출근:null, 외출:null, 복귀:null, 퇴근:null};
     const type = r['구분'];
+    const tNorm = toHHMM(r['시간']) || r['시간'];
     if(['출근','외출','복귀','퇴근'].includes(type)){
-      // 같은 타입이 여러개면 가장 마지막(또는 가장 처음)
       if(type==='출근'||type==='외출'){
         // 처음 기록
-        if(!groups[key][type] || r['시간'] < groups[key][type]) groups[key][type] = r['시간'];
+        if(!groups[key][type] || (toHHMM(r['시간'])||'') < (toHHMM(groups[key][type])||'')) groups[key][type] = r['시간'];
       } else {
         // 퇴근/복귀는 가장 마지막
-        if(!groups[key][type] || r['시간'] > groups[key][type]) groups[key][type] = r['시간'];
+        if(!groups[key][type] || (toHHMM(r['시간'])||'') > (toHHMM(groups[key][type])||'')) groups[key][type] = r['시간'];
       }
     }
   });
@@ -2588,17 +2738,17 @@ function renderAttendanceTable(){
   if(!list.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-3)">기록 없음</td></tr>';return;}
 
   tb.innerHTML = list.map(g=>{
-    const workMin = calcWorkMinutes(g.출근, g.외출, g.복귀, g.퇴근);
+    const workMin = calcWorkMinutes(toHHMM(g.출근), toHHMM(g.외출), toHHMM(g.복귀), toHHMM(g.퇴근));
     const hours = Math.floor(workMin/60);
     const mins = workMin % 60;
     const workStr = workMin > 0 ? `${hours}시간 ${mins}분` : '-';
     return `<tr>
       <td class="td-m">${g.날짜||''}</td>
       <td>${g.이름||''}</td>
-      <td class="td-m">${g.출근?'<span style="color:var(--accent-2);font-weight:600">☀️ '+g.출근+'</span>':'<span style="color:var(--text-3)">-</span>'}</td>
-      <td class="td-m">${g.외출?'<span style="color:var(--warn)">🍽 '+g.외출+'</span>':'<span style="color:var(--text-3)">-</span>'}</td>
-      <td class="td-m">${g.복귀?'<span style="color:var(--info)">🏢 '+g.복귀+'</span>':'<span style="color:var(--text-3)">-</span>'}</td>
-      <td class="td-m">${g.퇴근?'<span style="color:var(--purple);font-weight:600">🌙 '+g.퇴근+'</span>':'<span style="color:var(--text-3)">-</span>'}</td>
+      <td class="td-m">${g.출근?'<span style="color:var(--accent-2);font-weight:600">☀️ '+fmtTime(g.출근)+'</span>':'<span style="color:var(--text-3)">-</span>'}</td>
+      <td class="td-m">${g.외출?'<span style="color:var(--warn)">🍽 '+fmtTime(g.외출)+'</span>':'<span style="color:var(--text-3)">-</span>'}</td>
+      <td class="td-m">${g.복귀?'<span style="color:var(--info)">🏢 '+fmtTime(g.복귀)+'</span>':'<span style="color:var(--text-3)">-</span>'}</td>
+      <td class="td-m">${g.퇴근?'<span style="color:var(--purple);font-weight:600">🌙 '+fmtTime(g.퇴근)+'</span>':'<span style="color:var(--text-3)">-</span>'}</td>
       <td class="td-r" style="font-weight:700;color:var(--accent-2)">${workStr}</td>
     </tr>`;
   }).join('');
@@ -2631,42 +2781,6 @@ async function recordAtt(type){
 }
 
 
-
-// ══ 권한 관리 (관리자) ══════════════════════════════════════
-function loadPermList(){
-  const perms=getPerms();
-  const names=['송용한','신민철','이강호','김승현','신동석','장준철','홍민주','홍서은','장미','홍희선','류호정','김동욱','조우영','원지석','류동현'];
-  document.getElementById('perm-list').innerHTML=names.map(name=>{
-    const role=name===ADMIN_NAME?'admin':(perms[name]||'staff');
-    return `<div class="perm-card">
-      <div class="avatar" style="background:${abg(name)};color:${afg(name)};width:34px;height:34px;font-size:13px">${name[0]}</div>
-      <div class="perm-info">
-        <div class="perm-name">${name}${name===ADMIN_NAME?' 👑':''}</div>
-        <div class="perm-id">${getAccounts().find(a=>a.name===name)?.id||'미가입'}</div>
-      </div>
-      ${name===ADMIN_NAME
-        ?'<span class="role-admin">관리자 (고정)</span>'
-        :`<select class="perm-select" onchange="savePermChange('${name}',this.value)">
-            <option value="staff" ${role==='staff'?'selected':''}>직원</option>
-            <option value="manager" ${role==='manager'?'selected':''}>팀장</option>
-          </select>`
-      }
-    </div>`;
-  }).join('');
-}
-
-function savePermChange(name,role){
-  const perms=getPerms();
-  perms[name]=role;
-  savePerms(perms);
-  renderEmps(emps);
-  toast(name+'님 권한을 '+(role==='manager'?'팀장':'직원')+'으로 변경했어요 ✅','s');
-}
-
-async function doInit(){
-  if(!confirm('시트를 초기화하시겠습니까?'))return;
-  try{const r=await api('initAll');toast(r.message,'s');}catch(e){toast(e.message,'e');}
-}
 
 // ══ 셀렉트 업데이트 ══════════════════════════════════════════
 function updateSels(){
@@ -3452,24 +3566,104 @@ async function delSupport(id){
 
 // ════ 권한 관리 (새 시스템) ══════════════════════════════════
 function loadPermList(){
-  const names=['송용한','신민철','이강호','김승현','신동석','장준철','홍민주','홍서은','장미','홍희선','류호정','김동욱','조우영','원지석','류동현'];
+  // 직원 시트에서 가져온 데이터 사용 (재직중 + 퇴사 모두)
+  const allEmps = emps || [];
+  // 송용한이 직원에 없으면 추가
+  let names = allEmps.map(e=>e['이름']).filter(Boolean);
+  if(!names.includes(ADMIN_NAME)) names.unshift(ADMIN_NAME);
+  // 관리자 먼저
+  names = [ADMIN_NAME, ...names.filter(n=>n!==ADMIN_NAME)];
+
   const perms=getPermsDetail();
-  document.getElementById('perm-list').innerHTML=names.map(name=>{
+  const div = document.getElementById('perm-list');
+  if(!names.length){
+    div.innerHTML = '<div class="empty"><div class="empty-icon">👥</div><div class="empty-title">등록된 직원이 없습니다. "＋ 직원 추가" 버튼을 눌러 시작하세요.</div></div>';
+    return;
+  }
+  div.innerHTML = names.map(name=>{
     const isAdmin=name===ADMIN_NAME;
+    const empData = allEmps.find(e=>e['이름']===name);
+    const isResigned = empData && empData['상태']==='퇴사';
     const p=perms[name]||{position:'영업부직원',perms:{view_salary_self:true}};
     const permCount=Object.values(p.perms||{}).filter(v=>v).length;
-    return `<div class="perm-card">
+    const accountInfo = getAccounts().find(a=>a.name===name);
+    return `<div class="perm-card" style="${isResigned?'opacity:.5':''}">
       <div class="avatar" style="background:${abg(name)};color:${afg(name)};width:34px;height:34px;font-size:13px">${name[0]}</div>
       <div class="perm-info">
-        <div class="perm-name">${name}${isAdmin?' 👑':''}</div>
-        <div class="perm-id">${isAdmin?'관리자 (전체 권한)':p.position+' · 권한 '+permCount+'개'}</div>
+        <div class="perm-name">${name}${isAdmin?' 👑':''}${isResigned?' <span style="font-size:10px;color:var(--text-3)">(퇴사)</span>':''}</div>
+        <div class="perm-id">${isAdmin?'관리자 (전체 권한)':p.position+' · 권한 '+permCount+'개 · '+(accountInfo?'✅ 가입':'⚪ 미가입')}</div>
       </div>
       ${isAdmin
         ? '<span class="role-admin">관리자 (고정)</span>'
-        : `<button class="btn btn-purple btn-sm" onclick="openPermModal('${name}')">⚙️ 권한 설정</button>`
+        : `<div style="display:flex;gap:4px">
+            <button class="btn btn-purple btn-sm" onclick="openPermModal('${name}')">⚙️ 권한</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteEmpFully('${name}','${empData?empData['직원ID']:''}')">🗑 삭제</button>
+          </div>`
       }
     </div>`;
   }).join('');
+}
+
+// 직원 완전 삭제 (관리자 권한 페이지에서)
+async function deleteEmpFully(name, empId){
+  if(name === ADMIN_NAME){toast('관리자는 삭제할 수 없습니다.','e');return;}
+  if(!confirm(`⚠️ ${name}님의 데이터를 완전히 삭제합니다.\n\n• 구글 시트의 직원 행 삭제\n• 회원가입 계정 삭제\n• 권한 설정 삭제\n\n이 작업은 되돌릴 수 없습니다. 계속하시겠습니까?`))return;
+
+  try{
+    // 1. 구글 시트에서 삭제
+    if(empId){
+      await api('hardDeleteEmployee', {id: empId});
+    }
+    // 2. 로컬 계정 삭제
+    const accounts = getAccounts().filter(a=>a.name !== name);
+    lSet('accounts', accounts);
+    // 3. 권한 설정 삭제
+    const perms = getPermsDetail();
+    delete perms[name];
+    savePermsDetail(perms);
+
+    toast(`${name}님 데이터 완전히 삭제 완료 ✅`, 's');
+    // 직원 목록 재로드
+    await loadEmployees();
+    loadPermList();
+  }catch(e){
+    toast('삭제 실패: '+e.message, 'e');
+  }
+}
+
+// 빠른 직원 추가 모달 (관리자 페이지에서)
+function openQuickAddEmpModal(){
+  ['qe-name','qe-dept','qe-pay'].forEach(f=>document.getElementById(f).value='');
+  document.getElementById('qe-pos').value='영업부직원';
+  openM('m-quick-emp');
+}
+
+async function submitQuickEmp(){
+  const name = document.getElementById('qe-name').value.trim();
+  const dept = document.getElementById('qe-dept').value.trim();
+  const pos = document.getElementById('qe-pos').value;
+  const pay = document.getElementById('qe-pay').value;
+  if(!name){toast('이름은 필수입니다.','e');return;}
+  // 중복 체크
+  if((emps||[]).find(e=>e['이름']===name && e['상태']!=='퇴사')){
+    toast('이미 등록된 이름입니다.','e');return;
+  }
+  const btn = document.getElementById('qe-save-btn');
+  btn.disabled = true; btn.textContent = '저장 중...';
+  try{
+    const r = await api('addEmployee', {
+      name, dept: dept||'미정', position: pos,
+      basePay: pay||0, joinDate: ymd(new Date()), status: '재직중'
+    });
+    toast(r.message, 's');
+    closeM('m-quick-emp');
+    await loadEmployees();
+    loadPermList();
+  }catch(e){
+    toast(e.message, 'e');
+  }finally{
+    btn.disabled=false; btn.textContent='저장';
+  }
 }
 
 function openPermModal(name){
