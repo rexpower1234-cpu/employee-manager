@@ -545,29 +545,28 @@ tbody td{padding:9px 12px;vertical-align:middle}
     <button class="nav-item admin-item" id="nav-admin" onclick="go('admin')">⚙️ 관리자 페이지 <span class="nav-badge purple">ADMIN</span></button>
   </div>
 
-  <!-- 💭 명언/성구/신조 위젯 -->
-  <div id="motto-widget" style="margin-top:auto;padding:14px 12px 18px;border-top:1px solid var(--border)">
-    <div id="motto-display" style="cursor:pointer;padding:12px;background:var(--accent-light);border-radius:10px;transition:all .15s" onclick="openMottoEditor()" onmouseover="this.style.background='#D5F0E5'" onmouseout="this.style.background='var(--accent-light)'">
-      <div style="font-size:10px;color:var(--accent-2);font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:4px">
-        <span id="motto-icon">💭</span>
-        <span id="motto-label">내 명언</span>
-        <span style="margin-left:auto;font-size:9px;opacity:.5">클릭 편집</span>
+  <!-- 💭 명언/성구/신조 위젯 (첫 사진 스타일) -->
+  <div id="motto-widget" style="margin-top:auto;padding:10px 12px 14px">
+    <div id="motto-display" style="padding:10px 12px;background:var(--accent-light);border-radius:8px;transition:all .15s">
+      <div style="font-size:9px;color:var(--accent-2);font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:3px">
+        <span id="motto-icon" style="font-size:11px">⭐</span>
+        <span id="motto-label">내 신조</span>
+        <span id="motto-edit-trigger" style="margin-left:auto;font-size:9px;opacity:.5;cursor:pointer;display:none" onclick="openMottoEditor()">클릭 편집</span>
       </div>
-      <div id="motto-text" style="font-size:11px;color:var(--text);line-height:1.5;white-space:pre-wrap;font-weight:500;font-style:italic">아직 명언이 없습니다.
-클릭하여 작성해보세요!</div>
+      <div id="motto-text" style="font-size:10.5px;color:var(--text);line-height:1.45;white-space:pre-wrap;font-weight:500">아직 신조가 없습니다</div>
     </div>
     <div id="motto-edit" style="display:none">
-      <div style="display:flex;gap:4px;margin-bottom:6px;flex-wrap:wrap">
-        <button onclick="selectMottoType('명언','💭')" class="motto-type-btn" data-type="명언">💭 명언</button>
-        <button onclick="selectMottoType('성구','📖')" class="motto-type-btn" data-type="성구">📖 성구</button>
-        <button onclick="selectMottoType('신조','⭐')" class="motto-type-btn" data-type="신조">⭐ 신조</button>
-        <button onclick="selectMottoType('다짐','💪')" class="motto-type-btn" data-type="다짐">💪 다짐</button>
-        <button onclick="selectMottoType('기도','🙏')" class="motto-type-btn" data-type="기도">🙏 기도</button>
+      <div style="display:flex;gap:3px;margin-bottom:5px;flex-wrap:wrap">
+        <button onclick="selectMottoType('명언','💭')" class="motto-type-btn" data-type="명언">💭</button>
+        <button onclick="selectMottoType('성구','📖')" class="motto-type-btn" data-type="성구">📖</button>
+        <button onclick="selectMottoType('신조','⭐')" class="motto-type-btn" data-type="신조">⭐</button>
+        <button onclick="selectMottoType('다짐','💪')" class="motto-type-btn" data-type="다짐">💪</button>
+        <button onclick="selectMottoType('기도','🙏')" class="motto-type-btn" data-type="기도">🙏</button>
       </div>
-      <textarea id="motto-input" placeholder="짧은 명언이나 좋아하는 문구를 입력하세요..." style="width:100%;min-height:70px;padding:8px;border:1px solid var(--border);border-radius:6px;font-size:11px;font-family:var(--font);resize:vertical;line-height:1.4;box-sizing:border-box"></textarea>
-      <div style="display:flex;gap:4px;margin-top:6px">
-        <button onclick="saveMotto()" style="flex:1;padding:5px;background:var(--accent);color:#fff;border:none;border-radius:5px;font-size:10px;cursor:pointer;font-weight:600">💾 저장</button>
-        <button onclick="cancelMotto()" style="flex:1;padding:5px;background:var(--surface-2);color:var(--text-2);border:1px solid var(--border);border-radius:5px;font-size:10px;cursor:pointer">취소</button>
+      <textarea id="motto-input" placeholder="짧은 명언이나 문구를 입력..." style="width:100%;min-height:60px;padding:6px;border:1px solid var(--border);border-radius:5px;font-size:10.5px;font-family:var(--font);resize:vertical;line-height:1.4;box-sizing:border-box"></textarea>
+      <div style="display:flex;gap:3px;margin-top:5px">
+        <button onclick="saveMotto()" style="flex:1;padding:4px;background:var(--accent);color:#fff;border:none;border-radius:4px;font-size:10px;cursor:pointer;font-weight:600">💾 저장</button>
+        <button onclick="cancelMotto()" style="flex:1;padding:4px;background:var(--surface-2);color:var(--text-2);border:1px solid var(--border);border-radius:4px;font-size:10px;cursor:pointer">취소</button>
       </div>
     </div>
   </div>
@@ -629,6 +628,11 @@ tbody td{padding:9px 12px;vertical-align:middle}
           <div class="metric-card"><div class="metric-label"><span class="dot dot-b"></span>내 영업 수수료</div><div class="metric-value" id="d-my-sales">-</div><div class="metric-sub">최종수수료 합</div></div>
           <div class="metric-card"><div class="metric-label"><span class="dot dot-y"></span>내 용역(점검)</div><div class="metric-value" id="d-my-service">-</div><div class="metric-sub">일일급여 합</div></div>
           <div class="metric-card"><div class="metric-label"><span class="dot dot-r"></span>내 지원금액</div><div class="metric-value" id="d-my-support">-</div><div class="metric-sub">이번 달</div></div>
+          <div class="metric-card" style="background:linear-gradient(135deg,#1D9E75 0%,#0F6E56 100%);color:#fff;border:none">
+            <div class="metric-label" style="color:rgba(255,255,255,.85)"><span class="dot" style="background:#fff"></span>💰 예상 실지급액</div>
+            <div class="metric-value" id="d-my-net" style="color:#fff">-</div>
+            <div class="metric-sub" style="color:rgba(255,255,255,.75)">기본급+영업+용역+지원 - 공제</div>
+          </div>
         </div>
         <div class="card">
           <div class="card-header"><div class="card-title">내 최근 매출 내역</div></div>
@@ -777,12 +781,12 @@ tbody td{padding:9px 12px;vertical-align:middle}
                   <th>의무</th><th>렌탈료</th><th>지급율(기본)%</th><th>판매수수료(기본)</th>
                   <th>지급율(툴별)%</th><th>툴별&업소용 추가수수료</th><th>사업장 추가수수료</th>
                   <th>개인고객 추가수수료</th><th>셀프</th><th>최종수수료</th>
-                  <th>실 판매인</th><th>판매인</th><th>실적인정</th><th>사업자</th>
+                  <th>실 판매인</th><th>판매인</th><th>사업자</th>
                   <th id="verify-margin-th" style="background:#6B4EE6;display:none">검증 마진</th>
                   <th style="background:#0F6E56">관리</th>
                 </tr>
               </thead>
-              <tbody id="sale-tbody"><tr class="loading-row"><td colspan="20"><span class="spinner"></span> 불러오는 중...</td></tr></tbody>
+              <tbody id="sale-tbody"><tr class="loading-row"><td colspan="19"><span class="spinner"></span> 불러오는 중...</td></tr></tbody>
               <tfoot id="sale-tfoot"></tfoot>
             </table>
           </div>
@@ -1224,11 +1228,17 @@ tbody td{padding:9px 12px;vertical-align:middle}
         <div class="fgroup"><label class="flabel">툴별&업소용 추가수수료</label><input class="fc" id="sf-fee2" type="number" placeholder="자동계산" readonly style="background:var(--surface-2)"></div>
         <div class="fgroup"><label class="flabel">사업장 추가수수료</label><input class="fc" id="sf-biz-fee" type="number" placeholder="0" oninput="calcFee()"></div>
         <div class="fgroup"><label class="flabel">개인고객 추가수수료</label><input class="fc" id="sf-pers-fee" type="number" placeholder="0" oninput="calcFee()"></div>
-        <div class="fgroup"><label class="flabel">셀프</label><input class="fc" id="sf-self" type="number" placeholder="0" oninput="calcFee()"></div>
+        <div class="fgroup"><label class="flabel">셀프 여부</label>
+          <label style="display:flex;align-items:center;gap:6px;padding:11px 14px;border:1px solid var(--border);border-radius:6px;cursor:pointer;background:white">
+            <input type="checkbox" id="sf-self-check" oninput="calcFee()" style="width:14px;height:14px;cursor:pointer;accent-color:var(--accent)">
+            <span style="font-size:11px">셀프 (-10,000원)</span>
+          </label>
+          <input type="hidden" id="sf-self">
+        </div>
         <div class="fgroup"><label class="flabel">최종수수료</label><input class="fc" id="sf-final" type="number" placeholder="자동계산" readonly style="background:var(--accent-light);font-weight:700"></div>
         <div class="fgroup"><label class="flabel">실 판매인<span class="req">*</span></label><select class="fc" id="sf-real-seller"><option value="">선택</option></select></div>
         <div class="fgroup"><label class="flabel">판매인<span class="req">*</span></label><select class="fc" id="sf-seller"><option value="">선택</option></select></div>
-        <div class="fgroup"><label class="flabel">실적인정</label><input class="fc" id="sf-perf" type="number" placeholder="자동계산" readonly style="background:var(--surface-2)"></div>
+<input type="hidden" id="sf-perf">
         <div class="fgroup"><label class="flabel">사업자 여부</label><select class="fc" id="sf-biz-type"><option value="1">사업자</option><option value="0">개인</option></select></div>
       </div>
     </div>
@@ -2544,11 +2554,11 @@ function loadDashboard(){
   const totalFinal=monthSales.reduce((s,r)=>s+(Number(r['최종수수료'])||0),0);
   const branchFinal=branchSales.reduce((s,r)=>s+(Number(r['최종수수료'])||0),0);
   const dealerFinal=dealerSales.reduce((s,r)=>s+(Number(r['최종수수료'])||0),0);
-  const totalPerf=monthSales.reduce((s,r)=>s+(Number(r['실적인정'])||0),0);
+  const totalPerf=monthSales.reduce((s,r)=>s+(Number(r['최종수수료'])||0),0);
 
   if(showSales){
     document.getElementById('d-sales').textContent=fm(totalPerf);
-    document.getElementById('d-ssub').textContent='실적인정 합계';
+    document.getElementById('d-ssub').textContent='최종수수료 합계';
   }
   if(showComm){
     document.getElementById('d-comm').textContent=fm(totalFinal);
@@ -2601,6 +2611,25 @@ function loadDashboard(){
   document.getElementById('d-my-sales').textContent  = fm(myFinal);
   document.getElementById('d-my-service').textContent= fm(myService);
   document.getElementById('d-my-support').textContent= fm(mySupport);
+
+  // 💰 예상 실지급액 계산 (실시간)
+  const myEmp = (emps||[]).find(e=>e['이름']===CU.name);
+  if(myEmp){
+    const base = Number(myEmp['기본급'])||0;
+    const empInsRate = Number(myEmp['고용보험율'])||0;
+    const accInsRate = Number(myEmp['산재보험율'])||0;
+    const gross = base + myFinal + myService + mySupport;
+    const tax = Math.round(gross * 0.033);
+    const empIns = Math.round(gross * empInsRate / 100);
+    const accIns = Math.round(gross * accInsRate / 100);
+    const bond = 100000;
+    const net = gross - tax - empIns - accIns - bond;
+    const netEl = document.getElementById('d-my-net');
+    if(netEl) netEl.textContent = fm(net);
+  } else {
+    const netEl = document.getElementById('d-my-net');
+    if(netEl) netEl.textContent = '직원 정보 없음';
+  }
 
   // 본인 최근 매출
   const myRecent=[...mySales].sort((a,b)=>String(b['등록일']||'').localeCompare(String(a['등록일']||''))).slice(0,5);
@@ -2730,7 +2759,7 @@ function renderSales(list){
   const isVerify = tab==='verify';
 
   const total=list.reduce((s,r)=>s+(Number(r['최종수수료'])||0),0);
-  const totalPerf=list.reduce((s,r)=>s+(Number(r['실적인정'])||0),0);
+  // 실적인정 제거됨
   let totalMargin = 0;
   if(isVerify){
     list.forEach(r=>{
@@ -2749,13 +2778,13 @@ function renderSales(list){
   if(isVerify){
     document.getElementById('sale-total').innerHTML = `최종수수료 합계: ${fm(total)} | <span style="color:var(--purple)">검증 마진 합계: ${fm(totalMargin)}</span>`;
   } else {
-    document.getElementById('sale-total').textContent=`최종수수료 합계: ${fm(total)} | 실적인정 합계: ${fm(totalPerf)}`;
+    document.getElementById('sale-total').textContent=`최종수수료 합계: ${fm(total)}`;
   }
 
   const tb=document.getElementById('sale-tbody');
   const isAdmin = CU.name===ADMIN_NAME;
   const canEdit = isAdmin || canDo('manage_sales');
-  if(!list.length){tb.innerHTML='<tr><td colspan="20" style="text-align:center;padding:30px;color:var(--text-3)">데이터가 없습니다</td></tr>';renderSaleTfoot([],isVerify);return;}
+  if(!list.length){tb.innerHTML='<tr><td colspan="19" style="text-align:center;padding:30px;color:var(--text-3)">데이터가 없습니다</td></tr>';renderSaleTfoot([],isVerify);return;}
 
   tb.innerHTML=list.map(r=>{
     const sourceBadge = (r['출처']||'지국')==='총판'
@@ -2782,7 +2811,7 @@ function renderSales(list){
     <td class="td-num" style="color:var(--accent-2);font-weight:700">${fmN(r['최종수수료'])}</td>
     <td>${r['실판매인']||''}</td>
     <td>${r['판매인']||''}</td>
-    <td class="td-num">${fmN(r['실적인정'])}</td>
+    
     <td style="text-align:center">${r['사업자']==='1'||r['사업자']===1?'<span class="badge bb">사업자</span>':'<span class="badge bgr">개인</span>'}</td>
     ${verifyCell}
     <td>${canEdit?`<div style="display:flex;gap:3px"><button class="btn btn-secondary btn-sm" onclick="openSaleModal('${r['매출ID']}')">수정</button><button class="btn btn-danger btn-sm" onclick="delSale('${r['매출ID']}')">삭제</button></div>`:'<span style="color:var(--text-3);font-size:10px">-</span>'}</td>
@@ -2846,22 +2875,27 @@ function renderSaleTfoot(list, isVerify){
 // 수수료 자동 계산
 function calcFee(){
   const rental=Number(document.getElementById('sf-rental').value)||0;
-  const duty=Number(document.getElementById('sf-duty').value)||1;
   const rate1=Number(document.getElementById('sf-rate1').value)||0;
   const rate2=Number(document.getElementById('sf-rate2').value)||0;
   const bizFee=Number(document.getElementById('sf-biz-fee').value)||0;
   const persFee=Number(document.getElementById('sf-pers-fee').value)||0;
-  const self=Number(document.getElementById('sf-self').value)||0;
+  const selfCheck=document.getElementById('sf-self-check');
+  const selfChecked = selfCheck ? selfCheck.checked : false;
+  const selfAmount = selfChecked ? -10000 : 0;
 
-  const fee1=Math.round(rental*duty*rate1/100);
-  const fee2=Math.round(rental*duty*rate2/100);
-  const perf=Math.round(rental*duty);
-  const final=fee1+fee2+bizFee+persFee+self;
+  // 🚀 수정된 계산식: 렌탈료 × (지급율 / 100)
+  // 의무개월 곱하지 않음 - 100%가 곧 렌탈료 한 달치
+  const fee1=Math.round(rental*rate1/100);
+  const fee2=Math.round(rental*rate2/100);
+  const final=fee1+fee2+bizFee+persFee+selfAmount;
 
   document.getElementById('sf-fee1').value=fee1||'';
   document.getElementById('sf-fee2').value=fee2||'';
   document.getElementById('sf-final').value=final||'';
-  document.getElementById('sf-perf').value=perf||'';
+  document.getElementById('sf-self').value=selfAmount;
+  // 실적인정도 정리 - 항상 0 (실적인정 폐지)
+  const perfEl = document.getElementById('sf-perf');
+  if(perfEl) perfEl.value=0;
 }
 
 function openSaleModal(id){
@@ -2888,16 +2922,18 @@ function openSaleModal(id){
     document.getElementById('sf-biz-fee').value=r['사업장추가수수료']||'';
     document.getElementById('sf-pers-fee').value=r['개인고객추가수수료']||'';
     document.getElementById('sf-self').value=r['셀프']||'';
+    if(document.getElementById('sf-self-check')) document.getElementById('sf-self-check').checked = (Number(r['셀프'])||0) < 0;
     document.getElementById('sf-final').value=r['최종수수료']||'';
     document.getElementById('sf-real-seller').value=r['실판매인']||'';
     document.getElementById('sf-seller').value=r['판매인']||'';
-    document.getElementById('sf-perf').value=r['실적인정']||'';
+    if(document.getElementById('sf-perf')) document.getElementById('sf-perf').value=0;
     document.getElementById('sf-biz-type').value=String(r['사업자']||'0');
   }else{
     ['sf-id','sf-cno','sf-cname','sf-model','sf-product','sf-duty','sf-rental',
      'sf-rate1','sf-fee1','sf-rate2','sf-fee2','sf-biz-fee','sf-pers-fee','sf-self','sf-final','sf-perf']
       .forEach(id=>document.getElementById(id).value='');
     document.getElementById('sf-biz-type').value='1';
+    if(document.getElementById('sf-self-check')) document.getElementById('sf-self-check').checked = false;
     // 현재 탭에 따라 기본 출처 설정
     const defaultSource = (currentSalesTab==='dealer')?'총판':'지국';
     document.getElementById('sf-source').value=defaultSource;
@@ -2959,15 +2995,13 @@ async function loadSalary(){
   document.getElementById('pay-ym').value = ym;
 
   const canCalc = canDo('manage_salary') || CU.name===ADMIN_NAME;
-  const cacheKey = 'salary_' + ym;
+  const isAdmin = CU.name === ADMIN_NAME;
 
-  // 🚀 캐시 확인 (5분 이내면 자동 계산 스킵)
-  if(canCalc && !checkCache(cacheKey)){
+  // 🔥 항상 자동 계산 실행 (실시간 정산)
+  if(canCalc){
     try{
       const calcResult = await api('calcSalary',{ym});
-      if(calcResult.ok !== false){
-        setCache(cacheKey);
-      } else {
+      if(calcResult.ok === false){
         toast(calcResult.error || '계산 실패','e');
       }
     }catch(e){
@@ -2979,6 +3013,10 @@ async function loadSalary(){
   try{
     const r = await api('getSalary',{ym});
     salary = r.data || [];
+    // 일반 직원은 본인 것만 표시
+    if(!isAdmin && !canDo('view_salary_all')){
+      salary = salary.filter(s=>s['이름']===CU.name);
+    }
   }catch(e){
     toast('급여 데이터 로드 실패: '+e.message,'e');
     salary = [];
@@ -4984,6 +5022,8 @@ function renderMotto(){
   const iconEl = document.getElementById('motto-icon');
   const labelEl = document.getElementById('motto-label');
   const textEl = document.getElementById('motto-text');
+  const triggerEl = document.getElementById('motto-edit-trigger');
+  const displayEl = document.getElementById('motto-display');
   if(!iconEl || !labelEl || !textEl) return;
 
   iconEl.textContent = mottoData.icon;
@@ -4994,9 +5034,28 @@ function renderMotto(){
     textEl.style.fontStyle = 'italic';
     textEl.style.opacity = '1';
   } else {
-    textEl.textContent = '아직 ' + mottoData.type + '이 없습니다.\n클릭하여 작성해보세요!';
+    textEl.textContent = '아직 ' + mottoData.type + '이 없습니다';
     textEl.style.fontStyle = 'normal';
     textEl.style.opacity = '0.6';
+  }
+
+  // 권한 체크: 관리자 또는 manage_notice 권한자만 편집 가능
+  const isAdmin = CU && CU.name === ADMIN_NAME;
+  const canEdit = isAdmin || (typeof canDo === 'function' && canDo('manage_notice'));
+  if(triggerEl){
+    triggerEl.style.display = canEdit ? 'inline' : 'none';
+  }
+  // display 영역 자체의 클릭도 권한 있을 때만
+  if(displayEl){
+    displayEl.style.cursor = canEdit ? 'pointer' : 'default';
+    displayEl.onclick = canEdit ? openMottoEditor : null;
+    if(canEdit){
+      displayEl.onmouseover = function(){this.style.background='#D5F0E5'};
+      displayEl.onmouseout = function(){this.style.background='var(--accent-light)'};
+    } else {
+      displayEl.onmouseover = null;
+      displayEl.onmouseout = null;
+    }
   }
 }
 
