@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json">
@@ -296,6 +297,12 @@ tbody td{padding:9px 12px;vertical-align:middle}
 .quote-preview .quote-footer{margin-top:24px;padding-top:14px;border-top:1px solid var(--border);font-size:10px;color:var(--text-3);text-align:center}
 
 
+
+/* 명언 위젯 */
+.motto-type-btn{padding:3px 7px;border:1px solid var(--border);background:var(--surface);color:var(--text-2);border-radius:5px;font-size:9px;cursor:pointer;font-family:var(--font);font-weight:500;transition:all .1s}
+.motto-type-btn:hover{background:var(--accent-light);border-color:var(--accent)}
+.motto-type-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
 /* 점검 이벤트 (업체명 위 + 일급 아래) */
 .insp-event{background:#1D9E75;color:#fff;border-radius:5px;padding:3px 6px;margin-bottom:3px;cursor:pointer;line-height:1.2;overflow:hidden;transition:background .15s}
 .insp-event:hover{background:#0F6E56}
@@ -346,10 +353,12 @@ tbody td{padding:9px 12px;vertical-align:middle}
     </div>
     <button class="login-btn" onclick="doLogin()">로그인</button>
     <div class="login-err" id="ls-err"></div>
-    <div style="margin-top:12px;display:flex;justify-content:center;gap:14px">
+    <div style="margin-top:12px;display:flex;justify-content:center;gap:14px;flex-wrap:wrap">
       <button onclick="showSignup()" style="background:none;border:none;color:rgba(255,255,255,.4);font-size:11px;cursor:pointer;font-family:var(--font)">회원가입</button>
       <span style="color:rgba(255,255,255,.15);font-size:11px">|</span>
       <button onclick="showFind()" style="background:none;border:none;color:rgba(255,255,255,.4);font-size:11px;cursor:pointer;font-family:var(--font)">아이디/비밀번호 찾기</button>
+      <span style="color:rgba(255,255,255,.15);font-size:11px">|</span>
+      <button onclick="diagnoseAccounts()" style="background:none;border:none;color:rgba(255,255,255,.4);font-size:11px;cursor:pointer;font-family:var(--font)">🔧 계정 진단</button>
     </div>
   </div>
 </div>
@@ -535,6 +544,33 @@ tbody td{padding:9px 12px;vertical-align:middle}
     <div class="nav-label">관리자</div>
     <button class="nav-item admin-item" id="nav-admin" onclick="go('admin')">⚙️ 관리자 페이지 <span class="nav-badge purple">ADMIN</span></button>
   </div>
+
+  <!-- 💭 명언/성구/신조 위젯 -->
+  <div id="motto-widget" style="margin-top:auto;padding:14px 12px 18px;border-top:1px solid var(--border)">
+    <div id="motto-display" style="cursor:pointer;padding:12px;background:var(--accent-light);border-radius:10px;transition:all .15s" onclick="openMottoEditor()" onmouseover="this.style.background='#D5F0E5'" onmouseout="this.style.background='var(--accent-light)'">
+      <div style="font-size:10px;color:var(--accent-2);font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:4px">
+        <span id="motto-icon">💭</span>
+        <span id="motto-label">내 명언</span>
+        <span style="margin-left:auto;font-size:9px;opacity:.5">클릭 편집</span>
+      </div>
+      <div id="motto-text" style="font-size:11px;color:var(--text);line-height:1.5;white-space:pre-wrap;font-weight:500;font-style:italic">아직 명언이 없습니다.
+클릭하여 작성해보세요!</div>
+    </div>
+    <div id="motto-edit" style="display:none">
+      <div style="display:flex;gap:4px;margin-bottom:6px;flex-wrap:wrap">
+        <button onclick="selectMottoType('명언','💭')" class="motto-type-btn" data-type="명언">💭 명언</button>
+        <button onclick="selectMottoType('성구','📖')" class="motto-type-btn" data-type="성구">📖 성구</button>
+        <button onclick="selectMottoType('신조','⭐')" class="motto-type-btn" data-type="신조">⭐ 신조</button>
+        <button onclick="selectMottoType('다짐','💪')" class="motto-type-btn" data-type="다짐">💪 다짐</button>
+        <button onclick="selectMottoType('기도','🙏')" class="motto-type-btn" data-type="기도">🙏 기도</button>
+      </div>
+      <textarea id="motto-input" placeholder="짧은 명언이나 좋아하는 문구를 입력하세요..." style="width:100%;min-height:70px;padding:8px;border:1px solid var(--border);border-radius:6px;font-size:11px;font-family:var(--font);resize:vertical;line-height:1.4;box-sizing:border-box"></textarea>
+      <div style="display:flex;gap:4px;margin-top:6px">
+        <button onclick="saveMotto()" style="flex:1;padding:5px;background:var(--accent);color:#fff;border:none;border-radius:5px;font-size:10px;cursor:pointer;font-weight:600">💾 저장</button>
+        <button onclick="cancelMotto()" style="flex:1;padding:5px;background:var(--surface-2);color:var(--text-2);border:1px solid var(--border);border-radius:5px;font-size:10px;cursor:pointer">취소</button>
+      </div>
+    </div>
+  </div>
 </aside>
 
 <div class="main">
@@ -546,7 +582,7 @@ tbody td{padding:9px 12px;vertical-align:middle}
     <div class="topbar-right">
       <button class="btn btn-secondary btn-sm" id="btn-notice-popup" onclick="showNoticePopup()" style="display:none">📢 공지보기</button>
       <button class="btn btn-purple btn-sm" id="btn-add-notice" onclick="openNoticeModal()" style="display:none">📢 공지 등록</button>
-      <button class="btn btn-secondary btn-sm" onclick="syncAll()">🔄 새로고침</button>
+      <button class="btn btn-secondary btn-sm" onclick="forceRefresh()">🔄 새로고침</button>
       <button class="btn btn-primary btn-sm" id="act-btn" style="display:none" onclick="actClick()">＋ 추가</button>
     </div>
   </div>
@@ -812,10 +848,10 @@ tbody td{padding:9px 12px;vertical-align:middle}
       </div>
 
       <div class="card">
-        <div class="card-header"><div><div class="card-title">📋 출퇴근 기록</div><div class="card-sub" id="att-sub"></div></div></div>
+        <div class="card-header"><div><div class="card-title">📋 출퇴근 기록</div><div class="card-sub" id="att-sub"></div></div><div id="att-total" style="font-size:12px;font-weight:700;color:var(--accent-2)"></div></div>
         <div class="card-body np"><div class="tw"><table>
-          <thead><tr><th>날짜</th><th>이름</th><th>출근</th><th>외출</th><th>복귀</th><th>퇴근</th><th>근무시간</th></tr></thead>
-          <tbody id="att-tbody"><tr class="loading-row"><td colspan="7"><span class="spinner"></span> 불러오는 중...</td></tr></tbody>
+          <thead><tr><th>날짜</th><th>이름</th><th>구분</th><th>시간</th><th style="background:#0F6E56">관리</th></tr></thead>
+          <tbody id="att-tbody"><tr class="loading-row"><td colspan="5"><span class="spinner"></span> 불러오는 중...</td></tr></tbody>
         </table></div></div>
       </div>
     </div>
@@ -865,6 +901,86 @@ tbody td{padding:9px 12px;vertical-align:middle}
         <div class="card-body" style="padding:14px">
           <div id="memo-editor" style="height:280px;background:#fff"></div>
         </div>
+      </div>
+    </div>
+
+    <!-- DB 관리 (고객 데이터) -->
+    <div class="section" id="s-customers">
+      <!-- 회차 탭 -->
+      <div style="display:flex;gap:4px;margin-bottom:14px;background:var(--surface-2);border-radius:8px;padding:3px;width:fit-content;flex-wrap:wrap">
+        <button class="cus-batch-tab active" data-batch="" onclick="switchBatch('')" style="padding:7px 16px;border:none;background:var(--surface);font-size:12px;font-weight:600;cursor:pointer;border-radius:6px;font-family:var(--font);color:var(--text);box-shadow:var(--shadow)">📋 전체 보기</button>
+        <button class="cus-batch-tab" data-batch="36회차" onclick="switchBatch('36회차')" style="padding:7px 16px;border:none;background:none;font-size:12px;font-weight:500;cursor:pointer;border-radius:6px;font-family:var(--font);color:var(--text-2)">36회차</button>
+        <button class="cus-batch-tab" data-batch="47회차" onclick="switchBatch('47회차')" style="padding:7px 16px;border:none;background:none;font-size:12px;font-weight:500;cursor:pointer;border-radius:6px;font-family:var(--font);color:var(--text-2)">47회차</button>
+        <button class="cus-batch-tab" data-batch="55회차" onclick="switchBatch('55회차')" style="padding:7px 16px;border:none;background:none;font-size:12px;font-weight:500;cursor:pointer;border-radius:6px;font-family:var(--font);color:var(--text-2)">55회차</button>
+        <button class="cus-batch-tab" data-batch="mine" onclick="switchBatch('mine')" id="cus-mine-tab" style="padding:7px 16px;border:none;background:none;font-size:12px;font-weight:500;cursor:pointer;border-radius:6px;font-family:var(--font);color:var(--info);display:none">👤 내 고객</button>
+        <button class="cus-batch-tab" data-batch="unassigned" onclick="switchBatch('unassigned')" id="cus-unassigned-tab" style="padding:7px 16px;border:none;background:none;font-size:12px;font-weight:500;cursor:pointer;border-radius:6px;font-family:var(--font);color:var(--warn);display:none">⚠️ 미배정</button>
+      </div>
+
+      <!-- 액션 바 -->
+      <div class="fbar" id="cus-actionbar">
+        <div class="fgroup"><label class="flabel">담당자</label>
+          <select class="fc" id="cus-filter-assignee" style="width:140px" onchange="renderCustomersList()">
+            <option value="">전체</option>
+          </select>
+        </div>
+        <div class="fgroup"><label class="flabel">상태</label>
+          <select class="fc" id="cus-filter-status" style="width:130px" onchange="renderCustomersList()">
+            <option value="">전체</option>
+            <option value="연락전">⚪ 연락전</option>
+            <option value="연락중">🟡 연락중</option>
+            <option value="완료">✅ 완료</option>
+            <option value="제외">❌ 제외</option>
+          </select>
+        </div>
+        <div class="fgroup"><label class="flabel">🔍 검색</label>
+          <input class="fc" id="cus-filter-search" placeholder="고객명·연락처·계약번호" style="width:200px" oninput="renderCustomersList()">
+        </div>
+
+        <div style="margin-left:auto;display:flex;gap:6px;align-items:flex-end" id="cus-admin-actions">
+          <button class="btn btn-secondary btn-sm" onclick="downloadCustomersExcel()">📥 엑셀 다운로드</button>
+          <label class="btn btn-purple btn-sm" style="cursor:pointer">
+            📤 엑셀 업로드
+            <input type="file" accept=".xlsx,.xls" style="display:none" onchange="importCustomersExcel(this)">
+          </label>
+          <button class="btn btn-purple btn-sm" onclick="openDistributeModal()">👥 일괄 분배</button>
+          <button class="btn btn-primary btn-sm" onclick="openCustomerModal()">＋ 고객 추가</button>
+        </div>
+      </div>
+
+      <!-- 통계 카드 -->
+      <div class="metrics" id="cus-stats" style="margin-bottom:14px">
+        <div class="metric-card"><div class="metric-label"><span class="dot dot-b"></span>전체 고객</div><div class="metric-value" id="cus-stat-total">0</div></div>
+        <div class="metric-card"><div class="metric-label"><span class="dot" style="background:var(--text-3)"></span>연락전</div><div class="metric-value" id="cus-stat-before" style="color:var(--text-2)">0</div></div>
+        <div class="metric-card"><div class="metric-label"><span class="dot dot-y"></span>연락중</div><div class="metric-value" id="cus-stat-during" style="color:var(--warn)">0</div></div>
+        <div class="metric-card"><div class="metric-label"><span class="dot dot-g"></span>완료</div><div class="metric-value" id="cus-stat-done" style="color:var(--accent-2)">0</div></div>
+      </div>
+
+      <!-- 테이블 -->
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">고객 목록</div><div class="card-sub" id="cus-sub">-</div></div>
+          <div style="display:flex;gap:6px;align-items:center" id="cus-bulk-actions">
+            <span id="cus-selected-count" style="font-size:11px;color:var(--text-3)"></span>
+            <button class="btn btn-purple btn-sm" id="cus-bulk-assign-btn" onclick="openBulkAssignModal()" style="display:none">👤 선택 항목 담당자 변경</button>
+          </div>
+        </div>
+        <div class="card-body np"><div class="tw"><table>
+          <thead><tr>
+            <th id="cus-th-check" style="width:30px"><input type="checkbox" id="cus-select-all" onchange="toggleSelectAll(this.checked)" style="cursor:pointer"></th>
+            <th>회차</th>
+            <th>고객명</th>
+            <th>제품명</th>
+            <th>렌탈료</th>
+            <th>연락처</th>
+            <th>최초컨택</th>
+            <th>마지막컨택</th>
+            <th>담당자</th>
+            <th>상태</th>
+            <th>메모</th>
+            <th>관리</th>
+          </tr></thead>
+          <tbody id="cus-tbody"><tr class="loading-row"><td colspan="12"><span class="spinner"></span> 불러오는 중...</td></tr></tbody>
+        </table></div></div>
       </div>
     </div>
 
@@ -1369,14 +1485,11 @@ tbody td{padding:9px 12px;vertical-align:middle}
         </select>
       </div>
       <div style="background:var(--surface-2);border-radius:8px;padding:14px;margin-bottom:14px">
-        <div style="font-size:12px;font-weight:700;color:var(--text-2);margin-bottom:10px">💡 빠른 설정 (프리셋)</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <button class="btn btn-secondary btn-sm" onclick="applyPreset('all')">전체 권한</button>
-          <button class="btn btn-secondary btn-sm" onclick="applyPreset('manager')">팀장급</button>
-          <button class="btn btn-secondary btn-sm" onclick="applyPreset('sales')">영업직원</button>
-          <button class="btn btn-secondary btn-sm" onclick="applyPreset('service')">용역직원</button>
-          <button class="btn btn-secondary btn-sm" onclick="applyPreset('none')">최소 권한</button>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div style="font-size:12px;font-weight:700;color:var(--text-2)">💡 빠른 설정 (프리셋)</div>
+          <button class="btn btn-purple btn-sm" style="padding:3px 10px;font-size:10px" onclick="openPresetMgrModal()">⚙️ 프리셋 관리</button>
         </div>
+        <div id="preset-btns" style="display:flex;gap:6px;flex-wrap:wrap"></div>
       </div>
       <div style="font-size:12px;font-weight:700;color:var(--text-2);margin-bottom:10px">세부 권한</div>
       <div id="perm-checks" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
@@ -1384,6 +1497,35 @@ tbody td{padding:9px 12px;vertical-align:middle}
     <div class="mf">
       <button class="btn btn-secondary" onclick="closeM('m-perm')">취소</button>
       <button class="btn btn-primary" onclick="savePermDetail()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 모달: 프리셋 관리 -->
+<div class="modal-overlay" id="m-preset-mgr">
+  <div class="modal">
+    <div class="mh"><div class="mt">⚙️ 권한 프리셋 관리</div><button class="mc" onclick="closeM('m-preset-mgr')">✕</button></div>
+    <div class="mb" style="padding:20px 24px">
+      <div style="font-size:11px;color:var(--text-3);margin-bottom:14px;padding:8px 10px;background:var(--accent-light);border-radius:6px">
+        💡 프리셋 이름을 수정하거나 새 프리셋을 만들 수 있어요. 권한은 현재 선택된 체크박스 기준으로 저장됩니다.
+      </div>
+
+      <div style="margin-bottom:14px">
+        <div style="font-size:12px;font-weight:700;color:var(--text-2);margin-bottom:8px">📋 현재 프리셋 목록</div>
+        <div id="preset-list" style="display:flex;flex-direction:column;gap:6px"></div>
+      </div>
+
+      <div style="background:var(--surface-2);border-radius:8px;padding:14px">
+        <div style="font-size:12px;font-weight:700;color:var(--text-2);margin-bottom:8px">➕ 새 프리셋 추가</div>
+        <div style="display:flex;gap:6px">
+          <input class="fc" id="new-preset-name" placeholder="예: 영업팀장" style="flex:1">
+          <button class="btn btn-primary btn-sm" onclick="addPresetFromCurrent()">＋ 현재 권한으로 저장</button>
+        </div>
+        <div style="font-size:10px;color:var(--text-3);margin-top:6px">현재 권한 설정 창에서 체크한 권한을 그대로 새 프리셋으로 저장합니다</div>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn btn-secondary" onclick="closeM('m-preset-mgr')">닫기</button>
     </div>
   </div>
 </div>
@@ -1475,6 +1617,294 @@ tbody td{padding:9px 12px;vertical-align:middle}
       <button class="btn btn-secondary" onclick="closeM('m-cleaning')">취소</button>
       <button class="btn btn-primary" onclick="submitCleaning()">저장</button>
     </div>
+  </div>
+</div>
+
+<!-- SMS 발송 모달 -->
+<div class="modal-overlay" id="m-sms-send">
+  <div class="modal" style="width:680px">
+    <div class="mh">
+      <div>
+        <div class="mt">📱 SMS 발송</div>
+        <div style="font-size:11px;color:var(--text-3);margin-top:2px" id="sms-target-info">고객 정보 로드 중...</div>
+      </div>
+      <button class="mc" onclick="closeM('m-sms-send')">✕</button>
+    </div>
+    <div class="mb" style="padding:20px 24px">
+      <input type="hidden" id="sms-customer-id">
+
+      <!-- 수신자 정보 -->
+      <div class="fg" style="gap:12px;margin-bottom:14px">
+        <div class="fgroup"><label class="flabel">받는 사람</label><input class="fc" id="sms-customer-name" placeholder="고객명"></div>
+        <div class="fgroup"><label class="flabel">전화번호<span class="req">*</span></label><input class="fc" id="sms-phone" placeholder="010-0000-0000"></div>
+      </div>
+
+      <!-- 템플릿 선택 영역 -->
+      <div style="background:var(--surface-2);border-radius:8px;padding:12px 14px;margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div style="font-size:12px;font-weight:700;color:var(--text-2)">💬 템플릿 선택</div>
+          <button class="btn btn-purple btn-sm" style="padding:3px 10px;font-size:10px" onclick="openSmsTemplateMgrModal()">⚙️ 템플릿 관리</button>
+        </div>
+        <div id="sms-template-tabs" style="display:flex;gap:4px;margin-bottom:8px">
+          <button class="sms-tpl-tab active" data-type="공통" onclick="switchTplTab('공통')" style="padding:4px 10px;border:none;background:var(--surface);font-size:11px;font-weight:600;cursor:pointer;border-radius:5px;color:var(--text)">🌐 공통 ( <span id="sms-tpl-cnt-common">0</span> )</button>
+          <button class="sms-tpl-tab" data-type="개인" onclick="switchTplTab('개인')" style="padding:4px 10px;border:none;background:none;font-size:11px;font-weight:500;cursor:pointer;border-radius:5px;color:var(--text-2)">👤 내 템플릿 ( <span id="sms-tpl-cnt-personal">0</span> )</button>
+        </div>
+        <div id="sms-template-list" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;max-height:160px;overflow-y:auto">
+          <div class="empty" style="grid-column:1/-1;padding:14px"><div style="font-size:11px;color:var(--text-3);text-align:center">템플릿이 없습니다. "⚙️ 템플릿 관리"에서 추가하세요.</div></div>
+        </div>
+      </div>
+
+      <!-- 메시지 내용 -->
+      <div class="fgroup" style="margin-bottom:12px">
+        <label class="flabel">메시지 내용<span class="req">*</span></label>
+        <textarea class="fc" id="sms-content" rows="7" placeholder="문자 내용 (템플릿 선택 시 자동 채워짐)" style="resize:vertical;line-height:1.5;font-family:var(--font)"></textarea>
+        <div style="display:flex;justify-content:space-between;margin-top:4px">
+          <div style="font-size:10px;color:var(--text-3)">💡 {고객명} 입력 시 자동으로 고객명이 들어갑니다</div>
+          <div style="font-size:10px;color:var(--text-3)" id="sms-char-count">0자 / SMS 90자</div>
+        </div>
+      </div>
+
+      <!-- 이미지 첨부 -->
+      <div class="fgroup" style="margin-bottom:12px">
+        <label class="flabel">📷 첨부 이미지 (선택)</label>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <input type="hidden" id="sms-image-url">
+          <div id="sms-image-preview" style="display:none;position:relative">
+            <img id="sms-image-thumb" style="width:80px;height:80px;object-fit:cover;border-radius:6px;border:1px solid var(--border)">
+            <button onclick="removeSmsImage()" style="position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;border:none;background:var(--danger);color:#fff;cursor:pointer;font-size:10px;display:flex;align-items:center;justify-content:center">✕</button>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="openSmsImagePicker()" type="button">📸 이미지 선택</button>
+        </div>
+        <div style="font-size:10px;color:var(--text-3);margin-top:6px">💡 휴대폰으로 이미지가 자동 다운로드됩니다. SMS 앱에서 갤러리에서 첨부해주세요.</div>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn btn-secondary" onclick="closeM('m-sms-send')">취소</button>
+      <button class="btn btn-primary" id="sms-send-btn" onclick="executeSendSms()" style="font-size:14px;padding:10px 24px">📱 SMS 앱으로 발송</button>
+    </div>
+  </div>
+</div>
+
+<!-- 이미지 선택 모달 -->
+<div class="modal-overlay" id="m-sms-image-picker">
+  <div class="modal">
+    <div class="mh"><div class="mt">📸 이미지 선택</div><button class="mc" onclick="closeM('m-sms-image-picker')">✕</button></div>
+    <div class="mb">
+      <div style="display:flex;gap:4px;margin-bottom:14px;background:var(--surface-2);border-radius:8px;padding:3px;width:fit-content">
+        <button class="img-pick-tab active" data-type="upload" onclick="switchImgPickTab('upload')" style="padding:6px 12px;border:none;background:var(--surface);font-size:11px;font-weight:600;cursor:pointer;border-radius:5px;color:var(--text)">📤 새로 업로드</button>
+        <button class="img-pick-tab" data-type="library" onclick="switchImgPickTab('library')" style="padding:6px 12px;border:none;background:none;font-size:11px;font-weight:500;cursor:pointer;border-radius:5px;color:var(--text-2)">🖼 라이브러리</button>
+      </div>
+
+      <!-- 업로드 영역 -->
+      <div id="img-pick-upload">
+        <div style="border:2px dashed var(--border);border-radius:8px;padding:24px;text-align:center;cursor:pointer" onclick="document.getElementById('sms-img-file').click()">
+          <div style="font-size:32px;margin-bottom:8px">📸</div>
+          <div style="font-size:12px;color:var(--text-2);margin-bottom:4px">이미지 파일 선택</div>
+          <div style="font-size:10px;color:var(--text-3)">JPG, PNG, GIF (5MB 이하)</div>
+          <input type="file" id="sms-img-file" accept="image/*" style="display:none" onchange="uploadSmsImage(this)">
+        </div>
+        <div id="sms-img-upload-status" style="margin-top:10px"></div>
+      </div>
+
+      <!-- 라이브러리 영역 -->
+      <div id="img-pick-library" style="display:none">
+        <div style="font-size:11px;color:var(--text-3);margin-bottom:10px">이전에 업로드한 이미지 (제휴카드, 프로모션, 회식, 견적서 등)</div>
+        <div id="sms-img-library-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-height:340px;overflow-y:auto"></div>
+      </div>
+    </div>
+    <div class="mf"><button class="btn btn-secondary" onclick="closeM('m-sms-image-picker')">닫기</button></div>
+  </div>
+</div>
+
+<!-- SMS 템플릿 관리 모달 -->
+<div class="modal-overlay" id="m-sms-template-mgr">
+  <div class="modal">
+    <div class="mh"><div class="mt">⚙️ SMS 템플릿 관리</div><button class="mc" onclick="closeM('m-sms-template-mgr')">✕</button></div>
+    <div class="mb" style="padding:20px 24px">
+      <!-- 탭 -->
+      <div style="display:flex;gap:4px;margin-bottom:14px;background:var(--surface-2);border-radius:8px;padding:3px;width:fit-content">
+        <button class="tpl-mgr-tab active" data-type="공통" onclick="switchTplMgrTab('공통')" style="padding:6px 14px;border:none;background:var(--surface);font-size:12px;font-weight:600;cursor:pointer;border-radius:6px;color:var(--text)">🌐 공통 템플릿</button>
+        <button class="tpl-mgr-tab" data-type="개인" onclick="switchTplMgrTab('개인')" style="padding:6px 14px;border:none;background:none;font-size:12px;font-weight:500;cursor:pointer;border-radius:6px;color:var(--text-2)">👤 내 템플릿</button>
+      </div>
+
+      <div id="tpl-mgr-type-info" style="font-size:11px;color:var(--text-3);margin-bottom:10px"></div>
+
+      <div id="tpl-mgr-list" style="margin-bottom:14px"></div>
+
+      <button class="btn btn-primary btn-sm" onclick="openTemplateEditModal()" style="width:100%">＋ 새 템플릿 추가</button>
+    </div>
+    <div class="mf"><button class="btn btn-secondary" onclick="closeM('m-sms-template-mgr')">닫기</button></div>
+  </div>
+</div>
+
+<!-- 템플릿 편집 모달 -->
+<div class="modal-overlay" id="m-template-edit">
+  <div class="modal">
+    <div class="mh"><div class="mt" id="m-template-edit-title">새 템플릿 추가</div><button class="mc" onclick="closeM('m-template-edit')">✕</button></div>
+    <div class="mb">
+      <input type="hidden" id="tpl-id">
+      <div class="fgroup" style="margin-bottom:12px">
+        <label class="flabel">구분<span class="req">*</span></label>
+        <select class="fc" id="tpl-type">
+          <option value="개인">👤 개인 (나만 사용)</option>
+          <option value="공통">🌐 공통 (모든 직원 공유)</option>
+        </select>
+      </div>
+      <div class="fgroup" style="margin-bottom:12px">
+        <label class="flabel">템플릿 제목<span class="req">*</span></label>
+        <input class="fc" id="tpl-title" placeholder="예: 쿠쿠 얼음정수기 안내">
+      </div>
+      <div class="fgroup" style="margin-bottom:12px">
+        <label class="flabel">메시지 내용<span class="req">*</span></label>
+        <textarea class="fc" id="tpl-content" rows="9" placeholder="문자 내용 입력 ({고객명} 사용 가능)" style="resize:vertical;line-height:1.5;font-family:var(--font)"></textarea>
+        <div style="font-size:10px;color:var(--text-3);margin-top:4px">💡 {고객명} 자리에 고객 이름이 자동으로 들어갑니다</div>
+      </div>
+      <div class="fgroup">
+        <label class="flabel">기본 첨부 이미지 (선택)</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="hidden" id="tpl-image-url">
+          <div id="tpl-image-preview" style="display:none">
+            <img id="tpl-image-thumb" style="width:60px;height:60px;object-fit:cover;border-radius:6px;border:1px solid var(--border)">
+            <button onclick="document.getElementById('tpl-image-url').value='';document.getElementById('tpl-image-preview').style.display='none';" style="margin-left:6px;padding:3px 8px;font-size:10px;border:1px solid var(--border);background:white;border-radius:4px;cursor:pointer">제거</button>
+          </div>
+          <input type="file" id="tpl-img-file" accept="image/*" style="display:none" onchange="uploadTplImage(this)">
+          <button class="btn btn-secondary btn-sm" type="button" onclick="document.getElementById('tpl-img-file').click()">📸 이미지 선택</button>
+        </div>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn btn-danger" id="tpl-del-btn" onclick="deleteSmsTemplate()" style="display:none;margin-right:auto">삭제</button>
+      <button class="btn btn-secondary" onclick="closeM('m-template-edit')">취소</button>
+      <button class="btn btn-primary" id="tpl-save-btn" onclick="submitSmsTemplate()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 고객 추가/수정 모달 -->
+<div class="modal-overlay" id="m-customer">
+  <div class="modal">
+    <div class="mh"><div class="mt" id="m-customer-title">고객 추가</div><button class="mc" onclick="closeM('m-customer')">✕</button></div>
+    <div class="mb"><input type="hidden" id="cu-id">
+      <div class="fg" style="gap:12px;margin-bottom:12px">
+        <div class="fgroup"><label class="flabel">회차<span class="req">*</span></label>
+          <select class="fc" id="cu-batch">
+            <option value="36회차">36회차</option>
+            <option value="47회차">47회차</option>
+            <option value="55회차">55회차</option>
+          </select>
+        </div>
+        <div class="fgroup"><label class="flabel">계약번호<span class="req">*</span></label><input class="fc" id="cu-contract" placeholder="13-0506xxx-xx-xxxxx"></div>
+      </div>
+      <div class="fg" style="gap:12px;margin-bottom:12px">
+        <div class="fgroup"><label class="flabel">고객명<span class="req">*</span></label><input class="fc" id="cu-name" placeholder="홍길동 또는 기업명"></div>
+        <div class="fgroup"><label class="flabel">연락처</label><input class="fc" id="cu-phone" placeholder="010-0000-0000"></div>
+      </div>
+      <div class="fg" style="gap:12px;margin-bottom:12px">
+        <div class="fgroup"><label class="flabel">의무사용기간</label><input class="fc" id="cu-duration" placeholder="36개월"></div>
+        <div class="fgroup"><label class="flabel">설치일자</label><input class="fc" id="cu-install" type="date"></div>
+      </div>
+      <div class="fg" style="gap:12px;margin-bottom:12px">
+        <div class="fgroup full"><label class="flabel">제품명</label><input class="fc" id="cu-product" placeholder="제품명"></div>
+        <div class="fgroup"><label class="flabel">렌탈료(원)</label><input class="fc" id="cu-rental" type="number" placeholder="49900"></div>
+      </div>
+      <div class="fg" style="gap:12px;margin-bottom:12px" id="cu-mgr-fields">
+        <div class="fgroup"><label class="flabel">담당자</label>
+          <select class="fc" id="cu-assignee">
+            <option value="">미배정</option>
+          </select>
+        </div>
+        <div class="fgroup"><label class="flabel">상태</label>
+          <select class="fc" id="cu-status">
+            <option value="연락전">⚪ 연락전</option>
+            <option value="연락중">🟡 연락중</option>
+            <option value="완료">✅ 완료</option>
+            <option value="제외">❌ 제외</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg" style="gap:12px;margin-bottom:12px">
+        <div class="fgroup"><label class="flabel">최초컨택</label><input class="fc" id="cu-first" type="date"></div>
+        <div class="fgroup"><label class="flabel">마지막컨택</label><input class="fc" id="cu-last" type="date"></div>
+      </div>
+      <div class="fgroup">
+        <label class="flabel">메모</label>
+        <textarea class="fc" id="cu-memo" rows="3" placeholder="영업 진행 상황, 특이사항 등" style="resize:vertical;font-family:var(--font);line-height:1.5"></textarea>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn btn-danger" id="cu-del-btn" onclick="delCustomer()" style="display:none;margin-right:auto">삭제</button>
+      <button class="btn btn-secondary" onclick="closeM('m-customer')">취소</button>
+      <button class="btn btn-primary" id="cu-save-btn" onclick="submitCustomer()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 일괄 분배 모달 -->
+<div class="modal-overlay" id="m-distribute">
+  <div class="modal modal-sm">
+    <div class="mh"><div class="mt">👥 고객 일괄 분배</div><button class="mc" onclick="closeM('m-distribute')">✕</button></div>
+    <div class="mb">
+      <div style="font-size:11px;color:var(--text-3);margin-bottom:14px;padding:8px 10px;background:var(--accent-light);border-radius:6px">
+        💡 선택한 직원들에게 고객을 균등하게 분배합니다. 기본적으로 미배정 고객만 분배되며, 옵션으로 전체 재분배도 가능합니다.
+      </div>
+      <div class="fgroup" style="margin-bottom:14px">
+        <label class="flabel">분배 대상 회차</label>
+        <select class="fc" id="dist-batch">
+          <option value="">전체 회차</option>
+          <option value="36회차">36회차</option>
+          <option value="47회차">47회차</option>
+          <option value="55회차">55회차</option>
+        </select>
+      </div>
+      <div class="fgroup" style="margin-bottom:14px">
+        <label class="flabel">분배 받을 직원 선택</label>
+        <div id="dist-emp-list" style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;max-height:240px;overflow-y:auto;padding:8px;background:var(--surface-2);border-radius:8px"></div>
+        <div style="display:flex;gap:6px;margin-top:8px">
+          <button class="btn btn-secondary btn-sm" onclick="distSelectAll(true)">전체 선택</button>
+          <button class="btn btn-secondary btn-sm" onclick="distSelectAll(false)">전체 해제</button>
+        </div>
+      </div>
+      <div class="fgroup">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" id="dist-only-unassigned" checked style="width:14px;height:14px;accent-color:var(--purple);cursor:pointer">
+          <span style="font-size:12px">미배정 고객만 분배 (해제 시 전체 재분배)</span>
+        </label>
+      </div>
+      <div id="dist-preview" style="margin-top:14px;padding:10px;background:var(--surface-2);border-radius:6px;font-size:11px;color:var(--text-2);display:none"></div>
+    </div>
+    <div class="mf">
+      <button class="btn btn-secondary" onclick="closeM('m-distribute')">취소</button>
+      <button class="btn btn-primary" id="dist-save-btn" onclick="submitDistribute()">🎯 분배 실행</button>
+    </div>
+  </div>
+</div>
+
+<!-- 일괄 담당자 변경 모달 -->
+<div class="modal-overlay" id="m-bulk-assign">
+  <div class="modal modal-sm">
+    <div class="mh"><div class="mt">👤 선택 항목 담당자 변경</div><button class="mc" onclick="closeM('m-bulk-assign')">✕</button></div>
+    <div class="mb">
+      <div id="bulk-assign-count" style="font-size:13px;font-weight:600;margin-bottom:14px;padding:10px;background:var(--accent-light);border-radius:6px;text-align:center"></div>
+      <div class="fgroup">
+        <label class="flabel">새 담당자<span class="req">*</span></label>
+        <select class="fc" id="bulk-assignee">
+          <option value="">미배정 (담당자 해제)</option>
+        </select>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn btn-secondary" onclick="closeM('m-bulk-assign')">취소</button>
+      <button class="btn btn-primary" id="bulk-save-btn" onclick="submitBulkAssign()">담당자 변경</button>
+    </div>
+  </div>
+</div>
+
+<!-- 엑셀 업로드 결과 모달 -->
+<div class="modal-overlay" id="m-import-result">
+  <div class="modal modal-sm">
+    <div class="mh"><div class="mt">📤 엑셀 가져오기 결과</div><button class="mc" onclick="closeM('m-import-result')">✕</button></div>
+    <div class="mb" id="import-result-content"></div>
+    <div class="mf"><button class="btn btn-primary" onclick="closeM('m-import-result')">확인</button></div>
   </div>
 </div>
 
@@ -1773,6 +2203,26 @@ function resetFindForm(){
   });
 }
 
+// 계정 진단 (localStorage 상태 확인)
+function diagnoseAccounts(){
+  const accounts = getAccounts();
+  let msg = '🔧 계정 진단 결과\n\n';
+  msg += `저장된 계정: ${accounts.length}개\n\n`;
+  if(accounts.length === 0){
+    msg += '⚠️ 저장된 계정이 없습니다.\n';
+    msg += '브라우저 캐시 삭제 또는 시크릿 모드 사용 시 계정이 사라질 수 있습니다.\n\n';
+    msg += '👉 해결: "회원가입"으로 다시 가입해주세요.\n';
+    msg += '   (송용한은 별도 검증 없이 바로 가입 가능)';
+  } else {
+    msg += '📋 가입된 계정 목록:\n';
+    accounts.forEach((a,i)=>{
+      msg += `${i+1}. ${a.name} (아이디: ${a.id})\n`;
+    });
+    msg += '\n💡 비밀번호를 잊었다면 "아이디/비밀번호 찾기"를 사용하세요.';
+  }
+  alert(msg);
+}
+
 async function doSignup(){
   const name=document.getElementById('su-name').value.trim();
   const id=document.getElementById('su-id').value.trim();
@@ -1793,22 +2243,24 @@ async function doSignup(){
   if(getAccounts().find(a=>a.id===id)){err.textContent='이미 사용 중인 아이디입니다.';return;}
   if(getAccounts().find(a=>a.email===email)){err.textContent='이미 사용 중인 이메일입니다.';return;}
 
-  // 🔒 직원 시트에 등록된 이름인지 검증
-  err.textContent='⏳ 직원 정보 확인 중...';
-  try{
-    const r = await api('getEmployeeNames');
-    const validNames = r.data || [];
-    if(!validNames.includes(name)){
-      err.textContent='❌ 등록되지 않은 이름입니다. 관리자에게 등록을 요청해주세요.';
-      return;
+  // 🔒 송용한(관리자)은 항상 가입 허용 (예외 처리)
+  if(name !== ADMIN_NAME){
+    err.textContent='⏳ 직원 정보 확인 중...';
+    try{
+      const r = await api('getEmployeeNames');
+      const validNames = r.data || [];
+      if(!validNames.includes(name)){
+        err.textContent='❌ 등록되지 않은 이름입니다. 관리자에게 등록을 요청해주세요.';
+        return;
+      }
+    }catch(e){
+      // API 실패 시에도 가입은 진행 (오프라인 대비)
+      console.warn('직원 정보 확인 실패:', e.message);
     }
-    // 이미 가입된 이름인지 확인
-    if(getAccounts().find(a=>a.name===name)){
-      err.textContent='❌ 이미 이 이름으로 가입된 계정이 있습니다. (1인 1계정)';
-      return;
-    }
-  }catch(e){
-    err.textContent='직원 정보 확인 실패: '+e.message;
+  }
+  // 이미 가입된 이름인지 확인
+  if(getAccounts().find(a=>a.name===name)){
+    err.textContent='❌ 이미 이 이름으로 가입된 계정이 있습니다. (1인 1계정)';
     return;
   }
 
@@ -1958,6 +2410,7 @@ const DEFAULT_MENUS = [
   {id:'dashboard',  label:'대시보드',   icon:'🏠', perm:null},
   {id:'employees',  label:'직원 관리',  icon:'👥', perm:'view_employees'},
   {id:'sales',      label:'매출 관리',  icon:'📊', perm:null},
+  {id:'customers',  label:'DB 관리',    icon:'📇', perm:null},
   {id:'quote',      label:'견적서 관리', icon:'📄', perm:null},
   {id:'inspection', label:'점검 관리',  icon:'🔧', perm:null},
   {id:'support',    label:'지원 관리',  icon:'💰', perm:null},
@@ -1997,37 +2450,60 @@ let _ci=0;
 function jsonp(params){
   return new Promise((res,rej)=>{
     const cb='__gc_'+(++_ci);
-    const to=setTimeout(()=>{delete window[cb];rej(new Error('요청 시간 초과'));},15000);
+    // 🚀 타임아웃 10초로 단축 (이전 15초)
+    const to=setTimeout(()=>{delete window[cb];rej(new Error('요청 시간 초과'));},10000);
     window[cb]=(d)=>{clearTimeout(to);delete window[cb];if(d&&d.ok===false)rej(new Error(d.error||'서버 오류'));else res(d);};
     const qs=Object.entries(params).map(([k,v])=>k+'='+encodeURIComponent(typeof v==='object'?JSON.stringify(v):v)).join('&');
     const s=document.createElement('script');
     s.src=GAS+'?'+qs+'&callback='+cb;
     s.onerror=()=>{clearTimeout(to);delete window[cb];rej(new Error('연결 실패'));};
     document.head.appendChild(s);
-    setTimeout(()=>{if(s.parentNode)s.parentNode.removeChild(s);},16000);
+    setTimeout(()=>{if(s.parentNode)s.parentNode.removeChild(s);},11000);
   });
 }
 function api(action,payload){ const p={action}; if(payload&&Object.keys(payload).length>0) p.payload=JSON.stringify(payload); return jsonp(p); }
 
 // ══ 동기화 ══════════════════════════════════════════════════
+// 🚀 강제 새로고침 (캐시 무시)
+async function forceRefresh(){
+  Object.keys(_pageCache).forEach(k=>delete _pageCache[k]);
+  toast('🔄 새로고침 중...','i');
+  await syncAll();
+}
+
 async function syncAll(){
   toast('데이터 불러오는 중...','i');
   const isAdmin = CU.name===ADMIN_NAME;
   try{
     // 직원 목록은 항상 로드 (담당자 선택 드롭다운 등에 필요)
-    const tasks=[loadEmployees(), loadSales(), loadEvents(), loadInspections(), loadSupports(), loadResignees(), loadRegulations(), loadQuoteProducts(), loadQuotes(), loadNotices(), loadRefreshes(), loadPartnerCards(), loadPromotions(), loadMenus(), loadCleanings()];
+    // 🚀 속도 최적화: 필수 데이터만 먼저 로드 (대시보드 표시용)
+    // 나머지는 백그라운드에서 로드
+    const essential = [loadEmployees(), loadSales(), loadNotices(), loadRefreshes()];
+    const background = [
+      loadEvents, loadInspections, loadSupports, loadResignees,
+      loadRegulations, loadQuoteProducts, loadQuotes,
+      loadPartnerCards, loadPromotions, loadMenus, loadCleanings,
+      loadCustomers, loadSmsTemplates
+    ];
+    const tasks = essential;
     if(canDo('view_salary_all') || canDo('view_salary_self') || canDo('manage_salary')) tasks.push(loadSalary());
     if(canDo('view_attendance_all') || isAdmin) tasks.push(loadAttendance());
     await Promise.all(tasks);
     loadDashboard();
     renderRefreshes();
-    renderPartnerCards();
-    renderPromotions();
     renderNoticesDash();
     if(isAdmin) { loadPermList(); renderMenuConfig(); }
     // 공지사항 팝업 (로그인 후 한번만)
     if(!window._noticeShown){ window._noticeShown=true; setTimeout(()=>showNoticePopup(),500); }
-    toast('동기화 완료 ✅','s');
+    toast('필수 데이터 로드 완료 ✅','s');
+    // 명언 위젯 로드
+    if(typeof loadMotto === 'function') loadMotto();
+    // 🚀 나머지는 백그라운드에서 로드
+    Promise.allSettled(background.map(fn=>fn())).then(()=>{
+      renderPartnerCards();
+      renderPromotions();
+      console.log('백그라운드 데이터 로드 완료');
+    });
   }catch(e){toast('실패: '+e.message,'e');}
 }
 
@@ -2482,35 +2958,30 @@ async function loadSalary(){
   const ym=document.getElementById('pay-ym').value||thisMonth();
   document.getElementById('pay-ym').value = ym;
 
-  // 일단 기존 데이터 가져오기
-  let r;
-  try{
-    r = await api('getSalary',{ym});
-  }catch(e){
-    toast('급여 데이터 로드 실패: '+e.message,'e');
-    salary=[];
-    renderSalary(salary,ym);
-    return;
-  }
-  salary = r.data || [];
-
-  // 데이터가 없고, 자동계산 권한 있으면 자동 실행
   const canCalc = canDo('manage_salary') || CU.name===ADMIN_NAME;
-  if(salary.length === 0 && canCalc){
+  const cacheKey = 'salary_' + ym;
+
+  // 🚀 캐시 확인 (5분 이내면 자동 계산 스킵)
+  if(canCalc && !checkCache(cacheKey)){
     try{
-      toast('급여 자동 계산 중...','i');
       const calcResult = await api('calcSalary',{ym});
-      if(calcResult.ok === false){
-        toast(calcResult.error || '계산 실패','e');
+      if(calcResult.ok !== false){
+        setCache(cacheKey);
       } else {
-        // 다시 조회
-        const r2 = await api('getSalary',{ym});
-        salary = r2.data || [];
-        if(salary.length > 0) toast(`${salary.length}명 급여 계산 완료 ✅`,'s');
+        toast(calcResult.error || '계산 실패','e');
       }
     }catch(e){
-      toast('자동 계산 실패: '+e.message,'e');
+      console.warn('자동 계산 실패:', e.message);
     }
+  }
+
+  // 계산 후 조회
+  try{
+    const r = await api('getSalary',{ym});
+    salary = r.data || [];
+  }catch(e){
+    toast('급여 데이터 로드 실패: '+e.message,'e');
+    salary = [];
   }
   renderSalary(salary,ym);
 }
@@ -2659,18 +3130,23 @@ function updateAttendanceQuick(){
     const items = myToday.filter(r=>r['구분']===type).sort((a,b)=>(toHHMM(b['시간'])||'').localeCompare(toHHMM(a['시간'])||''));
     return items[0] ? items[0]['시간'] : null;
   };
+  const countType = (type)=>myToday.filter(r=>r['구분']===type).length;
+
   const tIn = findLast('출근');
   const tOut = findLast('외출');
   const tBack = findLast('복귀');
   const tLeave = findLast('퇴근');
 
+  const outCount = countType('외출');
+  const backCount = countType('복귀');
+
   document.getElementById('att-time-in').textContent = fmtTime(tIn);
-  document.getElementById('att-time-out').textContent = fmtTime(tOut);
-  document.getElementById('att-time-back').textContent = fmtTime(tBack);
+  document.getElementById('att-time-out').innerHTML = fmtTime(tOut) + (outCount>1 ? `<span style="font-size:9px;opacity:.7"> (${outCount}회)</span>` : '');
+  document.getElementById('att-time-back').innerHTML = fmtTime(tBack) + (backCount>1 ? `<span style="font-size:9px;opacity:.7"> (${backCount}회)</span>` : '');
   document.getElementById('att-time-leave').textContent = fmtTime(tLeave);
 
-  // 근무시간 계산 (HH:MM으로 정규화)
-  const workMinutes = calcWorkMinutes(toHHMM(tIn), toHHMM(tOut), toHHMM(tBack), toHHMM(tLeave));
+  // 근무시간 계산 - 다중 외출 지원
+  const workMinutes = calcMultiWorkMinutes(myToday);
   const hours = Math.floor(workMinutes/60);
   const mins = workMinutes % 60;
   if(workMinutes > 0){
@@ -2709,61 +3185,174 @@ function calcWorkMinutes(tIn, tOut, tBack, tLeave){
   return Math.max(0, total);
 }
 
-// 출퇴근 테이블 렌더링 - 날짜+이름별 그룹화하여 한 줄에 표시
+// 출퇴근 테이블 렌더링 - 각 기록을 별도 행으로 표시
 function renderAttendanceTable(){
   const tb = document.getElementById('att-tbody');
-  // 그룹화
+  const records = (attendances||[]).slice();
+
+  // 날짜 역순 + 시간 순 정렬
+  records.sort((a,b)=>{
+    if(a['날짜'] !== b['날짜']) return String(b['날짜']).localeCompare(String(a['날짜']));
+    if(a['이름'] !== b['이름']) return String(a['이름']).localeCompare(String(b['이름']));
+    return (toHHMM(a['시간'])||'').localeCompare(toHHMM(b['시간'])||'');
+  });
+
+  document.getElementById('att-sub').textContent = '전체 '+records.length+'건';
+
+  // 합계: 날짜+이름별 근무시간 계산
   const groups = {};
-  (attendances||[]).forEach(r=>{
+  records.forEach(r=>{
     const key = (r['날짜']||'') + '|' + (r['이름']||'');
-    if(!groups[key]) groups[key] = {날짜:r['날짜'], 이름:r['이름'], 출근:null, 외출:null, 복귀:null, 퇴근:null};
-    const type = r['구분'];
-    const tNorm = toHHMM(r['시간']) || r['시간'];
-    if(['출근','외출','복귀','퇴근'].includes(type)){
-      if(type==='출근'||type==='외출'){
-        // 처음 기록
-        if(!groups[key][type] || (toHHMM(r['시간'])||'') < (toHHMM(groups[key][type])||'')) groups[key][type] = r['시간'];
-      } else {
-        // 퇴근/복귀는 가장 마지막
-        if(!groups[key][type] || (toHHMM(r['시간'])||'') > (toHHMM(groups[key][type])||'')) groups[key][type] = r['시간'];
+    if(!groups[key]) groups[key] = [];
+    groups[key].push(r);
+  });
+  let totalMin = 0;
+  Object.values(groups).forEach(arr=>{
+    totalMin += calcMultiWorkMinutes(arr);
+  });
+  const h = Math.floor(totalMin/60), m = totalMin%60;
+  document.getElementById('att-total').textContent = totalMin>0 ? `총 근무: ${h}시간 ${m}분` : '';
+
+  if(!records.length){tb.innerHTML='<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--text-3)">기록 없음</td></tr>';return;}
+
+  const isAdmin = CU.name===ADMIN_NAME;
+  const typeIcon = {
+    '출근': '☀️',
+    '외출': '🍽',
+    '복귀': '🏢',
+    '퇴근': '🌙'
+  };
+  const typeColor = {
+    '출근': 'var(--accent-2)',
+    '외출': 'var(--warn)',
+    '복귀': 'var(--info)',
+    '퇴근': 'var(--purple)'
+  };
+
+  // 마지막 행을 만들 때 그룹의 마지막 기록 뒤에 근무시간 합계 행을 끼움
+  const rendered = [];
+  let lastKey = null;
+  let groupRecords = [];
+
+  records.forEach((r, idx)=>{
+    const key = (r['날짜']||'') + '|' + (r['이름']||'');
+    // 그룹이 바뀌었을 때, 이전 그룹의 합계 행 출력
+    if(lastKey && key !== lastKey){
+      const workMin = calcMultiWorkMinutes(groupRecords);
+      if(workMin > 0){
+        const wh = Math.floor(workMin/60), wm = workMin%60;
+        rendered.push(`<tr style="background:var(--accent-light)">
+          <td colspan="3" style="text-align:right;font-size:11px;color:var(--text-2);font-weight:600">↑ ${lastKey.split('|')[1]} (${lastKey.split('|')[0]}) 근무시간</td>
+          <td colspan="2" style="font-weight:700;color:var(--accent-2)">⏱ ${wh}시간 ${wm}분</td>
+        </tr>`);
       }
+      groupRecords = [];
     }
-  });
-  const list = Object.values(groups).sort((a,b)=>{
-    if(a.날짜 !== b.날짜) return String(b.날짜).localeCompare(String(a.날짜));
-    return String(a.이름).localeCompare(String(b.이름));
-  });
-  document.getElementById('att-sub').textContent = '전체 '+list.length+'건';
+    groupRecords.push(r);
+    lastKey = key;
 
-  if(!list.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-3)">기록 없음</td></tr>';return;}
+    const type = r['구분'] || '-';
+    const icon = typeIcon[type] || '•';
+    const color = typeColor[type] || 'var(--text)';
+    rendered.push(`<tr>
+      <td class="td-m">${r['날짜']||''}</td>
+      <td>${r['이름']||''}</td>
+      <td><span style="color:${color};font-weight:600">${icon} ${type}</span></td>
+      <td class="td-m" style="color:${color};font-weight:500">${fmtTime(r['시간'])}</td>
+      <td>${isAdmin?`<button class="btn btn-danger btn-sm" onclick="delAttendance('${r['기록ID']}')">삭제</button>`:'<span style="color:var(--text-3);font-size:10px">-</span>'}</td>
+    </tr>`);
+  });
 
-  tb.innerHTML = list.map(g=>{
-    const workMin = calcWorkMinutes(toHHMM(g.출근), toHHMM(g.외출), toHHMM(g.복귀), toHHMM(g.퇴근));
-    const hours = Math.floor(workMin/60);
-    const mins = workMin % 60;
-    const workStr = workMin > 0 ? `${hours}시간 ${mins}분` : '-';
-    return `<tr>
-      <td class="td-m">${g.날짜||''}</td>
-      <td>${g.이름||''}</td>
-      <td class="td-m">${g.출근?'<span style="color:var(--accent-2);font-weight:600">☀️ '+fmtTime(g.출근)+'</span>':'<span style="color:var(--text-3)">-</span>'}</td>
-      <td class="td-m">${g.외출?'<span style="color:var(--warn)">🍽 '+fmtTime(g.외출)+'</span>':'<span style="color:var(--text-3)">-</span>'}</td>
-      <td class="td-m">${g.복귀?'<span style="color:var(--info)">🏢 '+fmtTime(g.복귀)+'</span>':'<span style="color:var(--text-3)">-</span>'}</td>
-      <td class="td-m">${g.퇴근?'<span style="color:var(--purple);font-weight:600">🌙 '+fmtTime(g.퇴근)+'</span>':'<span style="color:var(--text-3)">-</span>'}</td>
-      <td class="td-r" style="font-weight:700;color:var(--accent-2)">${workStr}</td>
-    </tr>`;
-  }).join('');
+  // 마지막 그룹 합계
+  if(groupRecords.length > 0){
+    const workMin = calcMultiWorkMinutes(groupRecords);
+    if(workMin > 0){
+      const wh = Math.floor(workMin/60), wm = workMin%60;
+      rendered.push(`<tr style="background:var(--accent-light)">
+        <td colspan="3" style="text-align:right;font-size:11px;color:var(--text-2);font-weight:600">↑ ${lastKey.split('|')[1]} (${lastKey.split('|')[0]}) 근무시간</td>
+        <td colspan="2" style="font-weight:700;color:var(--accent-2)">⏱ ${wh}시간 ${wm}분</td>
+      </tr>`);
+    }
+  }
+
+  tb.innerHTML = rendered.join('');
 }
 
-// 출퇴근 기록 (출근/외출/복귀/퇴근)
+// 여러 기록(출근/외출/복귀 여러 번 등)에서 근무 시간 계산
+function calcMultiWorkMinutes(records){
+  // 시간순 정렬
+  const sorted = [...records].sort((a,b)=>(toHHMM(a['시간'])||'').localeCompare(toHHMM(b['시간'])||''));
+
+  // 출근/퇴근 찾기
+  const inRec = sorted.find(r=>r['구분']==='출근');
+  const outRec = [...sorted].reverse().find(r=>r['구분']==='퇴근');
+  if(!inRec) return 0;
+
+  const toMin = (t)=>{
+    const hhmm = toHHMM(t);
+    if(!hhmm) return null;
+    const [h,m] = hhmm.split(':').map(Number);
+    return h*60 + (m||0);
+  };
+
+  const inM = toMin(inRec['시간']);
+  // 퇴근 안 했으면 현재 시간
+  const now = new Date();
+  const nowM = now.getHours()*60 + now.getMinutes();
+  const outM = outRec ? toMin(outRec['시간']) : nowM;
+
+  let total = outM - inM;
+  if(total <= 0) return 0;
+
+  // 외출/복귀 쌍을 차감 (여러 번 가능)
+  // 외출 시각과 그 다음 복귀 시각을 짝지어서 차감
+  const outs = sorted.filter(r=>r['구분']==='외출').map(r=>toMin(r['시간']));
+  const backs = sorted.filter(r=>r['구분']==='복귀').map(r=>toMin(r['시간']));
+
+  for(let i=0; i<outs.length; i++){
+    const outTime = outs[i];
+    // outTime 이후 가장 가까운 복귀 찾기
+    const matchedBack = backs.find(b=>b > outTime);
+    if(matchedBack){
+      total -= (matchedBack - outTime);
+      // 사용한 복귀는 제거
+      backs.splice(backs.indexOf(matchedBack), 1);
+    } else {
+      // 복귀가 없으면 퇴근까지 외출 상태로 본다 → 외출~퇴근 차감
+      total -= (outM - outTime);
+    }
+  }
+
+  // 점심 1시간 자동 차감 (4시간 이상 근무 시)
+  if(total >= 240) total -= 60;
+
+  return Math.max(0, total);
+}
+
+// 출퇴근 기록 삭제 (관리자만)
+async function delAttendance(id){
+  if(!confirm('이 출퇴근 기록을 삭제하시겠습니까?'))return;
+  try{
+    const r = await api('deleteAttendance', {id});
+    toast(r.message || '삭제 완료', 's');
+    await loadAttendance();
+  }catch(e){
+    toast('삭제 실패: '+e.message, 'e');
+  }
+}
+
+// 출퇴근 기록 (출근/외출/복귀/퇴근) - 여러 번 가능
 async function recordAtt(type){
   const now = new Date();
   const time = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
   const today_ = ymd(now);
 
-  // 같은 타입 중복 체크
-  const myToday = (attendances||[]).filter(r=>r['날짜']===today_ && r['이름']===CU.name && r['구분']===type);
-  if(myToday.length > 0){
-    if(!confirm(`이미 오늘 ${type} 기록이 있습니다 (${myToday[0]['시간']}).\n다시 ${type} 기록을 추가하시겠습니까?`)) return;
+  // 외출/복귀는 여러 번 가능, 출근/퇴근은 같은 날 한번만 권장
+  if(type==='출근' || type==='퇴근'){
+    const myToday = (attendances||[]).filter(r=>r['날짜']===today_ && r['이름']===CU.name && r['구분']===type);
+    if(myToday.length > 0){
+      if(!confirm(`이미 오늘 ${type} 기록이 있습니다 (${fmtTime(myToday[0]['시간'])}).\n다시 ${type} 기록을 추가하시겠습니까?`)) return;
+    }
   }
 
   try{
@@ -2773,7 +3362,7 @@ async function recordAtt(type){
       type: type,
       time: time
     });
-    toast(`✅ ${type} ${time} 기록 완료`, 's');
+    toast(`✅ ${type} ${formatKoreanTime(now.getHours(), now.getMinutes())} 기록 완료`, 's');
     await loadAttendance();
   }catch(e){
     toast('기록 실패: '+e.message, 'e');
@@ -2796,6 +3385,7 @@ const PAGES={
   dashboard: {title:'대시보드',sub:'전체 현황 요약',act:false},
   employees: {title:'직원 관리',sub:'직원 정보 관리',act:true,label:'＋ 직원 추가',fn:()=>openEmpModal()},
   sales:     {title:'매출 관리',sub:'지국 매출 정리표',act:true,label:'＋ 매출 입력',fn:()=>openSaleModal()},
+  customers: {title:'DB 관리',sub:'고객 데이터베이스 관리',act:false},
   quote:     {title:'견적서 관리',sub:'견적서 작성 및 발송',act:true,label:'＋ 새 견적서',fn:()=>openQuoteWizard()},
   inspection:{title:'점검 관리',sub:'점검 일정 및 일일급여',act:true,label:'＋ 점검 추가',fn:()=>openInspModal()},
   support:   {title:'지원 관리',sub:'회사 지원 항목',act:true,label:'＋ 지원 추가',fn:()=>openSupportModal()},
@@ -2804,6 +3394,18 @@ const PAGES={
   calendar:  {title:'캘린더',sub:'일정 관리',act:false},
   admin:     {title:'관리자 페이지',sub:'권한 · 메뉴 · 시스템',act:false},
 };
+
+// 🚀 페이지 데이터 캐시 (5분간 유지)
+const _pageCache = {};
+const CACHE_TTL = 5 * 60 * 1000; // 5분
+
+function checkCache(key){
+  const cached = _pageCache[key];
+  if(!cached) return false;
+  if(Date.now() - cached.time > CACHE_TTL){ delete _pageCache[key]; return false; }
+  return true;
+}
+function setCache(key){ _pageCache[key] = {time: Date.now()}; }
 
 function go(page){
   // 대시보드 진입 시 공지 관련 버튼 표시
@@ -3679,17 +4281,155 @@ function openPermModal(name){
     </label>
   `).join('');
   document.getElementById('perm-checks').innerHTML=checks;
+  // 프리셋 버튼 렌더링 (커스텀 포함)
+  renderPresetButtons();
   openM('m-perm');
 }
 
+// 커스텀 프리셋 저장/조회
+function getCustomPresets(){
+  try{
+    const stored = lGet('custom_presets', null);
+    return stored || {};
+  }catch(e){ return {}; }
+}
+function saveCustomPresets(presets){
+  lSet('custom_presets', presets);
+}
+
+// 기본 프리셋 라벨 (lstorage에 저장 - 이름 수정 가능)
+function getPresetLabels(){
+  const defaults = {
+    all: '전체 권한',
+    manager: '팀장급',
+    sales: '영업직원',
+    service: '용역직원',
+    none: '최소 권한'
+  };
+  const stored = lGet('preset_labels', null);
+  return Object.assign({}, defaults, stored || {});
+}
+function savePresetLabels(labels){
+  lSet('preset_labels', labels);
+}
+
+// 프리셋 버튼 렌더링 - 권한 모달이 열릴 때마다 호출
+function renderPresetButtons(){
+  const div = document.getElementById('preset-btns');
+  if(!div) return;
+  const labels = getPresetLabels();
+  const custom = getCustomPresets();
+
+  // 기본 5개
+  let html = ['all','manager','sales','service','none'].map(key=>
+    `<button class="btn btn-secondary btn-sm" onclick="applyPreset('${key}')">${labels[key]||key}</button>`
+  ).join('');
+
+  // 커스텀 프리셋들
+  Object.keys(custom).forEach(key=>{
+    html += `<button class="btn btn-secondary btn-sm" style="background:var(--purple-light);color:var(--purple);border-color:var(--purple)" onclick="applyPreset('custom:${key}')">${key}</button>`;
+  });
+
+  div.innerHTML = html;
+}
+
 function applyPreset(type){
-  const preset=PRESETS[type]||{};
+  let preset;
+  if(type.startsWith('custom:')){
+    const key = type.substring(7);
+    const custom = getCustomPresets();
+    preset = custom[key] || {};
+  } else {
+    preset = PRESETS[type]||{};
+  }
   document.querySelectorAll('#perm-checks input[type=checkbox]').forEach(cb=>{
     cb.checked = !!preset[cb.dataset.perm];
   });
-  // 직책 자동 설정
+  // 직책 자동 설정 (기본 프리셋만)
   const positionMap={all:'총괄실장',manager:'팀장',sales:'영업부직원',service:'용역부직원',none:'영업부직원'};
   if(positionMap[type]) document.getElementById('pm-position').value=positionMap[type];
+}
+
+// 프리셋 관리 모달 열기
+function openPresetMgrModal(){
+  renderPresetList();
+  document.getElementById('new-preset-name').value = '';
+  openM('m-preset-mgr');
+}
+
+// 프리셋 목록 렌더링 (관리 모달용)
+function renderPresetList(){
+  const div = document.getElementById('preset-list');
+  if(!div) return;
+  const labels = getPresetLabels();
+  const custom = getCustomPresets();
+
+  let html = '';
+  // 기본 프리셋 5개 (이름 수정 가능, 삭제 불가)
+  ['all','manager','sales','service','none'].forEach(key=>{
+    html += `
+      <div style="display:flex;align-items:center;gap:6px;padding:8px 10px;background:var(--surface);border:1px solid var(--border);border-radius:6px">
+        <span style="font-size:10px;color:var(--text-3);width:60px">기본 (${key})</span>
+        <input class="fc" value="${labels[key]||key}" style="flex:1" onchange="renamePreset('${key}',this.value)">
+        <span style="font-size:10px;color:var(--text-3)">수정 불가</span>
+      </div>`;
+  });
+  // 커스텀 프리셋
+  Object.keys(custom).forEach(key=>{
+    html += `
+      <div style="display:flex;align-items:center;gap:6px;padding:8px 10px;background:var(--purple-light);border:1px solid var(--purple);border-radius:6px">
+        <span style="font-size:10px;color:var(--purple);width:60px">커스텀</span>
+        <input class="fc" value="${key}" disabled style="flex:1;background:var(--surface)">
+        <button class="btn btn-danger btn-sm" onclick="deletePreset('${key}')">🗑 삭제</button>
+      </div>`;
+  });
+  if(!Object.keys(custom).length){
+    html += '<div style="text-align:center;padding:14px;font-size:11px;color:var(--text-3)">아직 커스텀 프리셋이 없습니다. 권한 설정 후 "현재 권한으로 저장"을 눌러주세요.</div>';
+  }
+  div.innerHTML = html;
+}
+
+// 프리셋 이름 변경 (기본 프리셋 라벨만 수정)
+function renamePreset(key, newName){
+  if(!newName.trim()){toast('이름을 입력해주세요.','e');return;}
+  const labels = getPresetLabels();
+  labels[key] = newName.trim();
+  savePresetLabels(labels);
+  toast(`프리셋 이름이 "${newName}"으로 변경됐습니다.`, 's');
+  renderPresetButtons();
+}
+
+// 새 프리셋 추가 (현재 체크박스 상태 기준)
+function addPresetFromCurrent(){
+  const name = document.getElementById('new-preset-name').value.trim();
+  if(!name){toast('프리셋 이름을 입력해주세요.','e');return;}
+  // 현재 권한 모달의 체크박스 상태 수집
+  const newPerms = {};
+  document.querySelectorAll('#perm-checks input[type=checkbox]').forEach(cb=>{
+    if(cb.checked) newPerms[cb.dataset.perm] = true;
+  });
+  if(!Object.keys(newPerms).length){
+    if(!confirm('체크된 권한이 없습니다. 빈 프리셋으로 저장할까요?'))return;
+  }
+  const custom = getCustomPresets();
+  if(custom[name] && !confirm(`"${name}" 프리셋이 이미 있습니다. 덮어쓸까요?`))return;
+  custom[name] = newPerms;
+  saveCustomPresets(custom);
+  toast(`"${name}" 프리셋 저장 완료 ✅`, 's');
+  renderPresetList();
+  renderPresetButtons();
+  document.getElementById('new-preset-name').value = '';
+}
+
+// 커스텀 프리셋 삭제
+function deletePreset(key){
+  if(!confirm(`"${key}" 프리셋을 삭제하시겠습니까?`))return;
+  const custom = getCustomPresets();
+  delete custom[key];
+  saveCustomPresets(custom);
+  toast(`"${key}" 프리셋 삭제 완료`, 's');
+  renderPresetList();
+  renderPresetButtons();
 }
 
 function savePermDetail(){
@@ -4215,6 +4955,1107 @@ function initMemoEditor(){
 }
 
 
+
+
+
+// ════ 명언/성구/신조 위젯 ═══════════════════════════════════
+let mottoData = { type: '명언', content: '', icon: '💭' };
+
+const MOTTO_TYPE_ICONS = {
+  '명언': '💭', '성구': '📖', '신조': '⭐', '다짐': '💪', '기도': '🙏'
+};
+
+async function loadMotto(){
+  if(!CU || !CU.name) return;
+  try{
+    const r = await api('getMotto', {name: CU.name});
+    if(r.ok && r.data){
+      mottoData.type = r.data.type || '명언';
+      mottoData.content = r.data.content || '';
+      mottoData.icon = MOTTO_TYPE_ICONS[mottoData.type] || '💭';
+    }
+    renderMotto();
+  }catch(e){
+    console.warn('명언 로드 실패:', e.message);
+  }
+}
+
+function renderMotto(){
+  const iconEl = document.getElementById('motto-icon');
+  const labelEl = document.getElementById('motto-label');
+  const textEl = document.getElementById('motto-text');
+  if(!iconEl || !labelEl || !textEl) return;
+
+  iconEl.textContent = mottoData.icon;
+  labelEl.textContent = '내 ' + mottoData.type;
+
+  if(mottoData.content){
+    textEl.textContent = mottoData.content;
+    textEl.style.fontStyle = 'italic';
+    textEl.style.opacity = '1';
+  } else {
+    textEl.textContent = '아직 ' + mottoData.type + '이 없습니다.\n클릭하여 작성해보세요!';
+    textEl.style.fontStyle = 'normal';
+    textEl.style.opacity = '0.6';
+  }
+}
+
+function openMottoEditor(){
+  document.getElementById('motto-display').style.display = 'none';
+  document.getElementById('motto-edit').style.display = 'block';
+  document.getElementById('motto-input').value = mottoData.content;
+  // 현재 선택된 타입 활성화
+  document.querySelectorAll('.motto-type-btn').forEach(b=>{
+    b.classList.toggle('active', b.dataset.type === mottoData.type);
+  });
+  setTimeout(()=>document.getElementById('motto-input').focus(), 100);
+}
+
+function selectMottoType(type, icon){
+  mottoData.type = type;
+  mottoData.icon = icon;
+  document.querySelectorAll('.motto-type-btn').forEach(b=>{
+    b.classList.toggle('active', b.dataset.type === type);
+  });
+}
+
+async function saveMotto(){
+  const content = document.getElementById('motto-input').value.trim();
+  mottoData.content = content;
+
+  try{
+    await api('saveMotto', {
+      name: CU.name,
+      type: mottoData.type,
+      content: content
+    });
+    cancelMotto();
+    renderMotto();
+    toast('✅ '+mottoData.type+' 저장 완료','s');
+  }catch(e){
+    toast('저장 실패: '+e.message, 'e');
+  }
+}
+
+function cancelMotto(){
+  document.getElementById('motto-display').style.display = 'block';
+  document.getElementById('motto-edit').style.display = 'none';
+}
+
+
+// ════ SMS 발송 시스템 ════════════════════════════════════════
+let SMS_TEMPLATES = [];
+let currentTplTab = '공통';
+
+async function loadSmsTemplates(){
+  try{
+    const r = await api('getSmsTemplates', {user: CU.name});
+    SMS_TEMPLATES = r.data || [];
+  }catch(e){
+    SMS_TEMPLATES = [];
+  }
+}
+
+// 📱 SMS 발송 모달 열기 (고객 정보 자동 입력)
+async function openSmsModal(customerId){
+  // 템플릿 로드
+  await loadSmsTemplates();
+
+  // 고객 정보 채우기
+  let customer = null;
+  if(customerId){
+    customer = (CUSTOMERS||[]).find(c=>c['고객ID']===customerId);
+  }
+
+  document.getElementById('sms-customer-id').value = customer ? customer['고객ID'] : '';
+  document.getElementById('sms-customer-name').value = customer ? customer['고객명']||'' : '';
+  document.getElementById('sms-phone').value = customer ? customer['연락처']||'' : '';
+  document.getElementById('sms-content').value = '';
+  document.getElementById('sms-image-url').value = '';
+  document.getElementById('sms-image-preview').style.display = 'none';
+
+  // 헤더 정보 업데이트
+  if(customer){
+    document.getElementById('sms-target-info').innerHTML =
+      `📞 <strong>${customer['고객명']||''}</strong> 님 (${customer['연락처']||'번호 없음'}) · ${customer['제품명']||''}`;
+  } else {
+    document.getElementById('sms-target-info').textContent = '직접 입력 모드';
+  }
+
+  // 글자 수 표시 이벤트
+  const ta = document.getElementById('sms-content');
+  ta.oninput = ()=>updateSmsCharCount();
+  updateSmsCharCount();
+
+  // 템플릿 탭 초기화
+  currentTplTab = '공통';
+  renderSmsTemplateTabs();
+
+  openM('m-sms-send');
+}
+
+// 글자 수 카운트
+function updateSmsCharCount(){
+  const ta = document.getElementById('sms-content');
+  const len = (ta.value||'').length;
+  const cntEl = document.getElementById('sms-char-count');
+  if(len <= 90) cntEl.innerHTML = `<span>${len}자 / SMS 90자 이내</span>`;
+  else if(len <= 2000) cntEl.innerHTML = `<span style="color:var(--info)">${len}자 / LMS (90자 초과)</span>`;
+  else cntEl.innerHTML = `<span style="color:var(--danger)">${len}자 / 너무 깁니다</span>`;
+}
+
+// 템플릿 탭 전환
+function switchTplTab(type){
+  currentTplTab = type;
+  document.querySelectorAll('.sms-tpl-tab').forEach(b=>{
+    if(b.dataset.type===type){
+      b.classList.add('active');
+      b.style.background='var(--surface)';
+      b.style.color='var(--text)';
+      b.style.fontWeight='600';
+    } else {
+      b.classList.remove('active');
+      b.style.background='none';
+      b.style.color='var(--text-2)';
+      b.style.fontWeight='500';
+    }
+  });
+  renderSmsTemplateTabs();
+}
+
+// 템플릿 리스트 렌더링 (SMS 발송 모달 안)
+function renderSmsTemplateTabs(){
+  const common = SMS_TEMPLATES.filter(t=>t['구분']==='공통');
+  const personal = SMS_TEMPLATES.filter(t=>t['구분']==='개인' && t['등록자']===CU.name);
+
+  document.getElementById('sms-tpl-cnt-common').textContent = common.length;
+  document.getElementById('sms-tpl-cnt-personal').textContent = personal.length;
+
+  const list = currentTplTab === '공통' ? common : personal;
+  const div = document.getElementById('sms-template-list');
+  if(!list.length){
+    div.innerHTML = '<div class="empty" style="grid-column:1/-1;padding:14px"><div style="font-size:11px;color:var(--text-3);text-align:center">'+(currentTplTab==='공통'?'공통 템플릿이 없습니다':'내 템플릿이 없습니다')+'<br>"⚙️ 템플릿 관리"에서 추가하세요</div></div>';
+    return;
+  }
+  div.innerHTML = list.map(t=>{
+    const preview = (t['내용']||'').substring(0,40) + ((t['내용']||'').length>40 ? '...' : '');
+    return `<div onclick="applySmsTemplate('${t['템플릿ID']}')" style="padding:8px 10px;background:var(--surface);border:1px solid var(--border);border-radius:6px;cursor:pointer;transition:all .1s" onmouseover="this.style.borderColor='var(--accent)';this.style.background='var(--accent-light)'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--surface)'">
+      <div style="font-size:11px;font-weight:600;color:var(--text);margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t['이미지URL']?'📷 ':''}${t['제목']||'-'}</div>
+      <div style="font-size:10px;color:var(--text-3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${preview}</div>
+    </div>`;
+  }).join('');
+}
+
+// 템플릿 적용
+function applySmsTemplate(id){
+  const t = SMS_TEMPLATES.find(x=>x['템플릿ID']===id);
+  if(!t) return;
+  const customerName = document.getElementById('sms-customer-name').value.trim() || '고객님';
+  let content = (t['내용']||'').replace(/\{고객명\}/g, customerName);
+  document.getElementById('sms-content').value = content;
+  if(t['이미지URL']){
+    document.getElementById('sms-image-url').value = t['이미지URL'];
+    document.getElementById('sms-image-thumb').src = gdriveImgUrl(t['이미지URL']);
+    document.getElementById('sms-image-thumb').referrerPolicy = 'no-referrer';
+    document.getElementById('sms-image-preview').style.display = 'inline-block';
+  } else {
+    removeSmsImage();
+  }
+  updateSmsCharCount();
+  toast('"' + t['제목'] + '" 템플릿 적용됨','s');
+}
+
+function removeSmsImage(){
+  document.getElementById('sms-image-url').value = '';
+  document.getElementById('sms-image-preview').style.display = 'none';
+}
+
+// 이미지 선택 모달
+function openSmsImagePicker(){
+  switchImgPickTab('upload');
+  document.getElementById('sms-img-upload-status').innerHTML = '';
+  loadSmsImageLibrary();
+  openM('m-sms-image-picker');
+}
+
+function switchImgPickTab(type){
+  document.querySelectorAll('.img-pick-tab').forEach(b=>{
+    if(b.dataset.type===type){
+      b.classList.add('active');
+      b.style.background='var(--surface)';
+      b.style.color='var(--text)';
+      b.style.fontWeight='600';
+    } else {
+      b.classList.remove('active');
+      b.style.background='none';
+      b.style.color='var(--text-2)';
+      b.style.fontWeight='500';
+    }
+  });
+  document.getElementById('img-pick-upload').style.display = type==='upload' ? '' : 'none';
+  document.getElementById('img-pick-library').style.display = type==='library' ? '' : 'none';
+}
+
+// 라이브러리 로드 (제휴카드/프로모션/회식 이미지 등)
+function loadSmsImageLibrary(){
+  const div = document.getElementById('sms-img-library-grid');
+  const allImages = [];
+  // 회식
+  (REFRESHES||[]).forEach(r=>{if(r['이미지URL']) allImages.push({url:r['이미지URL'], label:'회식: '+(r['회식명']||'')});});
+  // 제휴카드
+  (PARTNER_CARDS||[]).forEach(c=>{if(c['이미지URL']) allImages.push({url:c['이미지URL'], label:'카드: '+(c['카드명']||'')});});
+  // 프로모션
+  (PROMOTIONS||[]).forEach(p=>{if(p['이미지URL']) allImages.push({url:p['이미지URL'], label:'프로모션: '+(p['제목']||'')});});
+
+  if(!allImages.length){
+    div.innerHTML = '<div class="empty" style="grid-column:1/-1;padding:30px;text-align:center"><div style="font-size:11px;color:var(--text-3)">📭 라이브러리에 이미지가 없습니다<br>새로 업로드 탭에서 직접 업로드하세요</div></div>';
+    return;
+  }
+  div.innerHTML = allImages.map(img=>`
+    <div onclick="selectImageForSms('${img.url}')" style="cursor:pointer;border-radius:6px;overflow:hidden;border:2px solid var(--border);transition:all .1s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+      <img loading="lazy" src="${gdriveImgUrl(img.url)}" referrerpolicy="no-referrer" style="width:100%;height:80px;object-fit:cover;background:#f5f5f5" onerror="this.style.display='none'">
+      <div style="padding:4px 6px;font-size:10px;color:var(--text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${img.label}</div>
+    </div>
+  `).join('');
+}
+
+function selectImageForSms(url){
+  document.getElementById('sms-image-url').value = url;
+  document.getElementById('sms-image-thumb').src = gdriveImgUrl(url);
+  document.getElementById('sms-image-thumb').referrerPolicy = 'no-referrer';
+  document.getElementById('sms-image-preview').style.display = 'inline-block';
+  closeM('m-sms-image-picker');
+  toast('이미지 선택 완료 ✅','s');
+}
+
+async function uploadSmsImage(input){
+  const file = input.files[0];
+  if(!file) return;
+  const status = document.getElementById('sms-img-upload-status');
+  status.innerHTML = '<div style="font-size:11px;color:var(--text-3)"><span class="spinner"></span> 업로드 중...</div>';
+  try{
+    const url = await uploadToGoogleDrive(file);
+    selectImageForSms(url);
+    toast('이미지 업로드 완료 ✅','s');
+  }catch(e){
+    status.innerHTML = '<div style="font-size:11px;color:var(--danger)">업로드 실패: '+e.message+'</div>';
+  }
+  input.value = '';
+}
+
+// 📱 실제 SMS 발송 (URL 스킴 + 이미지 자동 다운로드)
+async function executeSendSms(){
+  const phone = document.getElementById('sms-phone').value.replace(/[^\d]/g,'');
+  const content = document.getElementById('sms-content').value.trim();
+  const imageUrl = document.getElementById('sms-image-url').value;
+  const customerName = document.getElementById('sms-customer-name').value.trim();
+  const customerId = document.getElementById('sms-customer-id').value;
+
+  if(!phone){toast('전화번호를 입력해주세요.','e');return;}
+  if(!content){toast('메시지 내용을 입력해주세요.','e');return;}
+
+  // 1. 이미지 다운로드 (브라우저에서 이미지 다운로드 트리거)
+  if(imageUrl){
+    try{
+      // 새 탭에서 이미지 열기 (휴대폰 사용자가 길게 눌러 저장)
+      // 또는 다운로드 링크 자동 클릭
+      const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+      if(isMobile){
+        // 모바일: 이미지를 새 탭에서 열어서 길게 눌러 저장 유도
+        toast('📷 이미지가 새 탭에서 열립니다. 길게 눌러 휴대폰에 저장한 후 SMS 앱에서 첨부하세요!','i');
+        window.open(gdriveImgUrl(imageUrl), '_blank');
+        // 약간의 딜레이 후 SMS 앱 열기
+        await new Promise(r=>setTimeout(r, 800));
+      } else {
+        // PC: 이미지 다운로드
+        await downloadImageForSms(imageUrl);
+        toast('💾 이미지가 다운로드되었습니다. 휴대폰으로 이동해서 첨부해주세요!','s');
+      }
+    }catch(e){
+      console.warn('이미지 다운로드 실패:', e);
+    }
+  }
+
+  // 2. SMS URL 스킴으로 SMS 앱 열기
+  // iOS: sms:NUMBER&body=... (& 사용)
+  // Android: sms:NUMBER?body=... (? 사용)
+  // 양쪽 호환: smsto: (좀 더 안정적)
+  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const isAndroid = /Android/i.test(navigator.userAgent);
+
+  let smsUrl;
+  if(isIOS){
+    smsUrl = `sms:${phone}&body=${encodeURIComponent(content)}`;
+  } else if(isAndroid){
+    smsUrl = `sms:${phone}?body=${encodeURIComponent(content)}`;
+  } else {
+    // PC: smsto: 시도 (호환성)
+    smsUrl = `sms:${phone}?body=${encodeURIComponent(content)}`;
+  }
+
+  // PC에서는 SMS 앱이 없으니 대안 안내
+  if(!isIOS && !isAndroid){
+    // 클립보드에 복사
+    try{
+      const text = `📱 SMS 발송 정보\n받는 번호: ${phone}\n${imageUrl?'이미지: '+imageUrl+'\n':''}\n메시지:\n${content}`;
+      await navigator.clipboard.writeText(text);
+      toast('📋 메시지가 클립보드에 복사되었습니다. 휴대폰에서 SMS 앱을 열고 붙여넣기하세요!','s');
+    }catch(e){
+      // 클립보드 실패 시 직접 표시
+      prompt('📱 이 내용을 복사해서 휴대폰 SMS 앱에 붙여넣으세요:', content);
+    }
+  } else {
+    // 모바일: SMS 앱 열기
+    window.location.href = smsUrl;
+  }
+
+  // 3. 발송 이력 기록 (백그라운드)
+  try{
+    const tplTitle = '';  // 어떤 템플릿 썼는지는 안 보냄 (단순화)
+    await api('logSmsSend', {
+      sender: CU.name,
+      customerName: customerName,
+      phone: phone,
+      templateTitle: tplTitle,
+      content: content,
+      imageUrl: imageUrl,
+      customerId: customerId,
+    });
+    // 고객 목록 새로고침 (마지막컨택 업데이트 반영)
+    if(customerId){
+      await loadCustomers();
+      if(document.getElementById('s-customers') && document.getElementById('s-customers').classList.contains('active')){
+        renderCustomersList();
+      }
+    }
+  }catch(e){console.warn('이력 기록 실패:', e);}
+
+  closeM('m-sms-send');
+}
+
+// 이미지 다운로드 (PC용)
+async function downloadImageForSms(url){
+  try{
+    const response = await fetch(gdriveImgUrl(url));
+    const blob = await response.blob();
+    const dlUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = dlUrl;
+    a.download = 'sms_image_' + Date.now() + '.jpg';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(dlUrl);
+  }catch(e){
+    // CORS 등으로 실패 시 새 탭에서 열기
+    window.open(gdriveImgUrl(url), '_blank');
+  }
+}
+
+// ═══ 템플릿 관리 ═══════════════════════════════════════════
+let currentTplMgrTab = '공통';
+
+function openSmsTemplateMgrModal(){
+  currentTplMgrTab = '공통';
+  renderTemplateMgrList();
+  openM('m-sms-template-mgr');
+}
+
+function switchTplMgrTab(type){
+  currentTplMgrTab = type;
+  document.querySelectorAll('.tpl-mgr-tab').forEach(b=>{
+    if(b.dataset.type===type){
+      b.classList.add('active');
+      b.style.background='var(--surface)';
+      b.style.color='var(--text)';
+      b.style.fontWeight='600';
+    } else {
+      b.classList.remove('active');
+      b.style.background='none';
+      b.style.color='var(--text-2)';
+      b.style.fontWeight='500';
+    }
+  });
+  renderTemplateMgrList();
+}
+
+function renderTemplateMgrList(){
+  const isAdmin = CU.name===ADMIN_NAME;
+  const list = currentTplMgrTab === '공통'
+    ? SMS_TEMPLATES.filter(t=>t['구분']==='공통')
+    : SMS_TEMPLATES.filter(t=>t['구분']==='개인' && t['등록자']===CU.name);
+
+  const info = currentTplMgrTab === '공통'
+    ? '🌐 공통 템플릿은 모든 직원이 사용할 수 있습니다. ' + (isAdmin?'(관리자: 자유 편집 가능)':'(편집은 관리자에게 요청)')
+    : '👤 개인 템플릿은 본인만 보이고 사용할 수 있습니다';
+  document.getElementById('tpl-mgr-type-info').textContent = info;
+
+  const div = document.getElementById('tpl-mgr-list');
+  if(!list.length){
+    div.innerHTML = '<div class="empty" style="padding:24px"><div class="empty-icon">📝</div><div class="empty-title">등록된 템플릿이 없습니다</div></div>';
+    return;
+  }
+  div.innerHTML = list.map(t=>{
+    const canEdit = currentTplMgrTab==='개인' || isAdmin;
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:6px">
+      ${t['이미지URL']?`<img loading="lazy" src="${gdriveImgUrl(t['이미지URL'])}" referrerpolicy="no-referrer" style="width:40px;height:40px;object-fit:cover;border-radius:6px;background:#f5f5f5;flex-shrink:0" onerror="this.style.display='none'">`:'<div style="width:40px;height:40px;background:var(--surface-2);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px">💬</div>'}
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:700;margin-bottom:2px">${t['제목']||'-'}</div>
+        <div style="font-size:10px;color:var(--text-3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:480px">${(t['내용']||'').substring(0,80)}</div>
+      </div>
+      ${canEdit
+        ? `<button class="btn btn-secondary btn-sm" onclick="openTemplateEditModal('${t['템플릿ID']}')">수정</button>`
+        : `<span style="font-size:10px;color:var(--text-3);padding:0 10px">읽기 전용</span>`
+      }
+    </div>`;
+  }).join('');
+}
+
+// 템플릿 편집 모달
+function openTemplateEditModal(id){
+  const isAdmin = CU.name===ADMIN_NAME;
+  document.getElementById('m-template-edit-title').textContent = id ? '템플릿 수정' : '새 템플릿 추가';
+  document.getElementById('tpl-del-btn').style.display = id ? 'inline-flex' : 'none';
+
+  if(id){
+    const t = SMS_TEMPLATES.find(x=>x['템플릿ID']===id);
+    if(!t) return;
+    document.getElementById('tpl-id').value = id;
+    document.getElementById('tpl-type').value = t['구분']||'개인';
+    document.getElementById('tpl-title').value = t['제목']||'';
+    document.getElementById('tpl-content').value = t['내용']||'';
+    document.getElementById('tpl-image-url').value = t['이미지URL']||'';
+    if(t['이미지URL']){
+      document.getElementById('tpl-image-thumb').src = gdriveImgUrl(t['이미지URL']);
+      document.getElementById('tpl-image-thumb').referrerPolicy = 'no-referrer';
+      document.getElementById('tpl-image-preview').style.display = 'inline-block';
+    } else {
+      document.getElementById('tpl-image-preview').style.display = 'none';
+    }
+  } else {
+    document.getElementById('tpl-id').value = '';
+    document.getElementById('tpl-type').value = currentTplMgrTab;
+    document.getElementById('tpl-title').value = '';
+    document.getElementById('tpl-content').value = '';
+    document.getElementById('tpl-image-url').value = '';
+    document.getElementById('tpl-image-preview').style.display = 'none';
+  }
+
+  // 공통 템플릿은 관리자만 등록/수정 가능
+  const typeSel = document.getElementById('tpl-type');
+  Array.from(typeSel.options).forEach(opt=>{
+    opt.disabled = (opt.value==='공통' && !isAdmin);
+  });
+
+  openM('m-template-edit');
+}
+
+async function uploadTplImage(input){
+  const file = input.files[0];
+  if(!file) return;
+  toast('이미지 업로드 중...','i');
+  try{
+    const url = await uploadToGoogleDrive(file);
+    document.getElementById('tpl-image-url').value = url;
+    document.getElementById('tpl-image-thumb').src = gdriveImgUrl(url);
+    document.getElementById('tpl-image-thumb').referrerPolicy = 'no-referrer';
+    document.getElementById('tpl-image-preview').style.display = 'inline-block';
+    toast('이미지 업로드 완료 ✅','s');
+  }catch(e){
+    toast('업로드 실패: '+e.message,'e');
+  }
+  input.value = '';
+}
+
+async function submitSmsTemplate(){
+  const id = document.getElementById('tpl-id').value;
+  const isAdmin = CU.name===ADMIN_NAME;
+  const p = {
+    id,
+    type: document.getElementById('tpl-type').value,
+    title: document.getElementById('tpl-title').value.trim(),
+    content: document.getElementById('tpl-content').value.trim(),
+    imageUrl: document.getElementById('tpl-image-url').value,
+    author: CU.name,
+  };
+  if(!p.title){toast('템플릿 제목은 필수입니다.','e');return;}
+  if(!p.content){toast('메시지 내용은 필수입니다.','e');return;}
+  if(p.type==='공통' && !isAdmin){toast('공통 템플릿은 관리자만 등록 가능합니다.','e');return;}
+
+  const btn = document.getElementById('tpl-save-btn');
+  btn.disabled = true; btn.textContent = '저장 중...';
+  try{
+    const r = await api(id ? 'updateSmsTemplate' : 'addSmsTemplate', p);
+    toast(r.message, 's');
+    closeM('m-template-edit');
+    await loadSmsTemplates();
+    renderTemplateMgrList();
+    // SMS 발송 모달이 열려있으면 템플릿 다시 렌더링
+    if(document.getElementById('m-sms-send').classList.contains('active')){
+      renderSmsTemplateTabs();
+    }
+  }catch(e){toast(e.message,'e');}
+  finally{btn.disabled=false; btn.textContent='저장';}
+}
+
+async function deleteSmsTemplate(){
+  const id = document.getElementById('tpl-id').value;
+  if(!id) return;
+  if(!confirm('이 템플릿을 삭제하시겠습니까?'))return;
+  try{
+    const r = await api('deleteSmsTemplate',{id});
+    toast(r.message,'s');
+    closeM('m-template-edit');
+    await loadSmsTemplates();
+    renderTemplateMgrList();
+  }catch(e){toast(e.message,'e');}
+}
+
+
+// ════ DB 관리 (고객 데이터) ════════════════════════════════
+let CUSTOMERS = [];
+let currentBatch = '';
+let selectedCustomerIds = new Set();
+
+async function initCustomersPage(){
+  const isAdmin = CU.name===ADMIN_NAME;
+  const canManage = canDo('manage_sales') || isAdmin;
+
+  // 관리자/권한자만 보이는 요소들
+  document.getElementById('cus-admin-actions').style.display = canManage ? 'flex' : 'none';
+  document.getElementById('cus-th-check').style.display = canManage ? '' : 'none';
+  document.getElementById('cus-mine-tab').style.display = canManage ? 'inline-flex' : 'none';
+  document.getElementById('cus-unassigned-tab').style.display = canManage ? 'inline-flex' : 'none';
+
+  // 일반 직원이면 처음에 "내 고객" 탭 활성화
+  if(!canManage){
+    currentBatch = 'mine';
+  } else {
+    currentBatch = '';
+  }
+
+  populateAssigneeSelects();
+
+  // 🚀 캐시 활용 - 5분 이내 재방문이면 재로드 안 함
+  if(!checkCache('customers') || !(CUSTOMERS && CUSTOMERS.length)){
+    await loadCustomers();
+    setCache('customers');
+  }
+  renderCustomersList();
+  updateBatchTabsUI();
+}
+
+async function loadCustomers(){
+  try{
+    const r = await api('getCustomers');
+    CUSTOMERS = r.data || [];
+  }catch(e){
+    CUSTOMERS = [];
+    toast('고객 데이터 로드 실패: '+e.message,'e');
+  }
+}
+
+function populateAssigneeSelects(){
+  const active = (emps||[]).filter(e=>e['상태']!=='퇴사');
+  const options = '<option value="">미배정</option>' +
+    active.map(e=>`<option value="${e['이름']}">${e['이름']}</option>`).join('');
+
+  ['cus-filter-assignee','cu-assignee','bulk-assignee'].forEach(id=>{
+    const sel = document.getElementById(id);
+    if(sel){
+      const cur = sel.value;
+      // 필터에는 "전체" 옵션도 추가
+      if(id==='cus-filter-assignee'){
+        sel.innerHTML = '<option value="">전체</option>' + options;
+      } else {
+        sel.innerHTML = options;
+      }
+      sel.value = cur;
+    }
+  });
+
+  // 분배 모달 직원 체크박스
+  const distList = document.getElementById('dist-emp-list');
+  if(distList){
+    distList.innerHTML = active.map(e=>`
+      <label style="display:flex;align-items:center;gap:6px;padding:6px 8px;background:var(--surface);border:1px solid var(--border);border-radius:6px;cursor:pointer">
+        <input type="checkbox" data-emp="${e['이름']}" checked style="width:14px;height:14px;cursor:pointer;accent-color:var(--purple)">
+        <span style="font-size:12px">${e['이름']}</span>
+      </label>
+    `).join('');
+  }
+}
+
+// 회차 탭 전환
+function switchBatch(batch){
+  currentBatch = batch;
+  selectedCustomerIds.clear();
+  document.getElementById('cus-select-all').checked = false;
+  updateBatchTabsUI();
+  renderCustomersList();
+}
+
+function updateBatchTabsUI(){
+  document.querySelectorAll('.cus-batch-tab').forEach(b=>{
+    const isActive = b.dataset.batch === currentBatch;
+    if(isActive){
+      b.classList.add('active');
+      b.style.background = 'var(--surface)';
+      b.style.color = b.dataset.batch==='mine' ? 'var(--info)' :
+                      b.dataset.batch==='unassigned' ? 'var(--warn)' : 'var(--text)';
+      b.style.fontWeight = '600';
+      b.style.boxShadow = 'var(--shadow)';
+    } else {
+      b.classList.remove('active');
+      b.style.background = 'none';
+      b.style.color = b.dataset.batch==='mine' ? 'var(--info)' :
+                      b.dataset.batch==='unassigned' ? 'var(--warn)' : 'var(--text-2)';
+      b.style.fontWeight = '500';
+      b.style.boxShadow = 'none';
+    }
+  });
+}
+
+// 필터링된 고객 목록 반환
+function getFilteredCustomers(){
+  const isAdmin = CU.name===ADMIN_NAME;
+  const canManage = canDo('manage_sales') || isAdmin;
+  let list = CUSTOMERS.slice();
+
+  // 권한별 기본 필터링
+  if(!canManage){
+    // 일반 직원은 본인 것만
+    list = list.filter(r=>r['담당자']===CU.name);
+  } else {
+    // 회차 탭 필터
+    if(currentBatch === 'mine'){
+      list = list.filter(r=>r['담당자']===CU.name);
+    } else if(currentBatch === 'unassigned'){
+      list = list.filter(r=>!r['담당자']);
+    } else if(currentBatch){
+      list = list.filter(r=>r['회차']===currentBatch);
+    }
+
+    // 담당자 추가 필터
+    const assignee = document.getElementById('cus-filter-assignee').value;
+    if(assignee) list = list.filter(r=>r['담당자']===assignee);
+  }
+
+  // 공통 필터
+  const status = document.getElementById('cus-filter-status').value;
+  if(status) list = list.filter(r=>r['상태']===status);
+  const search = (document.getElementById('cus-filter-search').value||'').toLowerCase().trim();
+  if(search){
+    list = list.filter(r=>
+      (r['고객명']||'').toLowerCase().includes(search) ||
+      (r['연락처']||'').toLowerCase().includes(search) ||
+      (r['계약번호']||'').toLowerCase().includes(search) ||
+      (r['제품명']||'').toLowerCase().includes(search)
+    );
+  }
+  return list;
+}
+
+function renderCustomersList(){
+  const isAdmin = CU.name===ADMIN_NAME;
+  const canManage = canDo('manage_sales') || isAdmin;
+  const list = getFilteredCustomers();
+
+  // 통계
+  document.getElementById('cus-stat-total').textContent = list.length;
+  document.getElementById('cus-stat-before').textContent = list.filter(r=>r['상태']==='연락전').length;
+  document.getElementById('cus-stat-during').textContent = list.filter(r=>r['상태']==='연락중').length;
+  document.getElementById('cus-stat-done').textContent = list.filter(r=>r['상태']==='완료').length;
+
+  document.getElementById('cus-sub').textContent = '전체 '+list.length+'명';
+
+  const tb = document.getElementById('cus-tbody');
+  if(!list.length){
+    tb.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:30px;color:var(--text-3)">📭 표시할 고객이 없습니다</td></tr>';
+    updateBulkButtonsState();
+    return;
+  }
+
+  const statusBadge = (s)=>{
+    if(s==='연락전') return '<span class="badge" style="background:#f3f4f6;color:#6B7280">⚪ 연락전</span>';
+    if(s==='연락중') return '<span class="badge by">🟡 연락중</span>';
+    if(s==='완료')   return '<span class="badge bg">✅ 완료</span>';
+    if(s==='제외')   return '<span class="badge" style="background:var(--danger-light);color:var(--danger)">❌ 제외</span>';
+    return s||'-';
+  };
+
+  tb.innerHTML = list.map(c=>{
+    const checked = selectedCustomerIds.has(c['고객ID']) ? 'checked' : '';
+    const checkCell = canManage
+      ? `<td><input type="checkbox" class="cus-row-check" data-id="${c['고객ID']}" ${checked} onchange="toggleCustomerSelect('${c['고객ID']}',this.checked)" style="cursor:pointer"></td>`
+      : '<td style="display:none"></td>';
+    const memoShort = (c['메모']||'').length > 30 ? (c['메모']||'').substring(0,30)+'...' : (c['메모']||'');
+    return `<tr style="${!c['담당자']?'background:#FFFAEB':''}">
+      ${checkCell}
+      <td><span class="badge" style="background:var(--accent-light);color:var(--accent-2);font-size:10px">${c['회차']||'-'}</span></td>
+      <td style="font-weight:600">${c['고객명']||'-'}</td>
+      <td style="font-size:11px;color:var(--text-2);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${c['제품명']||''}">${c['제품명']||'-'}</td>
+      <td class="td-r td-g">${fm(c['렌탈료'])}</td>
+      <td class="td-m">${c['연락처']||'-'}</td>
+      <td class="td-m" style="font-size:10px">${c['최초컨택']||'-'}</td>
+      <td class="td-m" style="font-size:10px">${c['마지막컨택']||'-'}</td>
+      <td>${c['담당자'] ? `<span class="badge" style="background:var(--info-light,#DBEAFE);color:var(--info)">${c['담당자']}</span>` : '<span style="color:var(--warn);font-size:10px">미배정</span>'}</td>
+      <td>${statusBadge(c['상태'])}</td>
+      <td style="font-size:10px;color:var(--text-3);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${c['메모']||''}">${memoShort||'-'}</td>
+      <td><div style="display:flex;gap:3px">
+        <button class="btn btn-primary btn-sm" style="padding:3px 8px;font-size:10px;background:var(--info)" onclick="openSmsModal('${c['고객ID']}')" title="SMS 발송">📱</button>
+        <button class="btn btn-secondary btn-sm" onclick="openCustomerModal('${c['고객ID']}')">${canManage?'수정':'편집'}</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+
+  updateBulkButtonsState();
+}
+
+// 체크박스 관련
+function toggleSelectAll(checked){
+  const list = getFilteredCustomers();
+  if(checked){
+    list.forEach(c=>selectedCustomerIds.add(c['고객ID']));
+  } else {
+    selectedCustomerIds.clear();
+  }
+  document.querySelectorAll('.cus-row-check').forEach(cb=>cb.checked=checked);
+  updateBulkButtonsState();
+}
+
+function toggleCustomerSelect(id, checked){
+  if(checked) selectedCustomerIds.add(id);
+  else selectedCustomerIds.delete(id);
+  updateBulkButtonsState();
+}
+
+function updateBulkButtonsState(){
+  const count = selectedCustomerIds.size;
+  const btn = document.getElementById('cus-bulk-assign-btn');
+  const info = document.getElementById('cus-selected-count');
+  if(btn) btn.style.display = count > 0 ? 'inline-flex' : 'none';
+  if(info) info.textContent = count > 0 ? `${count}개 선택됨` : '';
+}
+
+// 고객 추가/수정 모달
+function openCustomerModal(id){
+  const isAdmin = CU.name===ADMIN_NAME;
+  const canManage = canDo('manage_sales') || isAdmin;
+  document.getElementById('m-customer-title').textContent = id ? '고객 정보 수정' : '고객 추가';
+  document.getElementById('cu-del-btn').style.display = (id && canManage) ? 'inline-flex' : 'none';
+
+  // 일반 직원은 일부 필드만 수정 가능
+  const editableFields = ['cu-first','cu-last','cu-status','cu-memo','cu-phone'];
+  const readonlyFields = ['cu-batch','cu-contract','cu-name','cu-duration','cu-install','cu-product','cu-rental','cu-assignee'];
+
+  // 권한에 따라 필드 활성화
+  ['cu-batch','cu-contract','cu-name','cu-duration','cu-install','cu-product','cu-rental','cu-assignee'].forEach(f=>{
+    const el = document.getElementById(f);
+    if(el) el.disabled = !canManage && id; // 신규는 자유, 수정 시는 권한 필요
+  });
+
+  // 담당자 필드 표시 (관리자만)
+  document.getElementById('cu-mgr-fields').style.display = canManage ? 'grid' : 'none';
+  populateAssigneeSelects();
+
+  if(id){
+    const c = CUSTOMERS.find(x=>x['고객ID']===id);
+    if(!c) return;
+    document.getElementById('cu-id').value = id;
+    document.getElementById('cu-batch').value = c['회차']||'36회차';
+    document.getElementById('cu-contract').value = c['계약번호']||'';
+    document.getElementById('cu-name').value = c['고객명']||'';
+    document.getElementById('cu-phone').value = c['연락처']||'';
+    document.getElementById('cu-duration').value = c['의무사용기간']||'';
+    document.getElementById('cu-install').value = c['설치일자']||'';
+    document.getElementById('cu-product').value = c['제품명']||'';
+    document.getElementById('cu-rental').value = c['렌탈료']||'';
+    document.getElementById('cu-assignee').value = c['담당자']||'';
+    document.getElementById('cu-status').value = c['상태']||'연락전';
+    document.getElementById('cu-first').value = c['최초컨택']||'';
+    document.getElementById('cu-last').value = c['마지막컨택']||'';
+    document.getElementById('cu-memo').value = c['메모']||'';
+  } else {
+    ['cu-id','cu-contract','cu-name','cu-phone','cu-install','cu-product','cu-rental','cu-first','cu-last','cu-memo'].forEach(f=>document.getElementById(f).value='');
+    document.getElementById('cu-batch').value = currentBatch && ['36회차','47회차','55회차'].includes(currentBatch) ? currentBatch : '36회차';
+    document.getElementById('cu-duration').value = '36개월';
+    document.getElementById('cu-assignee').value = '';
+    document.getElementById('cu-status').value = '연락전';
+  }
+  openM('m-customer');
+}
+
+async function submitCustomer(){
+  const id = document.getElementById('cu-id').value;
+  const isAdmin = CU.name===ADMIN_NAME;
+  const canManage = canDo('manage_sales') || isAdmin;
+
+  const p = {
+    id,
+    batch: document.getElementById('cu-batch').value,
+    contractNo: document.getElementById('cu-contract').value.trim(),
+    customerName: document.getElementById('cu-name').value.trim(),
+    duration: document.getElementById('cu-duration').value,
+    installDate: document.getElementById('cu-install').value,
+    product: document.getElementById('cu-product').value,
+    rental: document.getElementById('cu-rental').value || 0,
+    phone: document.getElementById('cu-phone').value,
+    status: document.getElementById('cu-status').value,
+    firstContact: document.getElementById('cu-first').value,
+    lastContact: document.getElementById('cu-last').value,
+    memo: document.getElementById('cu-memo').value,
+  };
+  // 담당자는 관리자만 수정 가능
+  if(canManage) p.assignee = document.getElementById('cu-assignee').value;
+
+  if(!p.customerName){toast('고객명은 필수입니다.','e');return;}
+  if(!id && !p.contractNo){toast('계약번호는 필수입니다.','e');return;}
+
+  const btn = document.getElementById('cu-save-btn');
+  btn.disabled = true; btn.textContent = '저장 중...';
+  try{
+    const r = await api(id ? 'updateCustomer' : 'addCustomer', p);
+    toast(r.message, 's');
+    closeM('m-customer');
+    await loadCustomers();
+    renderCustomersList();
+  }catch(e){
+    toast(e.message, 'e');
+  }finally{
+    btn.disabled=false; btn.textContent='저장';
+  }
+}
+
+async function delCustomer(){
+  const id = document.getElementById('cu-id').value;
+  if(!id) return;
+  if(!confirm('이 고객을 완전히 삭제하시겠습니까?'))return;
+  try{
+    const r = await api('deleteCustomer',{id});
+    toast(r.message,'s');
+    closeM('m-customer');
+    await loadCustomers();
+    renderCustomersList();
+  }catch(e){toast(e.message,'e');}
+}
+
+// ─── 엑셀 업로드 ───
+async function importCustomersExcel(input){
+  const file = input.files[0];
+  if(!file) return;
+  if(!confirm(`"${file.name}"의 모든 시트를 가져옵니다.\\n\\n• 계약번호가 같은 고객은 정보 업데이트 (담당자/상태/메모는 유지)\\n• 새 계약번호는 추가\\n\\n진행할까요?`)){
+    input.value = ''; return;
+  }
+
+  toast('엑셀 파일 읽는 중...', 'i');
+  try{
+    const data = await file.arrayBuffer();
+    const workbook = XLSX.read(data, {type:'array', cellDates: true});
+
+    let totalAdded = 0, totalUpdated = 0;
+    const batchResults = [];
+
+    for(const sheetName of workbook.SheetNames){
+      const sheet = workbook.Sheets[sheetName];
+      const rows = XLSX.utils.sheet_to_json(sheet, {defval: '', raw: false});
+      if(!rows.length) continue;
+
+      // 시트명을 회차로 사용 (예: "36회차")
+      const batch = sheetName;
+
+      // 컬럼 매핑
+      const customers = rows.map(r=>{
+        // 다양한 컬럼명 매핑 시도
+        const get = (...keys)=>{
+          for(const k of keys){
+            if(r[k] !== undefined && r[k] !== '') return String(r[k]).trim();
+          }
+          return '';
+        };
+        let installDate = get('설치일자','설치일');
+        // 엑셀 시리얼 날짜 변환 (예: 45085)
+        if(/^\d+$/.test(installDate) && Number(installDate) > 30000){
+          const excelDate = Number(installDate);
+          const d = new Date(Math.round((excelDate - 25569) * 86400 * 1000));
+          installDate = ymd(d);
+        } else if(installDate && installDate.includes('-') && installDate.length >= 10){
+          // YYYY-MM-DD 형식 이미 있음
+          installDate = installDate.substring(0,10);
+        }
+        return {
+          batch: batch,
+          contractNo: get('계약번호'),
+          customerName: get('고객명','고객','이름'),
+          duration: get('의무사용기간','의무기간'),
+          installDate: installDate,
+          product: get('제품명','제품'),
+          rental: get('렌탈료','렌탈비'),
+          firstContact: get('최초컨택','첫컨택'),
+          lastContact: get('마지막컨택','최종컨택'),
+          phone: get('연락처','전화번호','전화'),
+        };
+      }).filter(c=>c.contractNo); // 계약번호 없는 건 제외
+
+      if(!customers.length) continue;
+
+      toast(`${batch} 업로드 중... (${customers.length}건)`, 'i');
+      const r = await api('importCustomers', {customers, batch});
+      if(r.ok === false){
+        toast(`${batch} 가져오기 실패: ${r.error}`, 'e');
+        continue;
+      }
+      totalAdded += (r.added||0);
+      totalUpdated += (r.updated||0);
+      batchResults.push({batch, added: r.added||0, updated: r.updated||0});
+    }
+
+    // 결과 표시
+    const resultHtml = `
+      <div style="text-align:center;padding:14px">
+        <div style="font-size:32px;margin-bottom:10px">✅</div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:14px">엑셀 가져오기 완료!</div>
+        <div style="background:var(--accent-light);border-radius:8px;padding:12px;margin-bottom:14px;text-align:left">
+          <div style="font-size:11px;color:var(--text-2);margin-bottom:6px">전체 결과</div>
+          <div style="font-size:13px"><strong style="color:var(--accent-2)">신규 ${totalAdded}명</strong> 추가, <strong style="color:var(--info)">${totalUpdated}명</strong> 정보 업데이트</div>
+        </div>
+        ${batchResults.map(b=>`
+          <div style="display:flex;justify-content:space-between;padding:6px 12px;border-bottom:1px solid var(--border);font-size:12px">
+            <span style="font-weight:600">${b.batch}</span>
+            <span><span style="color:var(--accent-2)">+${b.added}</span> · <span style="color:var(--info)">↻${b.updated}</span></span>
+          </div>
+        `).join('')}
+      </div>`;
+    document.getElementById('import-result-content').innerHTML = resultHtml;
+    openM('m-import-result');
+
+    await loadCustomers();
+    renderCustomersList();
+  }catch(e){
+    toast('엑셀 처리 실패: '+e.message, 'e');
+  }
+  input.value = '';
+}
+
+// ─── 엑셀 다운로드 ───
+function downloadCustomersExcel(){
+  const list = getFilteredCustomers();
+  if(!list.length){toast('다운로드할 고객이 없습니다.','e');return;}
+
+  // 회차별로 시트 분리
+  const byBatch = {};
+  list.forEach(c=>{
+    const b = c['회차'] || '기타';
+    if(!byBatch[b]) byBatch[b] = [];
+    byBatch[b].push(c);
+  });
+
+  const wb = XLSX.utils.book_new();
+  Object.keys(byBatch).sort().forEach(batch=>{
+    const rows = byBatch[batch].map(c=>({
+      '계약번호': c['계약번호']||'',
+      '고객명': c['고객명']||'',
+      '의무사용기간': c['의무사용기간']||'',
+      '설치일자': c['설치일자']||'',
+      '제품명': c['제품명']||'',
+      '렌탈료': c['렌탈료']||'',
+      '최초컨택': c['최초컨택']||'',
+      '마지막컨택': c['마지막컨택']||'',
+      '연락처': c['연락처']||'',
+      '담당자': c['담당자']||'',
+      '상태': c['상태']||'',
+      '메모': c['메모']||'',
+    }));
+    const ws = XLSX.utils.json_to_sheet(rows);
+    XLSX.utils.book_append_sheet(wb, ws, batch);
+  });
+
+  const fileName = `고객데이터_${ymd(new Date())}.xlsx`;
+  XLSX.writeFile(wb, fileName);
+  toast(`📥 ${fileName} 다운로드 완료`,'s');
+}
+
+// ─── 일괄 분배 ───
+function openDistributeModal(){
+  populateAssigneeSelects();
+  document.getElementById('dist-preview').style.display='none';
+  openM('m-distribute');
+}
+
+function distSelectAll(checked){
+  document.querySelectorAll('#dist-emp-list input[type=checkbox]').forEach(cb=>cb.checked=checked);
+}
+
+async function submitDistribute(){
+  const batch = document.getElementById('dist-batch').value;
+  const onlyUnassigned = document.getElementById('dist-only-unassigned').checked;
+  const selected = Array.from(document.querySelectorAll('#dist-emp-list input[type=checkbox]:checked'))
+    .map(cb=>cb.dataset.emp);
+
+  if(!selected.length){toast('분배 받을 직원을 1명 이상 선택해주세요.','e');return;}
+
+  // 대상 고객 수 미리 계산
+  let target = CUSTOMERS.slice();
+  if(batch) target = target.filter(r=>r['회차']===batch);
+  if(onlyUnassigned) target = target.filter(r=>!r['담당자']);
+
+  if(!target.length){toast('분배 대상 고객이 없습니다.','e');return;}
+
+  const msg = onlyUnassigned
+    ? `미배정 고객 ${target.length}명을 ${selected.length}명의 직원에게 균등 분배합니다.\\n\\n각자 약 ${Math.ceil(target.length/selected.length)}명씩 받게 됩니다.\\n계속하시겠습니까?`
+    : `⚠️ 전체 ${target.length}명의 담당자를 새로 배정합니다.\\n기존 담당자 정보가 모두 덮어쓰여집니다!\\n\\n각자 약 ${Math.ceil(target.length/selected.length)}명씩 받게 됩니다.\\n계속하시겠습니까?`;
+
+  if(!confirm(msg))return;
+
+  const btn = document.getElementById('dist-save-btn');
+  btn.disabled = true; btn.textContent = '분배 중...';
+  try{
+    const r = await api('distributeCustomers', {batch, employees: selected, onlyUnassigned});
+    if(r.ok === false){toast(r.error || '분배 실패','e');return;}
+    toast(r.message, 's');
+    closeM('m-distribute');
+    await loadCustomers();
+    renderCustomersList();
+  }catch(e){
+    toast('분배 실패: '+e.message,'e');
+  }finally{
+    btn.disabled=false; btn.textContent='🎯 분배 실행';
+  }
+}
+
+// ─── 일괄 담당자 변경 ───
+function openBulkAssignModal(){
+  const count = selectedCustomerIds.size;
+  if(count === 0){toast('변경할 고객을 선택해주세요.','e');return;}
+  document.getElementById('bulk-assign-count').innerHTML = `<strong>${count}명</strong>의 고객 담당자를 일괄 변경합니다`;
+  populateAssigneeSelects();
+  document.getElementById('bulk-assignee').value = '';
+  openM('m-bulk-assign');
+}
+
+async function submitBulkAssign(){
+  const assignee = document.getElementById('bulk-assignee').value;
+  const ids = Array.from(selectedCustomerIds);
+  if(!ids.length){toast('선택된 고객이 없습니다.','e');return;}
+
+  const btn = document.getElementById('bulk-save-btn');
+  btn.disabled = true; btn.textContent = '변경 중...';
+  try{
+    const r = await api('bulkAssignCustomers', {ids, assignee});
+    toast(r.message, 's');
+    closeM('m-bulk-assign');
+    selectedCustomerIds.clear();
+    document.getElementById('cus-select-all').checked = false;
+    await loadCustomers();
+    renderCustomersList();
+  }catch(e){
+    toast('변경 실패: '+e.message,'e');
+  }finally{
+    btn.disabled=false; btn.textContent='담당자 변경';
+  }
+}
+
+
 // ════ Phase 1: 대시보드 확장 ═══════════════════════════════
 let NOTICES = [], REFRESHES = [], PARTNER_CARDS = [], PROMOTIONS = [];
 
@@ -4430,7 +6271,7 @@ function renderRefreshes(){
       <!-- 좌: 이미지 -->
       <div style="position:relative;background:#f5f5f5;display:flex;align-items:center;justify-content:center;overflow:hidden">
         ${r['이미지URL']
-          ? `<img src="${gdriveImgUrl(r['이미지URL'])}" referrerpolicy="no-referrer" style="width:100%;height:100%;object-fit:cover;cursor:pointer" onclick="window.open('${r['이미지URL']}','_blank')" onerror="this.parentElement.innerHTML='<div style=\'width:100%;height:100%;background:linear-gradient(135deg,#1D9E75 0%,#0F6E56 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-size:48px\'>🎉</div>'">`
+          ? `<img loading="lazy" src="${gdriveImgUrl(r['이미지URL'])}" referrerpolicy="no-referrer" style="width:100%;height:100%;object-fit:cover;cursor:pointer" onclick="window.open('${r['이미지URL']}','_blank')" onerror="this.parentElement.innerHTML='<div style=\'width:100%;height:100%;background:linear-gradient(135deg,#1D9E75 0%,#0F6E56 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-size:48px\'>🎉</div>'">`
           : '<div style="width:100%;height:100%;background:linear-gradient(135deg,#1D9E75 0%,#0F6E56 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-size:48px">🎉</div>'
         }
         ${hasMultiple ? `
@@ -4486,7 +6327,7 @@ function openRefreshModal(id){
     document.getElementById('rf-memo').value = r['메모']||'';
     document.getElementById('rf-image-url').value = r['이미지URL']||'';
     document.getElementById('rf-image-preview').innerHTML = r['이미지URL']
-      ? `<img src="${gdriveImgUrl(r['이미지URL'])}" referrerpolicy="no-referrer" style="max-width:200px;border-radius:6px">` : '';
+      ? `<img loading="lazy" src="${gdriveImgUrl(r['이미지URL'])}" referrerpolicy="no-referrer" style="max-width:200px;border-radius:6px">` : '';
   } else {
     ['rf-id','rf-title','rf-datetime','rf-place','rf-menu','rf-memo','rf-image-url'].forEach(f=>document.getElementById(f).value='');
     document.getElementById('rf-image-preview').innerHTML = '';
@@ -4502,7 +6343,7 @@ async function uploadRefreshImage(input){
   try{
     const url = await uploadToGoogleDrive(file);
     document.getElementById('rf-image-url').value = url;
-    preview.innerHTML = `<img src="${gdriveImgUrl(url)}" referrerpolicy="no-referrer" style="max-width:200px;border-radius:6px"> <button class="btn btn-secondary btn-sm" style="margin-left:8px" onclick="document.getElementById('rf-image-url').value='';this.parentElement.innerHTML='';">제거</button>`;
+    preview.innerHTML = `<img loading="lazy" src="${gdriveImgUrl(url)}" referrerpolicy="no-referrer" style="max-width:200px;border-radius:6px"> <button class="btn btn-secondary btn-sm" style="margin-left:8px" onclick="document.getElementById('rf-image-url').value='';this.parentElement.innerHTML='';">제거</button>`;
     toast('이미지 업로드 완료 ✅','s');
   }catch(e){
     preview.innerHTML = '<div style="font-size:11px;color:var(--danger)">업로드 실패: '+e.message+'</div>';
@@ -4593,7 +6434,7 @@ async function uploadCardFile(input){
     document.getElementById('cd-file-url').value = url;
     const isImage = file.type.startsWith('image/');
     preview.innerHTML = isImage
-      ? `<img src="${gdriveImgUrl(url)}" referrerpolicy="no-referrer" style="max-width:200px;border-radius:6px">`
+      ? `<img loading="lazy" src="${gdriveImgUrl(url)}" referrerpolicy="no-referrer" style="max-width:200px;border-radius:6px">`
       : `<div style="font-size:11px;color:var(--text-2)">📄 ${file.name}</div>`;
     toast('파일 업로드 완료 ✅','s');
   }catch(e){
@@ -4765,7 +6606,7 @@ async function uploadPromoFile(input){
     document.getElementById('pm-file-url').value = url;
     const isImage = file.type.startsWith('image/');
     preview.innerHTML = isImage
-      ? `<img src="${gdriveImgUrl(url)}" referrerpolicy="no-referrer" style="max-width:200px;border-radius:6px">`
+      ? `<img loading="lazy" src="${gdriveImgUrl(url)}" referrerpolicy="no-referrer" style="max-width:200px;border-radius:6px">`
       : `<div style="font-size:11px;color:var(--text-2)">📄 ${file.name}</div>`;
     toast('파일 업로드 완료 ✅','s');
   }catch(e){
