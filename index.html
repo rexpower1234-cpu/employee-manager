@@ -749,9 +749,10 @@ tbody td{padding:9px 12px;vertical-align:middle}
     <div class="section" id="s-sales">
       <!-- 탭 -->
       <div style="display:flex;gap:4px;margin-bottom:14px;background:var(--surface-2);border-radius:8px;padding:3px;width:fit-content">
-        <button class="sales-tab active" data-tab="branch" onclick="switchSalesTab('branch')" style="padding:7px 16px;border:none;background:var(--surface);font-size:12px;font-weight:600;cursor:pointer;border-radius:6px;font-family:var(--font);color:var(--text);box-shadow:var(--shadow)">📊 지국 매출</button>
+        <button class="sales-tab active" data-tab="total" onclick="switchSalesTab('total')" style="padding:7px 16px;border:none;background:var(--surface);font-size:12px;font-weight:600;cursor:pointer;border-radius:6px;font-family:var(--font);color:var(--text);box-shadow:var(--shadow)">📈 총합계</button>
+        <button class="sales-tab" data-tab="branch" onclick="switchSalesTab('branch')" style="padding:7px 16px;border:none;background:none;font-size:12px;font-weight:500;cursor:pointer;border-radius:6px;font-family:var(--font);color:var(--text-2)">📊 지국 매출</button>
         <button class="sales-tab" data-tab="dealer" onclick="switchSalesTab('dealer')" style="padding:7px 16px;border:none;background:none;font-size:12px;font-weight:500;cursor:pointer;border-radius:6px;font-family:var(--font);color:var(--text-2)">🏢 총판 매출</button>
-        <button class="sales-tab" data-tab="total" onclick="switchSalesTab('total')" style="padding:7px 16px;border:none;background:none;font-size:12px;font-weight:500;cursor:pointer;border-radius:6px;font-family:var(--font);color:var(--text-2)">📈 총합계</button>
+        <button class="sales-tab" id="tab-verify" data-tab="verify" onclick="switchSalesTab('verify')" style="padding:7px 16px;border:none;background:none;font-size:12px;font-weight:500;cursor:pointer;border-radius:6px;font-family:var(--font);color:var(--purple);display:none">🔐 검증용</button>
       </div>
 
       <div class="fbar">
@@ -784,7 +785,7 @@ tbody td{padding:9px 12px;vertical-align:middle}
                   <th>지급율<br>(툴별)</th><th>툴별<br>추가수수료</th>
                   <th>추가수수료<br>(사업장)</th><th>추가수수료<br>(개인)</th>
                   <th>판매활성화<br>(사업장)</th><th>셀프</th>
-                  <th>최종수수료</th><th>판매인</th>
+                  <th>최종수수료</th><th id="seller-col-th" style="display:none">판매인</th>
                   <th id="verify-margin-th" style="background:#6B4EE6;display:none">검증<br>마진</th>
                   <th style="background:#0F6E56">관리</th>
                 </tr>
@@ -1311,7 +1312,7 @@ tbody td{padding:9px 12px;vertical-align:middle}
           <input type="hidden" id="sf-self">
         </div>
         <div class="fgroup"><label class="flabel">최종수수료</label><input class="fc" id="sf-final" type="number" placeholder="자동계산" readonly style="background:var(--accent-light);font-weight:700"></div>
-        <div class="fgroup"><label class="flabel">판매인<span class="req">*</span></label><select class="fc" id="sf-seller"><option value="">선택</option></select></div>
+        <div class="fgroup" id="sf-seller-group"><label class="flabel">판매인<span class="req">*</span> <span style="font-size:9px;color:var(--text-3)">(대리입력)</span></label><select class="fc" id="sf-seller"><option value="">선택</option></select></div>
         <input type="hidden" id="sf-real-seller"><input type="hidden" id="sf-perf">
         <div class="fgroup"><label class="flabel">사업자 여부</label><select class="fc" id="sf-biz-type" onchange="calcFee()"><option value="1">사업자</option><option value="0">개인</option></select></div>
       </div>
@@ -2316,6 +2317,7 @@ const PERM_KEYS = [
   {k:'view_employees',     label:'직원 관리 접근'},
   {k:'view_sales_all',     label:'전체 매출 보기 (모든 판매인)'},
   {k:'manage_sales',       label:'매출 수정/삭제'},
+  {k:'manage_sales_proxy', label:'🧾 매출 대리입력 (판매인 지정)'},
   {k:'view_salary_all',    label:'전체 급여 보기'},
   {k:'view_salary_self',   label:'본인 급여만 보기'},
   {k:'manage_salary',      label:'급여 계산 실행'},
@@ -2339,7 +2341,7 @@ const POSITION_LIST = ['총괄실장','영업부실장','용역부실장','영�
 // 프리셋 정의
 const PRESETS = {
   all: PERM_KEYS.reduce((o,p)=>{o[p.k]=true;return o;},{}),
-  manager: {view_dashboard_all:true,view_dash_emp_count:true,view_dash_total_sales:true,view_dash_total_comm:true,view_dash_ranking:true,view_dash_recent_sales:true,view_employees:true,view_sales_all:true,manage_sales:true,view_salary_all:true,view_attendance_all:true,view_inspection_all:true,manage_inspection:true,view_support_all:true,manage_support:true,view_calendar_all:true,manage_notice:true,manage_refresh:true,manage_menu:true,manage_cleaning:true,manage_partner_card:true,manage_promotion:true,manage_global_event:true},
+  manager: {view_dashboard_all:true,view_dash_emp_count:true,view_dash_total_sales:true,view_dash_total_comm:true,view_dash_ranking:true,view_dash_recent_sales:true,view_employees:true,view_sales_all:true,manage_sales:true,manage_sales_proxy:true,view_salary_all:true,view_attendance_all:true,view_inspection_all:true,manage_inspection:true,view_support_all:true,manage_support:true,view_calendar_all:true,manage_notice:true,manage_refresh:true,manage_menu:true,manage_cleaning:true,manage_partner_card:true,manage_promotion:true,manage_global_event:true},
   sales:   {view_sales_all:true,manage_sales:true,view_salary_self:true,view_dash_ranking:true,view_dash_recent_sales:true},
   service: {view_inspection_all:true,manage_inspection:true,view_salary_self:true},
   none:    {view_salary_self:true},
@@ -2603,7 +2605,9 @@ function applyRole(){
   // 급여 직원 필터 (전체 보기 권한 있을 때만)
   const payEmpWrap=document.getElementById('pay-emp-wrap');
   if(payEmpWrap) payEmpWrap.style.display = (canDo('view_salary_all')||isAdmin) ? 'flex' : 'none';
-  // (마감검증 탭은 제거됨 - 관리자는 모든 탭에서 마진 표시)
+  // 🔐 검증용 탭 (관리자만 표시)
+  const verifyTab=document.getElementById('tab-verify');
+  if(verifyTab) verifyTab.style.display = isAdmin ? '' : 'none';
 
   // Phase 1: 대시보드 추가 버튼 권한별 표시
   const btnNoticeDash = document.getElementById('btn-add-notice-dash');
@@ -2963,48 +2967,58 @@ async function loadSales(){
 function renderSales(list){
   const isAdmin = CU && CU.name === ADMIN_NAME;
   // 현재 탭에 따라 필터링
-  const tab = currentSalesTab||'branch';
+  const tab = currentSalesTab||'total';
   if(tab==='branch'){
     list = list.filter(r=>(r['출처']||'지국')==='지국');
   } else if(tab==='dealer'){
     list = list.filter(r=>r['출처']==='총판');
   }
-  // 'total'(총합계) 탭은 필터 없이 전체 표시
-  // 관리자는 항상 검증 마진 컬럼을 봄 (isVerify 역할)
-  const isVerify = isAdmin;
+  // 'total'(총합계) = 전체, 'verify'(검증용) = 전체 + 검증금액
+  // 검증용 탭에서만 검증마진 표시
+  const isVerify = (tab==='verify');
+  // 판매인 컬럼은 관리자 또는 대리입력 권한자만
+  const canSeeSeller = isAdmin || canDo('manage_sales_proxy');
 
-  // 합계는 권한별 최종수수료로 계산
+  // 합계 계산 (검증용 탭은 관리자 원본 기준, 그 외는 각자 권한 기준)
+  const useAdminCalc = isVerify;  // 검증용은 원본(50%상승) 금액
   let total = 0, totalMargin = 0;
   list.forEach(r=>{
-    const c = calcSaleCommission(r, isAdmin);
+    const c = calcSaleCommission(r, useAdminCalc);
     total += c.finalCommission;
     totalMargin += c.adminMargin;
   });
 
-  // 검증 마진 컬럼 표시/숨김 (관리자만)
+  // 검증 마진 컬럼 표시/숨김 (검증용 탭에서만)
   const marginTh = document.getElementById('verify-margin-th');
-  if(marginTh) marginTh.style.display = isAdmin ? '' : 'none';
+  if(marginTh) marginTh.style.display = isVerify ? '' : 'none';
+  // 판매인 컬럼 표시/숨김
+  const sellerTh = document.getElementById('seller-col-th');
+  if(sellerTh) sellerTh.style.display = canSeeSeller ? '' : 'none';
 
   // 합계
   document.getElementById('sale-sub').textContent=list.length+'건';
-  if(isAdmin){
-    document.getElementById('sale-total').innerHTML = `최종수수료 합계: ${fm(total)} | <span style="color:var(--purple)">관리자 마진 합계: ${fm(totalMargin)}</span>`;
+  if(isVerify){
+    document.getElementById('sale-total').innerHTML = `검증 최종수수료: ${fm(total)} | <span style="color:var(--purple)">검증 마진 합계: ${fm(totalMargin)}</span>`;
   } else {
     document.getElementById('sale-total').textContent=`최종수수료 합계: ${fm(total)}`;
   }
 
   const tb=document.getElementById('sale-tbody');
   const canEdit = isAdmin || canDo('manage_sales');
-  if(!list.length){tb.innerHTML='<tr><td colspan="21" style="text-align:center;padding:30px;color:var(--text-3)">데이터가 없습니다</td></tr>';renderSaleTfoot([],isVerify);return;}
+  const colspanCount = 20 + (canSeeSeller?1:0) + (isVerify?1:0);
+  if(!list.length){tb.innerHTML=`<tr><td colspan="${colspanCount}" style="text-align:center;padding:30px;color:var(--text-3)">데이터가 없습니다</td></tr>`;renderSaleTfoot([],isVerify);return;}
 
   tb.innerHTML=list.map(r=>{
     const sourceBadge = (r['출처']||'지국')==='총판'
       ? '<span class="badge bp">🏢 총판</span>'
       : '<span class="badge bg">📊 지국</span>';
-    // 권한별 계산 (직원=차감, 관리자=원본+검증)
-    const calc = calcSaleCommission(r, isAdmin);
-    const verifyCell = (isVerify || isAdmin)
+    // 검증용 탭이면 원본(50%상승) 계산, 아니면 각자 권한 기준
+    const calc = calcSaleCommission(r, useAdminCalc);
+    const verifyCell = isVerify
       ? `<td class="td-num" style="color:var(--purple);font-weight:700;background:rgba(107,78,230,.05)">${fmN(calc.adminMargin)}</td>`
+      : '';
+    const sellerCell = canSeeSeller
+      ? `<td>${r['판매인']||r['실판매인']||''}</td>`
       : '';
     return `<tr>
     <td>${sourceBadge}</td>
@@ -3026,11 +3040,11 @@ function renderSales(list){
     <td class="td-num td-g">${fmN(calc.activation)}</td>
     <td class="td-num td-red">${fmN(r['셀프'])}</td>
     <td class="td-num" style="color:var(--accent-2);font-weight:700">${fmN(calc.finalCommission)}</td>
-    <td>${r['판매인']||r['실판매인']||''}</td>
+    ${sellerCell}
     ${verifyCell}
     <td>${canEdit?`<div style="display:flex;gap:3px"><button class="btn btn-secondary btn-sm" onclick="openSaleModal('${r['매출ID']}')">수정</button><button class="btn btn-danger btn-sm" onclick="delSale('${r['매출ID']}')">삭제</button></div>`:'<span style="color:var(--text-3);font-size:10px">-</span>'}</td>
   </tr>`;}).join('');
-  renderSaleTfoot(list,isVerify);
+  renderSaleTfoot(list, isVerify, canSeeSeller, useAdminCalc);
 }
 
 // 지급율 표시 (배율 → %): 1.5 → "150%", 6 → "600%"
@@ -3119,13 +3133,10 @@ function calcVerifyMargin(r){
   return diff1 + diff2;
 }
 
-function renderSaleTfoot(list, isVerify){
-  const isAdmin = CU && CU.name === ADMIN_NAME;
-  // 19개 컬럼: 출처,고객번호,고객명,툴,모델명,상품명,의무,렌탈료,지급율기본,판매수수료1,
-  //           지급율재렌탈,판매수수료최종,지급율툴별,툴별추가,사업장추가,개인추가,판매활성화,셀프,최종수수료,판매인
+function renderSaleTfoot(list, isVerify, canSeeSeller, useAdminCalc){
   let rental=0, fee1=0, feeFinal=0, toolFee=0, biz=0, pers=0, activation=0, self=0, finalC=0, margin=0;
   list.forEach(r=>{
-    const c = calcSaleCommission(r, isAdmin);
+    const c = calcSaleCommission(r, useAdminCalc);
     rental += Number(r['렌탈료'])||0;
     fee1 += c.fee1; feeFinal += c.feeFinal; toolFee += c.toolFee;
     biz += Number(r['추가수수료(사업장)']||r['사업장추가수수료'])||0;
@@ -3142,9 +3153,9 @@ function renderSaleTfoot(list, isVerify){
     <td>-</td><td class="td-num">${f(toolFee)}</td>
     <td class="td-num">${f(biz)}</td><td class="td-num">${f(pers)}</td>
     <td class="td-num">${f(activation)}</td><td class="td-num">${f(self)}</td>
-    <td class="td-num" style="color:var(--accent-2)">${f(finalC)}</td>
-    <td>-</td>`;
-  if(isVerify || isAdmin){
+    <td class="td-num" style="color:var(--accent-2)">${f(finalC)}</td>`;
+  if(canSeeSeller) html += '<td>-</td>';
+  if(isVerify){
     html += `<td class="td-num" style="color:var(--purple)">${f(margin)}</td>`;
   }
   html += '<td></td></tr>';
@@ -3205,9 +3216,15 @@ function openSaleModal(id){
   const empOpts=emps.filter(e=>e['상태']!=='퇴사').map(e=>`<option value="${e['이름']}">${e['이름']}</option>`).join('');
   ['sf-real-seller','sf-seller'].forEach(elId=>{
     const sel=document.getElementById(elId);
-    sel.innerHTML='<option value="">선택</option>'+empOpts;
+    if(sel) sel.innerHTML='<option value="">선택</option>'+empOpts;
   });
   const setV=(id,val)=>{const el=document.getElementById(id);if(el)el.value=val;};
+
+  // 🧾 판매인 필드: 관리자 또는 대리입력 권한자만 표시
+  const isAdmin = CU && CU.name === ADMIN_NAME;
+  const canProxy = isAdmin || canDo('manage_sales_proxy');
+  const sellerGroup = document.getElementById('sf-seller-group');
+  if(sellerGroup) sellerGroup.style.display = canProxy ? '' : 'none';
   if(id){
     const r=sales.find(x=>x['매출ID']===id);if(!r)return;
     setV('sf-id',id);
@@ -3240,6 +3257,7 @@ function openSaleModal(id){
     setV('sf-product-type','정수기');
     const defaultSource = (currentSalesTab==='dealer')?'총판':'지국';
     setV('sf-source',defaultSource);
+    // 대리입력 권한 없으면 본인으로 고정, 있으면 선택 가능(기본 본인)
     setV('sf-seller',CU.name);
     setV('sf-real-seller',CU.name);
   }
@@ -3249,6 +3267,10 @@ function openSaleModal(id){
 async function submitSale(){
   const id=document.getElementById('sf-id').value;
   const g=(id)=>document.getElementById(id)?document.getElementById(id).value:'';
+  // 대리입력 권한 없으면 판매인은 무조건 본인
+  const isAdmin = CU && CU.name === ADMIN_NAME;
+  const canProxy = isAdmin || canDo('manage_sales_proxy');
+  const sellerName = canProxy ? (g('sf-seller')||CU.name) : CU.name;
   const p={
     id,
     출처:g('sf-source'),
@@ -3270,8 +3292,8 @@ async function submitSale(){
     제품종류:g('sf-product-type')||'정수기',
     셀프:g('sf-self'),
     최종수수료:g('sf-final'),
-    실판매인:g('sf-real-seller')||g('sf-seller'),
-    판매인:g('sf-seller'),
+    실판매인:sellerName,
+    판매인:sellerName,
     실적인정:g('sf-perf'),
     사업자:g('sf-biz-type'),
   };
@@ -3296,7 +3318,7 @@ function exportSales(){
   if(isAdmin) header.push('관리자마진');
   const rows=[header];
   // 현재 탭 필터 적용
-  const tab=currentSalesTab||'branch';
+  const tab=currentSalesTab||'total';
   let list=sales;
   if(tab==='branch') list=sales.filter(r=>(r['출처']||'지국')==='지국');
   else if(tab==='dealer') list=sales.filter(r=>r['출처']==='총판');
@@ -3846,7 +3868,11 @@ function actClick(){
 function openM(id){document.getElementById(id).classList.add('open');}
 function closeM(id){document.getElementById(id).classList.remove('open');}
 document.addEventListener('DOMContentLoaded',()=>{
-  document.querySelectorAll('.modal-overlay').forEach(el=>{el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');});});
+  document.querySelectorAll('.modal-overlay').forEach(el=>{el.addEventListener('click',e=>{
+    // 매출 입력 모달은 바깥 클릭으로 닫히지 않음 (실수 방지)
+    if(el.id==='m-sale') return;
+    if(e.target===el)el.classList.remove('open');
+  });});
 });
 
 // ══ 토스트 ══════════════════════════════════════════════════
@@ -4152,7 +4178,7 @@ async function deleteEvent(){
 
 
 // ════ 매출 관리 탭 전환 (지국/총판/마감검증) ══════════════════
-let currentSalesTab = 'branch';
+let currentSalesTab = 'total';
 
 function switchSalesTab(tab){
   currentSalesTab = tab;
@@ -4160,13 +4186,13 @@ function switchSalesTab(tab){
     if(b.dataset.tab===tab){
       b.classList.add('active');
       b.style.background='var(--surface)';
-      b.style.color = 'var(--text)';
+      b.style.color = (tab==='verify') ? 'var(--purple)' : 'var(--text)';
       b.style.fontWeight='600';
       b.style.boxShadow='var(--shadow)';
     } else {
       b.classList.remove('active');
       b.style.background='none';
-      b.style.color = 'var(--text-2)';
+      b.style.color = (b.dataset.tab==='verify') ? 'var(--purple)' : 'var(--text-2)';
       b.style.fontWeight='500';
       b.style.boxShadow='none';
     }
@@ -4177,11 +4203,11 @@ function switchSalesTab(tab){
   if(tab==='branch') cardTitle.textContent='📊 지국 매출 정리표';
   else if(tab==='dealer') cardTitle.textContent='🏢 총판 매출 정리표';
   else if(tab==='total') cardTitle.textContent='📈 총합계 (지국+총판)';
+  else if(tab==='verify') cardTitle.textContent='🔐 검증용 (50% 상승 · 검증마진)';
 
-  // 색상 처리: total 탭은 일반색
-  // 매출 입력 버튼은 total 탭에서도 표시
+  // 매출 입력 버튼은 검증용 탭에서 숨김
   const btnAdd = document.getElementById('btn-add-sale');
-  if(btnAdd) btnAdd.style.display = 'inline-flex';
+  if(btnAdd) btnAdd.style.display = (tab==='verify') ? 'none' : 'inline-flex';
 
   // 리렌더링
   renderSales(sales);
