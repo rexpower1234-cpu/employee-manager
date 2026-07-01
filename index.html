@@ -751,7 +751,7 @@ tbody td{padding:9px 12px;vertical-align:middle}
       <div style="display:flex;gap:4px;margin-bottom:14px;background:var(--surface-2);border-radius:8px;padding:3px;width:fit-content">
         <button class="sales-tab active" data-tab="branch" onclick="switchSalesTab('branch')" style="padding:7px 16px;border:none;background:var(--surface);font-size:12px;font-weight:600;cursor:pointer;border-radius:6px;font-family:var(--font);color:var(--text);box-shadow:var(--shadow)">📊 지국 매출</button>
         <button class="sales-tab" data-tab="dealer" onclick="switchSalesTab('dealer')" style="padding:7px 16px;border:none;background:none;font-size:12px;font-weight:500;cursor:pointer;border-radius:6px;font-family:var(--font);color:var(--text-2)">🏢 총판 매출</button>
-        <button class="sales-tab" id="tab-verify" data-tab="verify" onclick="switchSalesTab('verify')" style="padding:7px 16px;border:none;background:none;font-size:12px;font-weight:500;cursor:pointer;border-radius:6px;font-family:var(--font);color:var(--purple);display:none">🔐 마감 검증</button>
+        <button class="sales-tab" data-tab="total" onclick="switchSalesTab('total')" style="padding:7px 16px;border:none;background:none;font-size:12px;font-weight:500;cursor:pointer;border-radius:6px;font-family:var(--font);color:var(--text-2)">📈 총합계</button>
       </div>
 
       <div class="fbar">
@@ -776,16 +776,20 @@ tbody td{padding:9px 12px;vertical-align:middle}
             <table class="sales-table" id="sales-tbl">
               <thead>
                 <tr>
-                  <th>출처</th><th>고객번호</th><th>고객명</th><th>모델명</th><th>상품명</th>
-                  <th>의무</th><th>렌탈료</th><th>지급율(기본)%</th><th>판매수수료(기본)</th>
-                  <th>지급율(툴별)%</th><th>툴별&업소용 추가수수료</th><th>사업장 추가수수료</th>
-                  <th>개인고객 추가수수료</th><th>셀프</th><th>최종수수료</th>
-                  <th>실 판매인</th><th>판매인</th><th>사업자</th>
-                  <th id="verify-margin-th" style="background:#6B4EE6;display:none">검증 마진</th>
+                  <th>출처</th>
+                  <th>고객번호</th><th>고객명</th><th>툴</th><th>모델명</th><th>상품명</th>
+                  <th>의무</th><th>렌탈료</th>
+                  <th>지급율<br>(기본)</th><th>판매<br>수수료1</th>
+                  <th>지급율<br>(재렌탈)</th><th>판매수수료<br>(최종)</th>
+                  <th>지급율<br>(툴별)</th><th>툴별<br>추가수수료</th>
+                  <th>추가수수료<br>(사업장)</th><th>추가수수료<br>(개인)</th>
+                  <th>판매활성화<br>(사업장)</th><th>셀프</th>
+                  <th>최종수수료</th><th>판매인</th>
+                  <th id="verify-margin-th" style="background:#6B4EE6;display:none">검증<br>마진</th>
                   <th style="background:#0F6E56">관리</th>
                 </tr>
               </thead>
-              <tbody id="sale-tbody"><tr class="loading-row"><td colspan="19"><span class="spinner"></span> 불러오는 중...</td></tr></tbody>
+              <tbody id="sale-tbody"><tr class="loading-row"><td colspan="21"><span class="spinner"></span> 불러오는 중...</td></tr></tbody>
               <tfoot id="sale-tfoot"></tfoot>
             </table>
           </div>
@@ -1271,6 +1275,7 @@ tbody td{padding:9px 12px;vertical-align:middle}
         </div>
         <div class="fgroup full"><label class="flabel">고객번호</label><input class="fc" id="sf-cno" placeholder="1-01-260101-0000"></div>
         <div class="fgroup full"><label class="flabel">고객명<span class="req">*</span></label><input class="fc" id="sf-cname" placeholder="고객명 입력"></div>
+        <div class="fgroup"><label class="flabel">툴</label><input class="fc" id="sf-tool" placeholder="예: CP-AJ"></div>
         <div class="fgroup" style="position:relative">
           <label class="flabel">모델명<span class="req">*</span></label>
           <input class="fc" id="sf-model" placeholder="예: CP-AHS, ABS, 비데..." autocomplete="off" oninput="showRegSuggest(this,'model')" onfocus="showRegSuggest(this,'model')" onblur="setTimeout(()=>hideRegSuggest('sug-model'),200)">
@@ -1283,18 +1288,21 @@ tbody td{padding:9px 12px;vertical-align:middle}
         </div>
         <div class="fgroup"><label class="flabel">의무(개월)</label><input class="fc" id="sf-duty" type="number" placeholder="60"></div>
         <div class="fgroup"><label class="flabel">렌탈료</label><input class="fc" id="sf-rental" type="number" placeholder="39870" oninput="calcFee()"></div>
-        <div class="fgroup"><label class="flabel">지급율(기본)%</label><input class="fc" id="sf-rate1" type="number" placeholder="6" oninput="calcFee()"></div>
-        <div class="fgroup"><label class="flabel">판매수수료(기본)</label><input class="fc" id="sf-fee1" type="number" placeholder="자동계산" readonly style="background:var(--surface-2)"></div>
-        <div class="fgroup"><label class="flabel">지급율(툴별)%</label><input class="fc" id="sf-rate2" type="number" placeholder="1.5" oninput="calcFee()"></div>
-        <div class="fgroup"><label class="flabel">툴별&업소용 추가수수료</label><input class="fc" id="sf-fee2" type="number" placeholder="자동계산" readonly style="background:var(--surface-2)"></div>
+        <div class="fgroup"><label class="flabel">지급율(기본) <span style="font-size:9px;color:var(--text-3)">배율(6=600%)</span></label><input class="fc" id="sf-rate1" type="number" step="0.1" placeholder="6" oninput="calcFee()"></div>
+        <div class="fgroup"><label class="flabel">판매수수료1 <span style="font-size:9px;color:var(--text-3)">(자동)</span></label><input class="fc" id="sf-fee1" type="number" placeholder="자동" readonly style="background:var(--surface-2)"></div>
+        <div class="fgroup"><label class="flabel">지급율(재렌탈) <span style="font-size:9px;color:var(--text-3)">배율(1=100%)</span></label><input class="fc" id="sf-rate-re" type="number" step="0.1" placeholder="1" value="1" oninput="calcFee()"></div>
+        <div class="fgroup"><label class="flabel">판매수수료(최종) <span style="font-size:9px;color:var(--text-3)">(자동)</span></label><input class="fc" id="sf-fee-final" type="number" placeholder="자동" readonly style="background:var(--surface-2)"></div>
+        <div class="fgroup"><label class="flabel">지급율(툴별) <span style="font-size:9px;color:var(--text-3)">배율(1.5=150%)</span></label><input class="fc" id="sf-rate2" type="number" step="0.1" placeholder="0" oninput="calcFee()"></div>
+        <div class="fgroup"><label class="flabel">툴별 추가수수료 <span style="font-size:9px;color:var(--text-3)">(자동)</span></label><input class="fc" id="sf-fee2" type="number" placeholder="자동" readonly style="background:var(--surface-2)"></div>
         <div class="fgroup"><label class="flabel">제품 종류</label>
           <select class="fc" id="sf-product-type" onchange="calcFee()">
             <option value="정수기">💧 정수기</option>
             <option value="비정수기">🌀 비정수기</option>
           </select>
         </div>
-        <div class="fgroup"><label class="flabel">사업장 추가수수료 <span style="font-size:9px;color:var(--text-3)">(자동)</span></label><input class="fc" id="sf-biz-fee" type="number" placeholder="자동계산" readonly style="background:var(--surface-2)"></div>
-        <div class="fgroup"><label class="flabel">개인고객 추가수수료 <span style="font-size:9px;color:var(--text-3)">(자동)</span></label><input class="fc" id="sf-pers-fee" type="number" placeholder="자동계산" readonly style="background:var(--surface-2)"></div>
+        <div class="fgroup"><label class="flabel">추가수수료(사업장) <span style="font-size:9px;color:var(--text-3)">(자동)</span></label><input class="fc" id="sf-biz-fee" type="number" placeholder="자동" readonly style="background:var(--surface-2)"></div>
+        <div class="fgroup"><label class="flabel">추가수수료(개인) <span style="font-size:9px;color:var(--text-3)">(자동)</span></label><input class="fc" id="sf-pers-fee" type="number" placeholder="자동" readonly style="background:var(--surface-2)"></div>
+        <div class="fgroup"><label class="flabel">판매활성화 <span style="font-size:9px;color:var(--text-3)">배율(3=300%)</span></label><input class="fc" id="sf-activation" type="number" step="0.1" placeholder="0" oninput="calcFee()"></div>
         <div class="fgroup"><label class="flabel">셀프 여부</label>
           <label style="display:flex;align-items:center;gap:6px;padding:11px 14px;border:1px solid var(--border);border-radius:6px;cursor:pointer;background:white">
             <input type="checkbox" id="sf-self-check" oninput="calcFee()" style="width:14px;height:14px;cursor:pointer;accent-color:var(--accent)">
@@ -1303,9 +1311,8 @@ tbody td{padding:9px 12px;vertical-align:middle}
           <input type="hidden" id="sf-self">
         </div>
         <div class="fgroup"><label class="flabel">최종수수료</label><input class="fc" id="sf-final" type="number" placeholder="자동계산" readonly style="background:var(--accent-light);font-weight:700"></div>
-        <div class="fgroup"><label class="flabel">실 판매인<span class="req">*</span></label><select class="fc" id="sf-real-seller"><option value="">선택</option></select></div>
         <div class="fgroup"><label class="flabel">판매인<span class="req">*</span></label><select class="fc" id="sf-seller"><option value="">선택</option></select></div>
-<input type="hidden" id="sf-perf">
+        <input type="hidden" id="sf-real-seller"><input type="hidden" id="sf-perf">
         <div class="fgroup"><label class="flabel">사업자 여부</label><select class="fc" id="sf-biz-type" onchange="calcFee()"><option value="1">사업자</option><option value="0">개인</option></select></div>
       </div>
     </div>
@@ -2596,9 +2603,7 @@ function applyRole(){
   // 급여 직원 필터 (전체 보기 권한 있을 때만)
   const payEmpWrap=document.getElementById('pay-emp-wrap');
   if(payEmpWrap) payEmpWrap.style.display = (canDo('view_salary_all')||isAdmin) ? 'flex' : 'none';
-  // 마감검증 탭 (관리자만)
-  const verifyTab=document.getElementById('tab-verify');
-  if(verifyTab) verifyTab.style.display = isAdmin ? '' : 'none';
+  // (마감검증 탭은 제거됨 - 관리자는 모든 탭에서 마진 표시)
 
   // Phase 1: 대시보드 추가 버튼 권한별 표시
   const btnNoticeDash = document.getElementById('btn-add-notice-dash');
@@ -2956,6 +2961,7 @@ async function loadSales(){
 }
 
 function renderSales(list){
+  const isAdmin = CU && CU.name === ADMIN_NAME;
   // 현재 탭에 따라 필터링
   const tab = currentSalesTab||'branch';
   if(tab==='branch'){
@@ -2963,68 +2969,122 @@ function renderSales(list){
   } else if(tab==='dealer'){
     list = list.filter(r=>r['출처']==='총판');
   }
-  // verify 탭일 때는 전체 표시 (검증 마진 컬럼 추가)
-  const isVerify = tab==='verify';
+  // 'total'(총합계) 탭은 필터 없이 전체 표시
+  // 관리자는 항상 검증 마진 컬럼을 봄 (isVerify 역할)
+  const isVerify = isAdmin;
 
-  const total=list.reduce((s,r)=>s+(Number(r['최종수수료'])||0),0);
-  // 실적인정 제거됨
-  let totalMargin = 0;
-  if(isVerify){
-    list.forEach(r=>{
-      const m = calcVerifyMargin(r);
-      r._verifyMargin = m;
-      totalMargin += m;
-    });
-  }
+  // 합계는 권한별 최종수수료로 계산
+  let total = 0, totalMargin = 0;
+  list.forEach(r=>{
+    const c = calcSaleCommission(r, isAdmin);
+    total += c.finalCommission;
+    totalMargin += c.adminMargin;
+  });
 
-  // 마감검증 마진 컬럼 표시/숨김
+  // 검증 마진 컬럼 표시/숨김 (관리자만)
   const marginTh = document.getElementById('verify-margin-th');
-  if(marginTh) marginTh.style.display = isVerify ? '' : 'none';
+  if(marginTh) marginTh.style.display = isAdmin ? '' : 'none';
 
   // 합계
   document.getElementById('sale-sub').textContent=list.length+'건';
-  if(isVerify){
-    document.getElementById('sale-total').innerHTML = `최종수수료 합계: ${fm(total)} | <span style="color:var(--purple)">검증 마진 합계: ${fm(totalMargin)}</span>`;
+  if(isAdmin){
+    document.getElementById('sale-total').innerHTML = `최종수수료 합계: ${fm(total)} | <span style="color:var(--purple)">관리자 마진 합계: ${fm(totalMargin)}</span>`;
   } else {
     document.getElementById('sale-total').textContent=`최종수수료 합계: ${fm(total)}`;
   }
 
   const tb=document.getElementById('sale-tbody');
-  const isAdmin = CU.name===ADMIN_NAME;
   const canEdit = isAdmin || canDo('manage_sales');
-  if(!list.length){tb.innerHTML='<tr><td colspan="19" style="text-align:center;padding:30px;color:var(--text-3)">데이터가 없습니다</td></tr>';renderSaleTfoot([],isVerify);return;}
+  if(!list.length){tb.innerHTML='<tr><td colspan="21" style="text-align:center;padding:30px;color:var(--text-3)">데이터가 없습니다</td></tr>';renderSaleTfoot([],isVerify);return;}
 
   tb.innerHTML=list.map(r=>{
     const sourceBadge = (r['출처']||'지국')==='총판'
       ? '<span class="badge bp">🏢 총판</span>'
       : '<span class="badge bg">📊 지국</span>';
-    const verifyCell = isVerify
-      ? `<td class="td-num" style="color:var(--purple);font-weight:700;background:rgba(107,78,230,.05)">${fmN(r._verifyMargin)}</td>`
+    // 권한별 계산 (직원=차감, 관리자=원본+검증)
+    const calc = calcSaleCommission(r, isAdmin);
+    const verifyCell = (isVerify || isAdmin)
+      ? `<td class="td-num" style="color:var(--purple);font-weight:700;background:rgba(107,78,230,.05)">${fmN(calc.adminMargin)}</td>`
       : '';
     return `<tr>
     <td>${sourceBadge}</td>
     <td class="td-m" style="font-size:10px">${r['고객번호']||''}</td>
     <td style="min-width:80px">${r['고객명']||''}</td>
+    <td style="font-size:10px">${r['툴']||''}</td>
     <td>${r['모델명']||''}</td>
     <td style="min-width:120px;font-size:10px">${r['상품명']||''}</td>
     <td class="td-num">${r['의무']||''}</td>
     <td class="td-num">${fmN(r['렌탈료'])}</td>
-    <td class="td-num">${r['지급율(기본)']||''}%</td>
-    <td class="td-num td-g">${fmN(r['판매수수료(기본)'])}</td>
-    <td class="td-num">${r['지급율(툴별)']||''}%</td>
-    <td class="td-num td-g">${fmN(r['툴별추가수수료'])}</td>
-    <td class="td-num td-g">${fmN(r['사업장추가수수료'])}</td>
-    <td class="td-num td-g">${fmN(r['개인고객추가수수료'])}</td>
+    <td class="td-num">${pctView(r['지급율(기본)'])}</td>
+    <td class="td-num td-g">${fmN(calc.fee1)}</td>
+    <td class="td-num">${pctView(r['지급율(재렌탈)']||1)}</td>
+    <td class="td-num td-g">${fmN(calc.feeFinal)}</td>
+    <td class="td-num">${pctView(calc.shownToolRate)}</td>
+    <td class="td-num td-g">${fmN(calc.toolFee)}</td>
+    <td class="td-num td-g">${fmN(r['추가수수료(사업장)']||r['사업장추가수수료'])}</td>
+    <td class="td-num td-g">${fmN(r['추가수수료(개인)']||r['개인고객추가수수료'])}</td>
+    <td class="td-num td-g">${fmN(calc.activation)}</td>
     <td class="td-num td-red">${fmN(r['셀프'])}</td>
-    <td class="td-num" style="color:var(--accent-2);font-weight:700">${fmN(r['최종수수료'])}</td>
-    <td>${r['실판매인']||''}</td>
-    <td>${r['판매인']||''}</td>
-    
-    <td style="text-align:center">${r['사업자']==='1'||r['사업자']===1?'<span class="badge bb">사업자</span>':'<span class="badge bgr">개인</span>'}</td>
+    <td class="td-num" style="color:var(--accent-2);font-weight:700">${fmN(calc.finalCommission)}</td>
+    <td>${r['판매인']||r['실판매인']||''}</td>
     ${verifyCell}
     <td>${canEdit?`<div style="display:flex;gap:3px"><button class="btn btn-secondary btn-sm" onclick="openSaleModal('${r['매출ID']}')">수정</button><button class="btn btn-danger btn-sm" onclick="delSale('${r['매출ID']}')">삭제</button></div>`:'<span style="color:var(--text-3);font-size:10px">-</span>'}</td>
   </tr>`;}).join('');
   renderSaleTfoot(list,isVerify);
+}
+
+// 지급율 표시 (배율 → %): 1.5 → "150%", 6 → "600%"
+function pctView(v){
+  const n = Number(v);
+  if(!n) return '';
+  return Math.round(n*100) + '%';
+}
+
+// 매출 1건의 수수료 계산 (권한별)
+// isAdmin=false: 직원용 (Q,U 배율 -0.5 차감)
+// isAdmin=true:  원본 그대로 + 차익(관리자 마진) 함께 반환
+function calcSaleCommission(r, isAdmin){
+  const H = Number(r['렌탈료'])||0;
+  const M = Number(r['지급율(기본)'])||0;       // 기본 배율 (6)
+  const O = Number(r['지급율(재렌탈)']||1)||1;   // 재렌탈 배율
+  const Qraw = Number(r['지급율(툴별)'])||0;     // 툴별 배율 (1.5)
+  const Sbiz = Number(r['추가수수료(사업장)']||r['사업장추가수수료'])||0;
+  const Tpers = Number(r['추가수수료(개인)']||r['개인고객추가수수료'])||0;
+  const Uraw = Number(r['판매활성화']||0);       // 판매활성화 배율 (3 = 300%)
+  const V = Number(r['셀프'])||0;
+
+  // 직원용 차감 배율 (-0.5)
+  const Qstaff = Qraw > 0 ? Math.max(0, Qraw - 0.5) : 0;
+  const Ustaff = Uraw > 0 ? Math.max(0, Uraw - 0.5) : 0;
+
+  // 표시에 쓸 배율 (관리자=원본, 직원=차감)
+  const Qshow = isAdmin ? Qraw : Qstaff;
+  const Ushow = isAdmin ? Uraw : Ustaff;
+
+  // 판매수수료1 = H × M, 최종 = ×O
+  const fee1 = Math.round(H * M);
+  const feeFinal = Math.round(fee1 * O);
+
+  // 툴별추가수수료 = H × Q
+  const toolFee = Math.round(H * Qshow);
+  // 판매활성화 = H × U
+  const activation = Math.round(H * Ushow);
+
+  // 최종수수료 = feeFinal + toolFee + 사업장 + 개인 + 활성화 + 셀프
+  const finalCommission = Math.round(feeFinal + toolFee + Sbiz + Tpers + activation + V);
+
+  // 관리자 마진 = (원본 - 직원용) 차익
+  const toolFeeStaff = Math.round(H * Qstaff);
+  const activationStaff = Math.round(H * Ustaff);
+  const toolFeeAdmin = Math.round(H * Qraw);
+  const activationAdmin = Math.round(H * Uraw);
+  const adminMargin = (toolFeeAdmin - toolFeeStaff) + (activationAdmin - activationStaff);
+
+  return {
+    fee1, feeFinal, toolFee, activation, finalCommission,
+    shownToolRate: Qshow,
+    adminMargin
+  };
 }
 
 // 마감검증 마진 계산 (직원용 % → 마감검증용 %로 차액)
@@ -3060,21 +3120,32 @@ function calcVerifyMargin(r){
 }
 
 function renderSaleTfoot(list, isVerify){
-  const cols=['출처','고객번호','고객명','모델명','상품명','의무','렌탈료','지급율(기본)','판매수수료(기본)',
-    '지급율(툴별)','툴별추가수수료','사업장추가수수료','개인고객추가수수료','셀프','최종수수료',
-    '실판매인','판매인','실적인정','사업자'];
-  const numCols=['렌탈료','판매수수료(기본)','툴별추가수수료','사업장추가수수료','개인고객추가수수료','셀프','최종수수료','실적인정'];
-  let html='<tr>'+cols.map((c,i)=>{
-    if(i===0) return '<td style="font-weight:700">합계</td>';
-    if(numCols.includes(c)){
-      const s=list.reduce((acc,r)=>acc+(Number(r[c])||0),0);
-      return `<td class="td-num">${s?s.toLocaleString():'-'}</td>`;
-    }
-    return '<td>-</td>';
-  }).join('');
-  if(isVerify){
-    const marginSum = list.reduce((acc,r)=>acc+(r._verifyMargin||0),0);
-    html += `<td class="td-num" style="color:var(--purple);font-weight:700">${marginSum?marginSum.toLocaleString():'-'}</td>`;
+  const isAdmin = CU && CU.name === ADMIN_NAME;
+  // 19개 컬럼: 출처,고객번호,고객명,툴,모델명,상품명,의무,렌탈료,지급율기본,판매수수료1,
+  //           지급율재렌탈,판매수수료최종,지급율툴별,툴별추가,사업장추가,개인추가,판매활성화,셀프,최종수수료,판매인
+  let rental=0, fee1=0, feeFinal=0, toolFee=0, biz=0, pers=0, activation=0, self=0, finalC=0, margin=0;
+  list.forEach(r=>{
+    const c = calcSaleCommission(r, isAdmin);
+    rental += Number(r['렌탈료'])||0;
+    fee1 += c.fee1; feeFinal += c.feeFinal; toolFee += c.toolFee;
+    biz += Number(r['추가수수료(사업장)']||r['사업장추가수수료'])||0;
+    pers += Number(r['추가수수료(개인)']||r['개인고객추가수수료'])||0;
+    activation += c.activation; self += Number(r['셀프'])||0;
+    finalC += c.finalCommission; margin += c.adminMargin;
+  });
+  const f=(v)=>v?v.toLocaleString():'-';
+  let html=`<tr style="font-weight:700;background:var(--surface-2)">
+    <td>합계</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td>
+    <td class="td-num">${f(rental)}</td>
+    <td>-</td><td class="td-num">${f(fee1)}</td>
+    <td>-</td><td class="td-num">${f(feeFinal)}</td>
+    <td>-</td><td class="td-num">${f(toolFee)}</td>
+    <td class="td-num">${f(biz)}</td><td class="td-num">${f(pers)}</td>
+    <td class="td-num">${f(activation)}</td><td class="td-num">${f(self)}</td>
+    <td class="td-num" style="color:var(--accent-2)">${f(finalC)}</td>
+    <td>-</td>`;
+  if(isVerify || isAdmin){
+    html += `<td class="td-num" style="color:var(--purple)">${f(margin)}</td>`;
   }
   html += '<td></td></tr>';
   document.getElementById('sale-tfoot').innerHTML = html;
@@ -3082,41 +3153,44 @@ function renderSaleTfoot(list, isVerify){
 
 // 수수료 자동 계산
 function calcFee(){
-  const rental=Number(document.getElementById('sf-rental').value)||0;
-  const rate1=Number(document.getElementById('sf-rate1').value)||0;
-  const rate2=Number(document.getElementById('sf-rate2').value)||0;
+  const v=(id)=>Number(document.getElementById(id)?.value)||0;
+  const rental = v('sf-rental');
+  const rate1  = v('sf-rate1');      // 기본 배율 (6)
+  const rateRe = v('sf-rate-re')||1; // 재렌탈 배율 (1)
+  const rate2  = v('sf-rate2');      // 툴별 배율 (1.5)
+  const activation = v('sf-activation'); // 판매활성화 배율 (3)
   const selfCheck=document.getElementById('sf-self-check');
-  const selfChecked = selfCheck ? selfCheck.checked : false;
-  const selfAmount = selfChecked ? -10000 : 0;
+  const selfAmount = (selfCheck && selfCheck.checked) ? -10000 : 0;
 
-  // 제품 종류 (정수기/비정수기) + 사업자 여부
-  const productType = document.getElementById('sf-product-type') ? document.getElementById('sf-product-type').value : '정수기';
-  const bizType = document.getElementById('sf-biz-type') ? document.getElementById('sf-biz-type').value : '1';
+  const productType = document.getElementById('sf-product-type')?.value || '정수기';
+  const bizType = document.getElementById('sf-biz-type')?.value || '1';
   const isJeongsu = productType === '정수기';
-  const isBiz = bizType === '1'; // 1=사업자, 0=개인
+  const isBiz = bizType === '1';
 
-  // 🚀 수정된 계산식: 렌탈료 × (지급율 / 100)
-  // 의무개월 곱하지 않음 - 100%가 곧 렌탈료 한 달치
-  const fee1=Math.round(rental*rate1/100);
-  const fee2=Math.round(rental*rate2/100);
+  // 엑셀 계산식 (배율 기반, H × 배율)
+  // 판매수수료1 = H × M
+  const fee1 = Math.round(rental * rate1);
+  // 판매수수료(최종) = 판매수수료1 × O(재렌탈)
+  const feeFinal = Math.round(fee1 * rateRe);
+  // 툴별추가수수료 = H × Q
+  const fee2 = Math.round(rental * rate2);
+  // 판매활성화 = H × U
+  const activationFee = Math.round(rental * activation);
 
-  // 🚀 사업장/개인고객 추가수수료 = 요율 자동 계산
-  // 사업자: 정수기 200%, 비정수기 150%
-  // 개인고객: 정수기 150%, 비정수기 100%
+  // 사업장/개인 추가수수료 = 요율 자동 (배율)
+  // 사업자: 정수기 2.0, 비정수기 1.5 / 개인: 정수기 1.5, 비정수기 1.0
   let bizFee = 0, persFee = 0;
   if(isBiz){
-    // 사업자
-    const bizRate = isJeongsu ? 200 : 150;
-    bizFee = Math.round(rental * bizRate / 100);
+    bizFee = Math.round(rental * (isJeongsu ? 2.0 : 1.5));
   } else {
-    // 개인고객
-    const persRate = isJeongsu ? 150 : 100;
-    persFee = Math.round(rental * persRate / 100);
+    persFee = Math.round(rental * (isJeongsu ? 1.5 : 1.0));
   }
 
-  const final=fee1+fee2+bizFee+persFee+selfAmount;
+  // 최종수수료 = 판매수수료최종 + 툴별 + 사업장 + 개인 + 활성화 + 셀프
+  const final = feeFinal + fee2 + bizFee + persFee + activationFee + selfAmount;
 
   document.getElementById('sf-fee1').value=fee1||'';
+  if(document.getElementById('sf-fee-final')) document.getElementById('sf-fee-final').value=feeFinal||'';
   document.getElementById('sf-fee2').value=fee2||'';
   document.getElementById('sf-biz-fee').value=bizFee||'';
   document.getElementById('sf-pers-fee').value=persFee||'';
@@ -3133,71 +3207,73 @@ function openSaleModal(id){
     const sel=document.getElementById(elId);
     sel.innerHTML='<option value="">선택</option>'+empOpts;
   });
+  const setV=(id,val)=>{const el=document.getElementById(id);if(el)el.value=val;};
   if(id){
     const r=sales.find(x=>x['매출ID']===id);if(!r)return;
-    document.getElementById('sf-id').value=id;
-    document.getElementById('sf-source').value=r['출처']||'지국';
-    document.getElementById('sf-cno').value=r['고객번호']||'';
-    document.getElementById('sf-cname').value=r['고객명']||'';
-    document.getElementById('sf-model').value=r['모델명']||'';
-    document.getElementById('sf-product').value=r['상품명']||'';
-    document.getElementById('sf-duty').value=r['의무']||'';
-    document.getElementById('sf-rental').value=r['렌탈료']||'';
-    document.getElementById('sf-rate1').value=r['지급율(기본)']||'';
-    document.getElementById('sf-fee1').value=r['판매수수료(기본)']||'';
-    document.getElementById('sf-rate2').value=r['지급율(툴별)']||'';
-    document.getElementById('sf-fee2').value=r['툴별추가수수료']||'';
-    document.getElementById('sf-biz-fee').value=r['사업장추가수수료']||'';
-    document.getElementById('sf-pers-fee').value=r['개인고객추가수수료']||'';
-    if(document.getElementById('sf-product-type')) document.getElementById('sf-product-type').value=r['제품종류']||'정수기';
-    document.getElementById('sf-self').value=r['셀프']||'';
+    setV('sf-id',id);
+    setV('sf-source',r['출처']||'지국');
+    setV('sf-cno',r['고객번호']||'');
+    setV('sf-cname',r['고객명']||'');
+    setV('sf-tool',r['툴']||'');
+    setV('sf-model',r['모델명']||'');
+    setV('sf-product',r['상품명']||'');
+    setV('sf-duty',r['의무']||'');
+    setV('sf-rental',r['렌탈료']||'');
+    setV('sf-rate1',r['지급율(기본)']||'');
+    setV('sf-rate-re',r['지급율(재렌탈)']||1);
+    setV('sf-rate2',r['지급율(툴별)']||'');
+    setV('sf-activation',r['판매활성화']||'');
+    setV('sf-product-type',r['제품종류']||'정수기');
+    setV('sf-self',r['셀프']||'');
     if(document.getElementById('sf-self-check')) document.getElementById('sf-self-check').checked = (Number(r['셀프'])||0) < 0;
-    document.getElementById('sf-final').value=r['최종수수료']||'';
-    document.getElementById('sf-real-seller').value=r['실판매인']||'';
-    document.getElementById('sf-seller').value=r['판매인']||'';
-    if(document.getElementById('sf-perf')) document.getElementById('sf-perf').value=0;
-    document.getElementById('sf-biz-type').value=String(r['사업자']||'0');
+    setV('sf-seller',r['판매인']||r['실판매인']||'');
+    setV('sf-real-seller',r['실판매인']||r['판매인']||'');
+    setV('sf-biz-type',String(r['사업자']||'0'));
+    calcFee(); // 불러온 후 자동 재계산
   }else{
-    ['sf-id','sf-cno','sf-cname','sf-model','sf-product','sf-duty','sf-rental',
-     'sf-rate1','sf-fee1','sf-rate2','sf-fee2','sf-biz-fee','sf-pers-fee','sf-self','sf-final','sf-perf']
-      .forEach(id=>document.getElementById(id).value='');
-    document.getElementById('sf-biz-type').value='1';
+    ['sf-id','sf-cno','sf-cname','sf-tool','sf-model','sf-product','sf-duty','sf-rental',
+     'sf-rate1','sf-fee1','sf-fee-final','sf-rate2','sf-fee2','sf-activation','sf-biz-fee','sf-pers-fee','sf-self','sf-final','sf-perf']
+      .forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    setV('sf-rate-re',1);
+    setV('sf-biz-type','1');
     if(document.getElementById('sf-self-check')) document.getElementById('sf-self-check').checked = false;
-    if(document.getElementById('sf-product-type')) document.getElementById('sf-product-type').value='정수기';
-    // 현재 탭에 따라 기본 출처 설정
+    setV('sf-product-type','정수기');
     const defaultSource = (currentSalesTab==='dealer')?'총판':'지국';
-    document.getElementById('sf-source').value=defaultSource;
-    // 기본값: 로그인 사용자
-    document.getElementById('sf-real-seller').value=CU.name;
-    document.getElementById('sf-seller').value=CU.name;
+    setV('sf-source',defaultSource);
+    setV('sf-seller',CU.name);
+    setV('sf-real-seller',CU.name);
   }
   openM('m-sale');
 }
 
 async function submitSale(){
   const id=document.getElementById('sf-id').value;
+  const g=(id)=>document.getElementById(id)?document.getElementById(id).value:'';
   const p={
     id,
-    출처:document.getElementById('sf-source').value,
-    고객번호:document.getElementById('sf-cno').value,
-    고객명:document.getElementById('sf-cname').value,
-    모델명:document.getElementById('sf-model').value,
-    상품명:document.getElementById('sf-product').value,
-    의무:document.getElementById('sf-duty').value,
-    렌탈료:document.getElementById('sf-rental').value,
-    '지급율(기본)':document.getElementById('sf-rate1').value,
-    '판매수수료(기본)':document.getElementById('sf-fee1').value,
-    '지급율(툴별)':document.getElementById('sf-rate2').value,
-    툴별추가수수료:document.getElementById('sf-fee2').value,
-    사업장추가수수료:document.getElementById('sf-biz-fee').value,
-    개인고객추가수수료:document.getElementById('sf-pers-fee').value,
-    제품종류:document.getElementById('sf-product-type')?document.getElementById('sf-product-type').value:'정수기',
-    셀프:document.getElementById('sf-self').value,
-    최종수수료:document.getElementById('sf-final').value,
-    실판매인:document.getElementById('sf-real-seller').value,
-    판매인:document.getElementById('sf-seller').value,
-    실적인정:document.getElementById('sf-perf').value,
-    사업자:document.getElementById('sf-biz-type').value,
+    출처:g('sf-source'),
+    고객번호:g('sf-cno'),
+    고객명:g('sf-cname'),
+    툴:g('sf-tool'),
+    모델명:g('sf-model'),
+    상품명:g('sf-product'),
+    의무:g('sf-duty'),
+    렌탈료:g('sf-rental'),
+    '지급율(기본)':g('sf-rate1'),
+    '판매수수료(기본)':g('sf-fee1'),
+    '지급율(재렌탈)':g('sf-rate-re')||1,
+    '지급율(툴별)':g('sf-rate2'),
+    툴별추가수수료:g('sf-fee2'),
+    사업장추가수수료:g('sf-biz-fee'),
+    개인고객추가수수료:g('sf-pers-fee'),
+    판매활성화:g('sf-activation'),
+    제품종류:g('sf-product-type')||'정수기',
+    셀프:g('sf-self'),
+    최종수수료:g('sf-final'),
+    실판매인:g('sf-real-seller')||g('sf-seller'),
+    판매인:g('sf-seller'),
+    실적인정:g('sf-perf'),
+    사업자:g('sf-biz-type'),
   };
   if(!p['고객명']||!p['모델명']){toast('고객명과 모델명은 필수입니다.','e');return;}
   const btn=document.getElementById('sale-save-btn');btn.disabled=true;btn.textContent='저장 중...';
@@ -3213,11 +3289,29 @@ async function delSale(id){
 }
 
 function exportSales(){
-  const rows=[['고객번호','고객명','모델명','상품명','의무','렌탈료','지급율(기본)','판매수수료(기본)','지급율(툴별)','툴별추가수수료','사업장추가수수료','개인고객추가수수료','셀프','최종수수료','실판매인','판매인','실적인정','사업자']];
-  sales.forEach(r=>rows.push([r['고객번호'],r['고객명'],r['모델명'],r['상품명'],r['의무'],r['렌탈료'],r['지급율(기본)'],r['판매수수료(기본)'],r['지급율(툴별)'],r['툴별추가수수료'],r['사업장추가수수료'],r['개인고객추가수수료'],r['셀프'],r['최종수수료'],r['실판매인'],r['판매인'],r['실적인정'],r['사업자']]));
+  const isAdmin = CU && CU.name === ADMIN_NAME;
+  const header = ['출처','고객번호','고객명','툴','모델명','상품명','의무','렌탈료',
+    '지급율(기본)','판매수수료1','지급율(재렌탈)','판매수수료(최종)','지급율(툴별)','툴별추가수수료',
+    '추가수수료(사업장)','추가수수료(개인)','판매활성화','셀프','최종수수료','판매인'];
+  if(isAdmin) header.push('관리자마진');
+  const rows=[header];
+  // 현재 탭 필터 적용
+  const tab=currentSalesTab||'branch';
+  let list=sales;
+  if(tab==='branch') list=sales.filter(r=>(r['출처']||'지국')==='지국');
+  else if(tab==='dealer') list=sales.filter(r=>r['출처']==='총판');
+  list.forEach(r=>{
+    const c=calcSaleCommission(r,isAdmin);
+    const row=[r['출처']||'지국',r['고객번호'],r['고객명'],r['툴'],r['모델명'],r['상품명'],r['의무'],r['렌탈료'],
+      r['지급율(기본)'],c.fee1,r['지급율(재렌탈)']||1,c.feeFinal,c.shownToolRate,c.toolFee,
+      r['추가수수료(사업장)']||r['사업장추가수수료'],r['추가수수료(개인)']||r['개인고객추가수수료'],
+      c.activation,r['셀프'],c.finalCommission,r['판매인']||r['실판매인']];
+    if(isAdmin) row.push(c.adminMargin);
+    rows.push(row);
+  });
   const csv='\uFEFF'+rows.map(r=>r.map(c=>'"'+(c||'')+'"').join(',')).join('\n');
   const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
-  a.download='지국매출정리표_'+document.getElementById('sal-ym').value+'.csv';a.click();
+  a.download='매출정리표_'+tab+'_'+document.getElementById('sal-ym').value+'.csv';a.click();
 }
 
 // ══ 급여 ════════════════════════════════════════════════════
@@ -4066,13 +4160,13 @@ function switchSalesTab(tab){
     if(b.dataset.tab===tab){
       b.classList.add('active');
       b.style.background='var(--surface)';
-      b.style.color = tab==='verify' ? 'var(--purple)' : 'var(--text)';
+      b.style.color = 'var(--text)';
       b.style.fontWeight='600';
       b.style.boxShadow='var(--shadow)';
     } else {
       b.classList.remove('active');
       b.style.background='none';
-      b.style.color = b.dataset.tab==='verify' ? 'var(--purple)' : 'var(--text-2)';
+      b.style.color = 'var(--text-2)';
       b.style.fontWeight='500';
       b.style.boxShadow='none';
     }
@@ -4082,15 +4176,12 @@ function switchSalesTab(tab){
   const cardTitle = document.getElementById('sale-card-title');
   if(tab==='branch') cardTitle.textContent='📊 지국 매출 정리표';
   else if(tab==='dealer') cardTitle.textContent='🏢 총판 매출 정리표';
-  else if(tab==='verify') cardTitle.textContent='🔐 마감 검증 정리표';
+  else if(tab==='total') cardTitle.textContent='📈 총합계 (지국+총판)';
 
-  // 마감검증 배너 표시
-  const banner = document.getElementById('verify-banner');
-  if(banner) banner.style.display = (tab==='verify') ? '' : 'none';
-
-  // 매출 입력 버튼은 verify 탭에서 숨김
+  // 색상 처리: total 탭은 일반색
+  // 매출 입력 버튼은 total 탭에서도 표시
   const btnAdd = document.getElementById('btn-add-sale');
-  if(btnAdd) btnAdd.style.display = (tab==='verify') ? 'none' : 'inline-flex';
+  if(btnAdd) btnAdd.style.display = 'inline-flex';
 
   // 리렌더링
   renderSales(sales);
