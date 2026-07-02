@@ -762,6 +762,7 @@ tbody td{padding:9px 12px;vertical-align:middle}
         <button class="btn btn-primary" style="margin-top:auto" onclick="loadSales()">조회</button>
         <button class="btn btn-secondary" style="margin-top:auto" id="btn-add-sale" onclick="openSaleModal()">＋ 매출 입력</button>
         <button class="btn btn-secondary btn-sm" style="margin-top:auto" onclick="exportSales()">📥 엑셀 다운로드</button>
+        <button class="btn btn-secondary btn-sm" style="margin-top:auto;display:none" id="btn-tool-mgr" onclick="openToolMgrModal()">🔧 툴 관리</button>
       </div>
       <div id="verify-banner" style="display:none;background:linear-gradient(135deg,#EEEDFE 0%,#FAEEDA 100%);border:1px solid var(--purple);border-radius:10px;padding:12px 16px;margin-bottom:14px">
         <div style="font-size:12px;font-weight:700;color:var(--purple);margin-bottom:4px">🔐 마감 검증 모드 (관리자 전용)</div>
@@ -1276,7 +1277,11 @@ tbody td{padding:9px 12px;vertical-align:middle}
         </div>
         <div class="fgroup full"><label class="flabel">고객번호</label><input class="fc" id="sf-cno" placeholder="1-01-260101-0000"></div>
         <div class="fgroup full"><label class="flabel">고객명<span class="req">*</span></label><input class="fc" id="sf-cname" placeholder="고객명 입력"></div>
-        <div class="fgroup"><label class="flabel">툴</label><input class="fc" id="sf-tool" placeholder="예: CP-AJ"></div>
+        <div class="fgroup"><label class="flabel">툴 <span style="font-size:9px;color:var(--text-3)">(선택 시 지급율 자동)</span></label>
+          <select class="fc" id="sf-tool" onchange="onToolSelect()">
+            <option value="">툴 선택...</option>
+          </select>
+        </div>
         <div class="fgroup" style="position:relative">
           <label class="flabel">모델명<span class="req">*</span></label>
           <input class="fc" id="sf-model" placeholder="예: CP-AHS, ABS, 비데..." autocomplete="off" oninput="showRegSuggest(this,'model')" onfocus="showRegSuggest(this,'model')" onblur="setTimeout(()=>hideRegSuggest('sug-model'),200)">
@@ -1293,7 +1298,7 @@ tbody td{padding:9px 12px;vertical-align:middle}
         <div class="fgroup"><label class="flabel">판매수수료1 <span style="font-size:9px;color:var(--text-3)">(자동)</span></label><input class="fc" id="sf-fee1" type="number" placeholder="자동" readonly style="background:var(--surface-2)"></div>
         <div class="fgroup"><label class="flabel">지급율(재렌탈) <span style="font-size:9px;color:var(--text-3)">배율(1=100%)</span></label><input class="fc" id="sf-rate-re" type="number" step="0.1" placeholder="1" value="1" oninput="calcFee()"></div>
         <div class="fgroup"><label class="flabel">판매수수료(최종) <span style="font-size:9px;color:var(--text-3)">(자동)</span></label><input class="fc" id="sf-fee-final" type="number" placeholder="자동" readonly style="background:var(--surface-2)"></div>
-        <div class="fgroup"><label class="flabel">지급율(툴별) <span style="font-size:9px;color:var(--text-3)">배율(1.5=150%)</span></label><input class="fc" id="sf-rate2" type="number" step="0.1" placeholder="0" oninput="calcFee()"></div>
+        <div class="fgroup"><label class="flabel">지급율(툴별) <span style="font-size:9px;color:var(--text-3)">배율(툴 선택 시 자동)</span></label><input class="fc" id="sf-rate2" type="number" step="0.1" placeholder="0" readonly style="background:var(--surface-2)"></div>
         <div class="fgroup"><label class="flabel">툴별 추가수수료 <span style="font-size:9px;color:var(--text-3)">(자동)</span></label><input class="fc" id="sf-fee2" type="number" placeholder="자동" readonly style="background:var(--surface-2)"></div>
         <div class="fgroup"><label class="flabel">제품 종류</label>
           <select class="fc" id="sf-product-type" onchange="calcFee()">
@@ -1993,6 +1998,31 @@ tbody td{padding:9px 12px;vertical-align:middle}
   </div>
 </div>
 
+<!-- 🔧 툴 관리 모달 -->
+<div class="modal-overlay" id="m-tool">
+  <div class="modal">
+    <div class="mh"><div class="mt">🔧 툴별 지급율 관리</div><button class="mc" onclick="closeM('m-tool')">✕</button></div>
+    <div class="mb" style="padding:20px 24px">
+      <div style="font-size:11px;color:var(--text-3);margin-bottom:12px;padding:8px 10px;background:var(--accent-light);border-radius:6px">
+        💡 툴을 등록하면 매출 입력 시 <strong>툴 선택만으로 지급율이 자동 반영</strong>됩니다.<br>
+        지급율은 <strong>배율</strong>로 입력하세요 (예: 150% → <strong>1.5</strong>, 100% → <strong>1</strong>)
+      </div>
+      <!-- 툴 추가 -->
+      <div style="display:flex;gap:6px;margin-bottom:14px;align-items:flex-end">
+        <div class="fgroup" style="flex:2"><label class="flabel">툴명</label><input class="fc" id="tool-name" placeholder="예: CP-AJ"></div>
+        <div class="fgroup" style="flex:1"><label class="flabel">지급율(배율)</label><input class="fc" id="tool-rate" type="number" step="0.1" placeholder="1.5"></div>
+        <button class="btn btn-primary btn-sm" onclick="addTool()" style="white-space:nowrap;height:38px">＋ 추가</button>
+      </div>
+      <!-- 툴 목록 -->
+      <div class="tw"><table style="font-size:12px">
+        <thead><tr><th>툴명</th><th style="width:100px">지급율</th><th style="width:80px">관리</th></tr></thead>
+        <tbody id="tool-tbody"><tr><td colspan="3" style="text-align:center;color:var(--text-3);padding:20px">불러오는 중...</td></tr></tbody>
+      </table></div>
+    </div>
+    <div class="mf"><button class="btn btn-secondary" onclick="closeM('m-tool')">닫기</button></div>
+  </div>
+</div>
+
 <!-- 🎯 마감보고 목표 설정 모달 -->
 <div class="modal-overlay" id="m-target">
   <div class="modal">
@@ -2608,6 +2638,9 @@ function applyRole(){
   // 🔐 검증용 탭 (관리자만 표시)
   const verifyTab=document.getElementById('tab-verify');
   if(verifyTab) verifyTab.style.display = isAdmin ? '' : 'none';
+  // 🔧 툴 관리 버튼 (관리자 또는 대리입력 권한자)
+  const btnToolMgr=document.getElementById('btn-tool-mgr');
+  if(btnToolMgr) btnToolMgr.style.display = (isAdmin || canDo('manage_sales_proxy')) ? 'inline-flex' : 'none';
 
   // Phase 1: 대시보드 추가 버튼 권한별 표시
   const btnNoticeDash = document.getElementById('btn-add-notice-dash');
@@ -2705,7 +2738,7 @@ async function syncAll(){
     // 직원 목록은 항상 로드 (담당자 선택 드롭다운 등에 필요)
     // 🚀 속도 최적화: 필수 데이터만 먼저 로드 (대시보드 표시용)
     // 나머지는 백그라운드에서 로드
-    const essential = [loadEmployees(), loadSales(), loadNotices(), loadRefreshes()];
+    const essential = [loadEmployees(), loadSales(), loadNotices(), loadRefreshes(), loadTools()];
     const background = [
       loadEvents, loadInspections, loadSupports, loadResignees,
       loadRegulations, loadQuoteProducts, loadQuotes,
@@ -2953,15 +2986,28 @@ async function loadSales(){
   const biz=document.getElementById('sal-biz').value;
   const payload={};
   if(ym) payload.ym=ym;
-  // 전체 매출 보기 권한 없으면 본인 것만
-  if(!canDo('view_sales_all')) payload.sellerName=CU.name;
-  else if(seller) payload.sellerName=seller;
 
-  const r=await api('getSalesNew',payload);
-  let data=r.data||[];
-  if(biz!=='') data=data.filter(x=>String(x['사업자'])===biz);
-  sales=data;
-  renderSales(data);
+  const isAdmin = CU && CU.name === ADMIN_NAME;
+  const canSeeAll = isAdmin || canDo('view_sales_all') || canDo('manage_sales_proxy');
+  // 전체 매출 보기 권한 없으면 본인 것만
+  if(!canSeeAll){
+    payload.sellerName=CU.name;
+  } else if(seller){
+    payload.sellerName=seller;
+  }
+
+  try{
+    const r=await api('getSalesNew',payload);
+    let data=r.data||[];
+    if(biz!=='') data=data.filter(x=>String(x['사업자'])===biz);
+    sales=data;
+    console.log(`[매출로드] ${data.length}건 (연월:${ym||'전체'}, 판매인필터:${payload.sellerName||'없음'})`);
+    renderSales(data);
+  }catch(e){
+    toast('매출 로드 실패: '+e.message,'e');
+    sales=[];
+    renderSales([]);
+  }
 }
 
 function renderSales(list){
@@ -3061,10 +3107,13 @@ function calcSaleCommission(r, isAdmin){
   const H = Number(r['렌탈료'])||0;
   const M = Number(r['지급율(기본)'])||0;       // 기본 배율 (6)
   const O = Number(r['지급율(재렌탈)']||1)||1;   // 재렌탈 배율
-  const Qraw = Number(r['지급율(툴별)'])||0;     // 툴별 배율 (1.5)
+  // 툴별 지급율: 10 이상이면 %로 잘못 입력된 것 → 배율로 자동 보정
+  let Qraw = Number(r['지급율(툴별)'])||0;
+  if(Qraw >= 10) Qraw = Qraw / 100;
   const Sbiz = Number(r['추가수수료(사업장)']||r['사업장추가수수료'])||0;
   const Tpers = Number(r['추가수수료(개인)']||r['개인고객추가수수료'])||0;
-  const Uraw = Number(r['판매활성화']||0);       // 판매활성화 배율 (3 = 300%)
+  let Uraw = Number(r['판매활성화']||0);       // 판매활성화 배율 (3 = 300%)
+  if(Uraw >= 10) Uraw = Uraw / 100;
   const V = Number(r['셀프'])||0;
 
   // 직원용 차감 배율 (-0.5)
@@ -3163,13 +3212,118 @@ function renderSaleTfoot(list, isVerify, canSeeSeller, useAdminCalc){
 }
 
 // 수수료 자동 계산
+// ════ 툴 관리 (툴별 지급율) ═════════════════════════════════
+let TOOLS_CACHE = [];
+
+async function loadTools(){
+  try{
+    const r = await api('getTools');
+    if(r.ok && Array.isArray(r.data)) TOOLS_CACHE = r.data;
+  }catch(e){ console.warn('툴 로드 실패:', e.message); }
+  return TOOLS_CACHE;
+}
+
+// 매출 모달의 툴 드롭다운 채우기
+function fillToolOptions(selectedTool){
+  const sel = document.getElementById('sf-tool');
+  if(!sel) return;
+  let opts = '<option value="">툴 선택...</option>';
+  TOOLS_CACHE.forEach(t=>{
+    const s = (t.name===selectedTool) ? ' selected' : '';
+    opts += `<option value="${t.name}"${s}>${t.name} (${Math.round(t.rate*100)}%)</option>`;
+  });
+  sel.innerHTML = opts;
+}
+
+// 툴 선택 시 툴별 지급율 자동 반영
+function onToolSelect(){
+  const toolName = document.getElementById('sf-tool').value;
+  const tool = TOOLS_CACHE.find(t=>t.name===toolName);
+  const rate2El = document.getElementById('sf-rate2');
+  if(tool && rate2El){
+    rate2El.value = tool.rate;  // 배율 (1.5 등)
+  } else if(rate2El){
+    rate2El.value = '';
+  }
+  calcFee();
+}
+
+// ─── 툴 관리 모달 ───
+async function openToolMgrModal(){
+  openM('m-tool');
+  await loadTools();
+  renderToolList();
+}
+
+function renderToolList(){
+  const tb = document.getElementById('tool-tbody');
+  if(!TOOLS_CACHE.length){
+    tb.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--text-3);padding:20px">등록된 툴이 없습니다</td></tr>';
+    return;
+  }
+  tb.innerHTML = TOOLS_CACHE.map(t=>`<tr>
+    <td style="font-weight:600">${t.name}</td>
+    <td><input class="fc" type="number" step="0.1" value="${t.rate}" style="font-size:12px;padding:3px 8px;width:80px" onchange="updateToolRate('${t.name}',this.value)"> <span style="font-size:10px;color:var(--text-3)">(${Math.round(t.rate*100)}%)</span></td>
+    <td><button class="btn btn-danger btn-sm" onclick="removeTool('${t.name}')">삭제</button></td>
+  </tr>`).join('');
+}
+
+async function addTool(){
+  const name = document.getElementById('tool-name').value.trim();
+  const rate = Number(document.getElementById('tool-rate').value)||0;
+  if(!name){ toast('툴명을 입력하세요','e'); return; }
+  if(rate<=0){ toast('지급율(배율)을 입력하세요','e'); return; }
+  // 100 이상이면 %로 잘못 입력한 것 → 배율로 자동 변환
+  let finalRate = rate;
+  if(rate >= 10){
+    if(!confirm(`${rate}는 %로 보입니다. 배율 ${rate/100}(${rate}%)로 저장할까요?\n\n(취소하면 입력값 그대로 저장)`)){
+      finalRate = rate;
+    } else {
+      finalRate = rate/100;
+    }
+  }
+  try{
+    await api('saveTool',{name, rate:finalRate, memo:''});
+    toast('툴 추가 완료 ✅','s');
+    document.getElementById('tool-name').value='';
+    document.getElementById('tool-rate').value='';
+    await loadTools();
+    renderToolList();
+  }catch(e){ toast('추가 실패: '+e.message,'e'); }
+}
+
+async function updateToolRate(name, rate){
+  let finalRate = Number(rate)||0;
+  if(finalRate >= 10){
+    finalRate = finalRate/100; // 자동 배율 변환
+  }
+  try{
+    await api('saveTool',{name, rate:finalRate, memo:''});
+    toast(`${name} 지급율 수정 ✅`,'s');
+    await loadTools();
+    renderToolList();
+  }catch(e){ toast('수정 실패: '+e.message,'e'); }
+}
+
+async function removeTool(name){
+  if(!confirm(`"${name}" 툴을 삭제하시겠습니까?`)) return;
+  try{
+    await api('deleteTool',{name});
+    toast('툴 삭제 완료','s');
+    await loadTools();
+    renderToolList();
+  }catch(e){ toast('삭제 실패: '+e.message,'e'); }
+}
+
 function calcFee(){
   const v=(id)=>Number(document.getElementById(id)?.value)||0;
   const rental = v('sf-rental');
   const rate1  = v('sf-rate1');      // 기본 배율 (6)
   const rateRe = v('sf-rate-re')||1; // 재렌탈 배율 (1)
-  const rate2  = v('sf-rate2');      // 툴별 배율 (1.5)
-  const activation = v('sf-activation'); // 판매활성화 배율 (3)
+  let rate2  = v('sf-rate2');      // 툴별 배율 (1.5)
+  if(rate2 >= 10) rate2 = rate2/100;  // % 잘못 입력 자동 보정
+  let activation = v('sf-activation'); // 판매활성화 배율 (3)
+  if(activation >= 10) activation = activation/100;
   const selfCheck=document.getElementById('sf-self-check');
   const selfAmount = (selfCheck && selfCheck.checked) ? -10000 : 0;
 
@@ -3225,13 +3379,17 @@ function openSaleModal(id){
   const canProxy = isAdmin || canDo('manage_sales_proxy');
   const sellerGroup = document.getElementById('sf-seller-group');
   if(sellerGroup) sellerGroup.style.display = canProxy ? '' : 'none';
+
+  // 툴 드롭다운 채우기 (없으면 로드)
+  if(TOOLS_CACHE.length===0){ loadTools().then(()=>fillToolOptions(id?sales.find(x=>x['매출ID']===id)?.['툴']:'')); }
+  else { fillToolOptions(id?sales.find(x=>x['매출ID']===id)?.['툴']:''); }
   if(id){
     const r=sales.find(x=>x['매출ID']===id);if(!r)return;
     setV('sf-id',id);
     setV('sf-source',r['출처']||'지국');
     setV('sf-cno',r['고객번호']||'');
     setV('sf-cname',r['고객명']||'');
-    setV('sf-tool',r['툴']||'');
+    setV('sf-tool',r['툴']||''); fillToolOptions(r['툴']||'');
     setV('sf-model',r['모델명']||'');
     setV('sf-product',r['상품명']||'');
     setV('sf-duty',r['의무']||'');
@@ -3299,8 +3457,16 @@ async function submitSale(){
   };
   if(!p['고객명']||!p['모델명']){toast('고객명과 모델명은 필수입니다.','e');return;}
   const btn=document.getElementById('sale-save-btn');btn.disabled=true;btn.textContent='저장 중...';
-  try{const r=await api(id?'updateSaleNew':'addSaleNew',p);toast(r.message||'저장 완료 ✅','s');closeM('m-sale');await loadSales();loadDashboard();}
-  catch(e){toast(e.message,'e');}
+  try{
+    const r=await api(id?'updateSaleNew':'addSaleNew',p);
+    toast(r.message||'저장 완료 ✅','s');
+    closeM('m-sale');
+    // 신규 저장 시: 조회 연월을 이번 달로 맞춰 방금 입력한 매출이 보이게
+    if(!id){ document.getElementById('sal-ym').value = thisMonth(); }
+    await loadSales();
+    loadDashboard();
+  }
+  catch(e){toast('저장 실패: '+e.message,'e');}
   finally{btn.disabled=false;btn.textContent='저장';}
 }
 
